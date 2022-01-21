@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.shape.Rectangle?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kedamosclientside.controllers.MyEventsViewController">
+   <children>
+   <fx:include fx:id="menu" source="Menu.fxml" />
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#eaeaea00" height="190.0" layoutX="13.0" layoutY="66.0" stroke="BLACK" strokeType="INSIDE" width="1166.0" />
+      <TableView fx:id="tvTable" layoutX="14.0" layoutY="278.0" prefHeight="377.0" prefWidth="1193.0">
+        <columns>
+          <TableColumn fx:id="tcTable" prefWidth="134.39999389648438" text="TITLE" />
+          <TableColumn fx:id="tcDescription" prefWidth="291.20001220703125" text="DESCRIPTION" />
+            <TableColumn fx:id="tcPrice" minWidth="4.00006103515625" prefWidth="68.0" text="PRICE" />
+            <TableColumn fx:id="tcCategory" minWidth="0.0" prefWidth="121.5999755859375" text="CATEGORY" />
+            <TableColumn fx:id="tcDate" prefWidth="105.60003662109375" text="DATE" />
+            <TableColumn fx:id="tcMinParticipants" prefWidth="65.5999755859375" text="MIN. P" />
+            <TableColumn fx:id="tcMaxParticipants" prefWidth="65.60003662109375" text="MAX. P" />
+            <TableColumn fx:id="tcActualParticipants" prefWidth="73.5999755859375" text="ACTUAL P" />
+            <TableColumn fx:id="tcPlace" prefWidth="124.7998046875" text="PLACE" />
+            <TableColumn fx:id="tcPersonal" prefWidth="140.0001220703125" text="PERSONAL" />
+        </columns>
+      </TableView>
+      <ComboBox fx:id="cmbCategory" layoutX="399.0" layoutY="155.0" onAction="#handleComboCategory" prefHeight="25.0" prefWidth="165.0" />
+      <TextField fx:id="tfTitle" layoutX="94.0" layoutY="90.0" prefHeight="25.0" prefWidth="226.0" promptText="Event for..." />
+      <DatePicker fx:id="dpDate" editable="false" layoutX="399.0" layoutY="91.0" prefHeight="25.0" prefWidth="165.0" />
+      <Button fx:id="btnCreate" layoutX="1058.0" layoutY="91.0" mnemonicParsing="false" onAction="#handleCreate" prefHeight="25.0" prefWidth="100.0" text="Create" />
+      <Label layoutX="56.0" layoutY="95.0" text="Title" />
+      <Label layoutX="363.0" layoutY="95.0" text="Date" />
+      <Label layoutX="22.0" layoutY="158.0" text="Description" />
+      <Label layoutX="339.0" layoutY="155.0" text="Category" />
+      <Button fx:id="btnDelete" layoutX="1135.0" layoutY="664.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="25.0" prefWidth="72.0" text="Delete" />
+      <Button fx:id="btnBack" layoutX="1058.0" layoutY="664.0" mnemonicParsing="false" onAction="#handleBack" prefHeight="25.0" prefWidth="65.0" text="Back" />
+      <Button fx:id="btnModify" layoutX="1058.0" layoutY="146.0" mnemonicParsing="false" onAction="#handleModify" prefHeight="25.0" prefWidth="100.0" text="Modify" />
+      <Label layoutX="628.0" layoutY="202.0" prefHeight="17.0" prefWidth="92.0" text="Max. Participants" />
+      <TextField fx:id="tfMaxParticipants" layoutX="729.0" layoutY="198.0" prefHeight="25.0" prefWidth="48.0" promptText="100" />
+      <Label layoutX="628.0" layoutY="147.0" prefHeight="17.0" prefWidth="92.0" text="Min. Participants" />
+      <TextField fx:id="tfMinParticipants" layoutX="729.0" layoutY="146.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
+      <Button fx:id="btnAddPlace" layoutX="831.0" layoutY="91.0" mnemonicParsing="false" onAction="#handleAddPlace" prefHeight="25.0" prefWidth="135.0" text="Add Place..." />
+      <Label layoutX="674.0" layoutY="95.0" prefHeight="17.0" prefWidth="32.0" text="Price" />
+      <TextField fx:id="tfPrice" layoutX="729.0" layoutY="91.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
+      <Button fx:id="btnAddPersonal" layoutX="831.0" layoutY="146.0" mnemonicParsing="false" onAction="#handleAddPersonal" prefHeight="25.0" prefWidth="135.0" text="Add Personal..." />
+      <TextArea fx:id="taDescription" layoutX="93.0" layoutY="140.0" prefHeight="82.0" prefWidth="226.0" promptText="In this Event..." />
+      <CheckBox fx:id="cbAccepted" disable="true" layoutX="1194.0" layoutY="58.0" mnemonicParsing="false" text="Accepted" />
+      <Button fx:id="btnPrint" layoutX="956.0" layoutY="664.0" mnemonicParsing="false" onAction="#handlePrint" prefHeight="25.0" prefWidth="81.0" text="Print" />
+   </children>
+</Pane>
