@@ -18,8 +18,11 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Client;
+import kedamosclientside.entities.EventManager;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
+import kedamosclientside.logic.EventManagerFactory;
+import kedamosclientside.logic.EventManagerInterface;
 import kedamosclientside.security.Crypt;
 
 /**
@@ -143,16 +146,15 @@ public class VSignUpController {
     private void handleSignUp(ActionEvent event) {
         logger.info("Se ha pulsado el boton SignUp");
         logger.info("Se ha iniciado el metodo para hacer signUp");
-
-        ClientInterface ci = ClientFactory.getClientImplementation();
+        
         Client client = new Client();
-
+        
         client.setUsername(txtUsername.getText());
         client.setEmail(txtEmail.getText());
         client.setFullName(txtFullName.getText());
-        client.setPassword(txtPassword.getText());
+        client.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
 
-        ci.create(client);
+        ClientFactory.getClientImplementation().createClient(client);
         
         // Alerta para mostrar que ha ido bien
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

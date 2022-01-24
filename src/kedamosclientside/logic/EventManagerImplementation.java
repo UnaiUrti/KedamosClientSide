@@ -15,7 +15,7 @@ import kedamosclientside.restful.EventManagerREST;
  *
  * @author Steven Arce
  */
-public class EventManagerImplementation implements EventManagerInterface{
+public class EventManagerImplementation implements EventManagerInterface {
 
     private EventManagerREST webClient;
 
@@ -23,42 +23,66 @@ public class EventManagerImplementation implements EventManagerInterface{
         webClient = new EventManagerREST();
     }
 
-    
     @Override
-    public EventManager getEventManagerByUsername(EventManager eventManager, String username) {
-        EventManager eventManagerBean;
-        eventManagerBean = webClient.getEventManagerByUsername(new GenericType<EventManager>(){}, username);
-        return eventManagerBean;
-        
-    }
-
-    @Override
-    public void edit(EventManager eventManager, String id) {
-       webClient.edit(eventManager, id);
-    }
-
-    @Override
-    public EventManager find(EventManager eventManager, String id) {
-        EventManager eventManagerBean;
-        eventManagerBean = webClient.find(new GenericType<EventManager>(){}, id);
-        return eventManagerBean;
-    }
-
-    @Override
-    public void create(EventManager eventManager) {
+    public void createEventManager(EventManager eventManager) {
         webClient.create(eventManager);
+    }
+
+    @Override
+    public void editEventManager(EventManager eventManager) {
+        webClient.edit(eventManager, eventManager.getUser_id());
+    }
+
+    @Override
+    public void removeEventManager(EventManager eventManager) {
+        webClient.remove(eventManager.getUser_id());
+    }
+
+    @Override
+    public EventManager findEventManager(EventManager eventManager) {
+        EventManager eventManagerBean;
+        eventManagerBean = webClient.find(new GenericType<EventManager>() {
+        }, eventManager.getUser_id());
+        return eventManagerBean;
     }
 
     @Override
     public Collection<EventManager> findAll() {
         Set<EventManager> eventManagers;
-        eventManagers = webClient.findAll(new GenericType<Set<EventManager>>(){});
+        eventManagers = webClient.findAll(new GenericType<Set<EventManager>>() {
+        });
         return eventManagers;
     }
 
     @Override
-    public void remove(String id) {
-        webClient.remove(id);
+    public EventManager getEventManagerByUsername(EventManager eventManager) {
+        EventManager eventManagerBean;
+        eventManagerBean = webClient.getEventManagerByUsername(new GenericType<EventManager>() {
+        }, eventManager.getUsername());
+        return eventManagerBean;
     }
-    
+
+    @Override
+    public EventManager isUsernameExisting(EventManager eventManager) {
+        EventManager eventManagerBean;
+        eventManagerBean = webClient.isUsernameExisting(new GenericType<EventManager>() {
+        }, eventManager.getUsername());
+        return eventManagerBean;
+    }
+
+    @Override
+    public EventManager isEmailExisting(EventManager eventManager) {
+        EventManager eventManagerBean;
+        eventManagerBean = webClient.isEmailExisting(new GenericType<EventManager>() {
+        }, eventManager.getEmail());
+        return eventManagerBean;
+    }
+
+    @Override
+    public EventManager eventManagerLoginValidation(EventManager eventManager) {
+        EventManager eventManagerBean;
+        eventManagerBean = webClient.eventManagerLoginValidation(new GenericType<EventManager>(){}, eventManager.getUsername(), eventManager.getPassword());
+        return eventManagerBean;
+    }
+
 }

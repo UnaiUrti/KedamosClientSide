@@ -7,13 +7,11 @@ package kedamosclientside.entities;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Embeddable;
 
 /**
  * Clase que contiene las IDs de la entidad Revise
  * @author UnaiUrtiaga
  */
-@Embeddable
 public class ReviseId implements Serializable{
     
     /**

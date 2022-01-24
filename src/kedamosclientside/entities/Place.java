@@ -9,9 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
-import static javax.persistence.CascadeType.ALL;
-import static javax.persistence.FetchType.EAGER;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -33,14 +30,12 @@ public class Place implements Serializable {
      * Atributo de la direccion del lugar
      * Es unico porque no puede mas de un sitio con la misma direccion
      */
-    @NotNull
     private String address;
     
     /**
      * Atributo del nombre del lugar
      * Es un campo que no puede dejarse nulo
      */
-    @NotNull
     private String name;
     
     /**

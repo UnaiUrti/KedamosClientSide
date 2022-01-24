@@ -13,17 +13,23 @@ import kedamosclientside.entities.EventManager;
  * @author Steven Arce
  */
 public interface EventManagerInterface {
-    
-    public EventManager getEventManagerByUsername(EventManager eventManager, String username);
 
-    public void edit(EventManager eventManager, String id);
+    public void createEventManager(EventManager eventManager);
 
-    public EventManager find(EventManager eventManager, String id);
+    public void editEventManager(EventManager eventManager);
 
-    public void create(EventManager eventManager);
+    public void removeEventManager(EventManager eventManager);
+
+    public EventManager findEventManager(EventManager eventManager);
 
     public Collection<EventManager> findAll();
-
-    public void remove(String id);
+    
+    public EventManager getEventManagerByUsername(EventManager eventManager);
+    
+    public EventManager isUsernameExisting(EventManager eventManager);
+    
+    public EventManager isEmailExisting(EventManager eventManager);
+    
+    public EventManager eventManagerLoginValidation(EventManager eventManager);
 
 }

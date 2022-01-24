@@ -8,7 +8,6 @@ package kedamosclientside.entities;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -57,7 +56,6 @@ public class Event implements Serializable {
     /**
      * Titulo que asigna el cliente al Evento
      */
-    @NotNull
     private String title;
 
     /**

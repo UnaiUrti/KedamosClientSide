@@ -21,7 +21,7 @@ import javax.ws.rs.core.GenericType;
  *        client.close();
  * </pre>
  *
- * @author 2dam
+ * @author Freak
  */
 public class EventManagerREST {
 
@@ -34,9 +34,9 @@ public class EventManagerREST {
         webTarget = client.target(BASE_URI).path("kedamosserverside.entities.eventmanager");
     }
 
-    public <T> T getEventManagerByUsername(GenericType<T> responseType, String username) throws ClientErrorException {
+    public <T> T eventManagerLoginValidation(GenericType<T> responseType, String username, String passwd) throws ClientErrorException {
         WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("getEventManagerByUsername/{0}", new Object[]{username}));
+        resource = resource.path(java.text.MessageFormat.format("eventManagerLoginValidation/{0}/{1}", new Object[]{username, passwd}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
@@ -46,11 +46,17 @@ public class EventManagerREST {
         return resource.request(javax.ws.rs.core.MediaType.TEXT_PLAIN).get(String.class);
     }
 
-    public void edit(Object requestEntity, String id) throws ClientErrorException {
+    public <T> T isEmailExisting(GenericType<T> responseType, String email) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path(java.text.MessageFormat.format("isEmailExisting/{0}", new Object[]{email}));
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    }
+
+    public void edit(Object requestEntity, Long id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request(javax.ws.rs.core.MediaType.APPLICATION_XML).put(javax.ws.rs.client.Entity.entity(requestEntity, javax.ws.rs.core.MediaType.APPLICATION_XML));
     }
 
-    public <T> T find(GenericType<T> responseType, String id) throws ClientErrorException {
+    public <T> T find(GenericType<T> responseType, Long id) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
@@ -59,6 +65,12 @@ public class EventManagerREST {
     public <T> T findRange(GenericType<T> responseType, String from, String to) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}/{1}", new Object[]{from, to}));
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    }
+
+    public <T> T isUsernameExisting(GenericType<T> responseType, String username) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path(java.text.MessageFormat.format("isUsernameExisting/{0}", new Object[]{username}));
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
@@ -71,7 +83,13 @@ public class EventManagerREST {
         return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
-    public void remove(String id) throws ClientErrorException {
+    public <T> T getEventManagerByUsername(GenericType<T> responseType, String username) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path(java.text.MessageFormat.format("getEventManagerByUsername/{0}", new Object[]{username}));
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+    }
+
+    public void remove(Long id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
     }
 

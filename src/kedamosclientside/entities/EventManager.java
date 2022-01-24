@@ -2,7 +2,6 @@ package kedamosclientside.entities;
 
 import java.io.Serializable;
 import java.util.Set;
-import static javax.persistence.CascadeType.ALL;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 

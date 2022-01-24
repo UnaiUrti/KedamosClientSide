@@ -19,8 +19,11 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import kedamosclientside.entities.Client;
 import kedamosclientside.entities.User;
+import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.UserFactory;
+//import kedamosclientside.logic.UserFactory;
 import kedamosclientside.logic.UserInterface;
 
 /**
@@ -81,12 +84,10 @@ public class VResetPasswordController {
     @FXML
     private void handleResetPasswordAction(ActionEvent event) {
         
-        UserInterface ui = UserFactory.getUserImplementation();
+        Client client = new Client();
+        client.setEmail(txtEmail.getText());
 
-        User user = new User();
-        user.setEmail(txtEmail.getText().trim());
-
-        ui.resetPassword(user);
+        ClientFactory.getClientImplementation().resetPassword(client);
        
     }
 

@@ -9,6 +9,7 @@ package kedamosclientside.logic;
  *
  * @author 2dam
  */
+
 public class EventManagerFactory {
 
     public static EventManagerInterface getEventManagerImplementation() {

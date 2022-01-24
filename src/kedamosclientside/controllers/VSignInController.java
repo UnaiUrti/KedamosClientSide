@@ -21,7 +21,7 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.User;
-import kedamosclientside.logic.UserFactory;
+//import kedamosclientside.logic.UserFactory;
 import kedamosclientside.logic.UserInterface;
 
 /**
@@ -138,7 +138,7 @@ public class VSignInController {
         user.setUsername(txtUsername.getText());
         user.setPassword(txtPassword.getText());
 
-        UserInterface ui = UserFactory.getUserImplementation();
+        //UserInterface ui = UserFactory.getUserImplementation();
         /*
             if (dataFac.getDataTraffic().signIn(user) != null) {
 

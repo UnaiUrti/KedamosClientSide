@@ -14,20 +14,29 @@ import kedamosclientside.entities.Client;
  */
 public interface ClientInterface {
 
-    public Client getClientByUsername(Client client, String username);
+    public void createClient(Client client);
 
-    public Client validatePassword(Client client, String username, String passwd);
+    public void editClient(Client client);
 
-    public void edit(Client client, String id);
+    public void removeClient(Client client);
 
-    public Client find(Client client, String id);
+    public Client findClient(Client client);
 
-    public void create(Client client);
+    public Collection<Client> findAllClient();
+ 
+    public Client resetPassword(Client client);
+ 
+    public void changePassword(Client client);
+ 
+    public Client validatePassword(Client client);
+ 
+    public Client getClientByUsername(Client client);
 
-    public Collection<Client> findAll();
-
-    public void remove(String id);
-
-    public void changePassword(Client client, String id);
+    public Client isUsernameExisting(Client client);
+ 
+    public Client isEmailExisting(Client client);
+ 
+    public Client clientLoginValidation(Client client);
+    
 
 }

@@ -24,7 +24,7 @@ public class UserImplementation implements UserInterface {
     public UserImplementation() {
         webClient = new UserREST();
     }
-
+    
     @Override
     public void createUser(User user) {
         webClient.create(user);
@@ -43,62 +43,16 @@ public class UserImplementation implements UserInterface {
     @Override
     public User findUser(User user) {
         User userBean;
-        userBean = webClient.find(new GenericType<User>() {
-        }, user.getUser_id().toString());
+        userBean = webClient.find(new GenericType<User>(){}, user.getUser_id());
         return userBean;
     }
 
     @Override
     public Collection<User> findAllUser() {
-
-        Set<User> users = null;
-        users = webClient.findAll(new GenericType<Set<User>>() {
-        });
+        
+        Set<User> users;
+        users = webClient.findAll(new GenericType<Set<User>>(){});
         return users;
 
     }
-
-    @Override
-    public User resetPassword(User user) {
-
-        User userBean;
-        userBean = webClient.resetPassword(new GenericType<User>() {},
-                user.getEmail());
-        /*
-        if (userBean instanceof Client) {
-            userBean = (Client) userBean;
-        }
-        if (userBean instanceof EventManager) {
-            userBean = (EventManager) userBean;
-        }
-        */
-        return userBean;
-
-    }
-
-    @Override
-    public User isEmailExisting(User user) {
-
-        User userBean;
-        userBean = webClient.isEmailExisting(new GenericType<User>() {
-        }, user.getEmail());
-        return userBean;
-    }
-
-    @Override
-    public User isUsernameExisting(User user) {
-        User userBean;
-        userBean = webClient.isUsernameExisting(new GenericType<User>() {
-        }, user.getUsername());
-        return userBean;
-    }
-
-    @Override
-    public User userLoginValidation(User user) {
-        User userBean;
-        userBean = webClient.userLoginValidation(new GenericType<User>(){},
-                user.getUsername(), user.getPassword());
-        return userBean;
-    }
-
 }

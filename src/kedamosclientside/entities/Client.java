@@ -2,11 +2,13 @@ package kedamosclientside.entities;
 
 import java.io.Serializable;
 import java.util.Set;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad que representa al usuario que es un cliente.
  * @author Steven Arce
  */
+@XmlRootElement
 public class Client extends User implements Serializable {
 
     private static final long serialVersionUID = 1L;

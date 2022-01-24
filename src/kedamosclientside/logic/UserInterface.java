@@ -6,7 +6,6 @@
 package kedamosclientside.logic;
 
 import java.util.Collection;
-import java.util.List;
 import kedamosclientside.entities.User;
 
 /**
@@ -46,24 +45,4 @@ public interface UserInterface {
      * @param user
      * @return 
      */
-    public <T> T resetPassword(User user);
-    /**
-     * 
-     * @param user
-     * @return 
-     */
-    public User isEmailExisting(User user);
-    /**
-     * 
-     * @param user
-     * @return 
-     */
-    public User isUsernameExisting(User user);
-    /**
-     * 
-     * @param user
-     * @return 
-     */
-    public User userLoginValidation(User user);
-    
 }

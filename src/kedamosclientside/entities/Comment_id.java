@@ -7,13 +7,11 @@ package kedamosclientside.entities;
 
 import java.io.Serializable;
 import java.util.Objects;
-import javax.persistence.Embeddable;
 
 /**
  *
  * @author Irkus de la Fuente
  */
-@Embeddable
 public class Comment_id implements Serializable {
 //Atributos
 

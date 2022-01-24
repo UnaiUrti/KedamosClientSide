@@ -7,7 +7,6 @@ package kedamosclientside.entities;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -27,7 +26,6 @@ public class Revise implements Serializable {
     /**
      * Atributo booleano que indica si el evento ha sido aceptado o no
      */
-    @NotNull
     private Boolean isAccepted;
     
     /**
@@ -38,7 +36,6 @@ public class Revise implements Serializable {
     /**
      * Atributo tipo fecha que guarda cuando ha sido revisado el evento
      */
-    @NotNull
     private Date revisionDate;
     
     /**

@@ -7,7 +7,6 @@ package kedamosclientside.logic;
 
 import java.util.Collection;
 import java.util.Set;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.GenericType;
 import kedamosclientside.entities.Client;
 import kedamosclientside.restful.ClientREST;
@@ -25,55 +24,87 @@ public class ClientImplementation implements ClientInterface {
     }
 
     @Override
-    public Client getClientByUsername(Client client, String username) {
-        Client clientBean;
-        clientBean = webClient.getClientByUsername(new GenericType<Client>() {
-        }, username);
-        return clientBean;
-    }
-
-    @Override
-    public Client validatePassword(Client client, String username, String passwd) {
-        Client clientBean;
-        clientBean = webClient.validatePassword(new GenericType<Client>() {
-        }, username, passwd);
-        return clientBean;
-    }
-
-    @Override
-    public void edit(Client client, String id) {
-        webClient.edit(new GenericType<Client>() {
-        }, id);
-    }
-
-    @Override
-    public Client find(Client client, String id) {
-        Client clientBean;
-        clientBean = webClient.find(new GenericType<Client>() {
-        }, id);
-        return clientBean;
-    }
-
-    @Override
-    public void create(Client client) {
+    public void createClient(Client client) {
         webClient.create(client);
     }
 
     @Override
-    public Collection<Client> findAll() {
-        Set<Client> clients = null;
-        clients = webClient.findAll(new GenericType<Set<Client>>(){});
+    public void editClient(Client client) {
+        webClient.edit(client, client.getUser_id());
+    }
+
+    @Override
+    public void removeClient(Client client) {
+        webClient.remove(client.getUser_id());
+    }
+
+    @Override
+    public Client findClient(Client client) {
+        Client clientBean = null;
+        webClient.find(new GenericType<Client>() {
+        }, client.getUser_id());
+        return clientBean;
+    }
+
+    @Override
+    public Collection<Client> findAllClient() {
+        Set<Client> clients;
+        clients = webClient.findAll(new GenericType<Set<Client>>() {
+        });
         return clients;
     }
 
     @Override
-    public void remove(String id) {
-        webClient.remove(id);
+    public Client resetPassword(Client client) {
+        Client clientBean;
+        clientBean = webClient.resetPassword(new GenericType<Client>() {
+        }, client.getEmail());
+        return clientBean;
     }
 
     @Override
-    public void changePassword(Client client, String id) {
-        webClient.changePassword(new GenericType<Client>(){}, id);
+    public void changePassword(Client client) {
+        webClient.changePassword(client, client.getUser_id());
+    }
+
+    @Override
+    public Client validatePassword(Client client) {
+        Client clientBean;
+        clientBean = webClient.validatePassword(new GenericType<Client>() {
+        }, client.getUsername(), client.getPassword());
+        return clientBean;
+    }
+
+    @Override
+    public Client getClientByUsername(Client client) {
+        Client clientBean;
+        clientBean = webClient.getClientByUsername(new GenericType<Client>() {
+        }, client.getUsername());
+        return clientBean;
+    }
+
+    @Override
+    public Client isUsernameExisting(Client client) {
+        Client clientBean;
+        clientBean = webClient.isUsernameExisting(new GenericType<Client>() {
+        }, client.getUsername());
+        return clientBean;
+    }
+
+    @Override
+    public Client isEmailExisting(Client client) {
+        Client clientBean;
+        clientBean = webClient.isEmailExisting(new GenericType<Client>() {
+        }, client.getEmail());
+        return clientBean;
+    }
+
+    @Override
+    public Client clientLoginValidation(Client client) {
+        Client clientBean;
+        clientBean = webClient.clientLoginValidation(new GenericType<Client>() {
+        }, client.getUsername(), client.getPassword());
+        return clientBean;
     }
 
 }
