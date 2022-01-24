@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package kedamosClientSide.entities;
+package kedamosclientside.entities;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.beans.property.SimpleLongProperty;
@@ -14,6 +15,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import kedamosclientside.entities.Category;
+import kedamosclientside.entities.Client;
+import kedamosclientside.entities.Comment;
+import kedamosclientside.entities.PersonalResource;
+import kedamosclientside.entities.Revise;
+import kedamosclientside.entities.Place;
 
 /**
  * Entidad que contiene todos los datos relacionados con los Eventos
@@ -91,7 +98,26 @@ public class Event implements Serializable {
      * Atributo que define al organizador de cada evento
      */
     private Set<Client> organizer;
-    //Getters & Setters
+    //Constructor
+
+    public Event() {
+        this.event_id=new SimpleLongProperty();
+        this.date=new Date();
+        this.maxParticipants=new SimpleLongProperty();
+        this.minParticipants=new SimpleLongProperty();
+        this.actualParticipants=new SimpleLongProperty();
+        this.description=new SimpleStringProperty();
+        this.price=new SimpleFloatProperty();
+        this.title= new SimpleStringProperty();
+        this.category=new HashSet<>();
+        this.comment=new HashSet<>();
+        this.personalResource=new HashSet<>();
+        this.eventRevisions=new HashSet<>();
+        this.place=new HashSet<>();
+        this.organizer=new HashSet<>();
+    }
+    
+    //Getters & Setters   
 
     public SimpleLongProperty getEvent_id() {
         return event_id;
@@ -157,12 +183,12 @@ public class Event implements Serializable {
         this.category = category;
     }
 
-    public SimpleStringProperty getTitle() {
-        return title;
+    public String getTitle() {
+        return title.get();
     }
 
-    public void setTitle(SimpleStringProperty title) {
-        this.title = title;
+    public void setTitle(String title) {
+        this.title.set(title);
     }
 
     @XmlTransient

@@ -12,10 +12,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
 import kedamosclientside.controllers.MyEventsViewController;
+import kedamosclientside.logic.EventFactory;
 
 /**
  *
- * @author 2dam
+ * @author Adrian Franco
  */
 public class Main extends Application {
 
@@ -25,12 +26,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        
         FXMLLoader loader;
         loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/MyEventsView.fxml"));
         
-        Parent root =loader.load();
+        Parent root = (Parent) loader.load();
         
         MyEventsViewController controller= ((MyEventsViewController)loader.getController());
+        controller.setEventinterface(EventFactory.getEvent());
         controller.setStage(primaryStage);
         controller.initStage(root);
         

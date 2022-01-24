@@ -6,13 +6,22 @@
 package kedamosclientside.logic;
 
 import java.util.Collection;
-import kedamosClientSide.entities.Event;
+import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.core.GenericType;
+import kedamosclientside.entities.Event;
+import kedamosclientside.exceptions.ClientLogicException;
+import kedamosclientside.restful.EventClientREST;
 
 /**
  *
  * @author Adrian Franco
  */
-public class EventImplementation implements EventInterface{
+public class EventImplementation implements EventInterface {
+
+    public EventImplementation() {
+        eventREST = new EventClientREST();
+    }
+    private EventClientREST eventREST;
 
     @Override
     public void createEvent(Event event) throws Exception {
@@ -40,9 +49,16 @@ public class EventImplementation implements EventInterface{
     }
 
     @Override
-    public Collection<Event> getEvents() throws Exception {
-        
-        Collection <Event> events = null;
+    public Collection<Event> getEvents() throws ClientLogicException {
+
+        Collection<Event> events = null;
+        try {
+            events =eventREST.findAll(new GenericType<Collection<Event>>() {
+
+            });
+        } catch (ClientErrorException e) {
+                throw new ClientLogicException(e.getMessage());
+        }
         return events;
     }
 }

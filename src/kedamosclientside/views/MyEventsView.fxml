@@ -41,13 +41,13 @@
       <Button fx:id="btnDelete" layoutX="1135.0" layoutY="664.0" mnemonicParsing="false" onAction="#handleDelete" prefHeight="25.0" prefWidth="72.0" text="Delete" />
       <Button fx:id="btnBack" layoutX="1058.0" layoutY="664.0" mnemonicParsing="false" onAction="#handleBack" prefHeight="25.0" prefWidth="65.0" text="Back" />
       <Button fx:id="btnModify" layoutX="1058.0" layoutY="146.0" mnemonicParsing="false" onAction="#handleModify" prefHeight="25.0" prefWidth="100.0" text="Modify" />
-      <Label layoutX="628.0" layoutY="202.0" prefHeight="17.0" prefWidth="92.0" text="Max. Participants" />
-      <TextField fx:id="tfMaxParticipants" layoutX="729.0" layoutY="198.0" prefHeight="25.0" prefWidth="48.0" promptText="100" />
-      <Label layoutX="628.0" layoutY="147.0" prefHeight="17.0" prefWidth="92.0" text="Min. Participants" />
-      <TextField fx:id="tfMinParticipants" layoutX="729.0" layoutY="146.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
+      <Label layoutX="628.0" layoutY="202.0" text="Max. Participants" />
+      <TextField fx:id="tfMaxParticipants" layoutX="738.0" layoutY="198.0" prefHeight="25.0" prefWidth="48.0" promptText="100" />
+      <Label layoutX="628.0" layoutY="147.0" text="Min. Participants" />
+      <TextField fx:id="tfMinParticipants" layoutX="738.0" layoutY="146.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
       <Button fx:id="btnAddPlace" layoutX="831.0" layoutY="91.0" mnemonicParsing="false" onAction="#handleAddPlace" prefHeight="25.0" prefWidth="135.0" text="Add Place..." />
-      <Label layoutX="674.0" layoutY="95.0" prefHeight="17.0" prefWidth="32.0" text="Price" />
-      <TextField fx:id="tfPrice" layoutX="729.0" layoutY="91.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
+      <Label layoutX="674.0" layoutY="95.0" text="Price" />
+      <TextField fx:id="tfPrice" layoutX="738.0" layoutY="91.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
       <Button fx:id="btnAddPersonal" layoutX="831.0" layoutY="146.0" mnemonicParsing="false" onAction="#handleAddPersonal" prefHeight="25.0" prefWidth="135.0" text="Add Personal..." />
       <TextArea fx:id="taDescription" layoutX="93.0" layoutY="140.0" prefHeight="82.0" prefWidth="226.0" promptText="In this Event..." />
       <CheckBox fx:id="cbAccepted" disable="true" layoutX="1194.0" layoutY="58.0" mnemonicParsing="false" text="Accepted" />

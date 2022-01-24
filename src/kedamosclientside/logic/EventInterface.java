@@ -6,7 +6,8 @@
 package kedamosclientside.logic;
 
 import java.util.Collection;
-import kedamosClientSide.entities.Event;
+import kedamosclientside.entities.Event;
+import kedamosclientside.exceptions.ClientLogicException;
 
 
 
@@ -26,6 +27,6 @@ public interface EventInterface {
     
     public void deleteEvent (Event event) throws Exception;
     
-    public Collection <Event> getEvents() throws Exception;
+    public Collection <Event> getEvents() throws ClientLogicException;
             
 }

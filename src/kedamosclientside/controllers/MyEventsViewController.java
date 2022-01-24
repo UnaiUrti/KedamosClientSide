@@ -5,12 +5,19 @@
  */
 package kedamosclientside.controllers;
 
-
+import java.util.Collection;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
@@ -18,7 +25,12 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
+import kedamosclientside.entities.Event;
+import kedamosclientside.exceptions.ClientLogicException;
+import kedamosclientside.logic.EventInterface;
 
 /**
  * FXML Controller class
@@ -27,12 +39,19 @@ import javafx.stage.Stage;
  */
 public class MyEventsViewController {
 
+    private final static Logger logger = Logger.getLogger("client.controllers.MyEventsViewController");
     private Stage stage;
+    private EventInterface eventinterface;
+
+    public void setEventinterface(EventInterface eventinterface) {
+        this.eventinterface = eventinterface;
+    }
+    
     
     @FXML
-    private TableView<?> tvTable;
+    private TableView<Event> tvTable;
     @FXML
-    private TableColumn<?, ?> tcTable;
+    private TableColumn<Event, String> tcTable;
     @FXML
     private TableColumn<?, ?> tcDescription;
     @FXML
@@ -104,6 +123,31 @@ public class MyEventsViewController {
         stage.setScene(scene);
         stage.setTitle("Event");
         stage.setResizable(false);
+
+        
+            
+        tcTable.setCellValueFactory(new PropertyValueFactory<>("title"));
+        tcDescription.setCellValueFactory(new PropertyValueFactory<>("Description"));
+        tcPrice.setCellValueFactory(new PropertyValueFactory<>("Price"));          
+        tcCategory.setCellValueFactory(new PropertyValueFactory<>("Category"));
+        tcDate.setCellValueFactory(new PropertyValueFactory<>("Date"));
+        tcMinParticipants.setCellValueFactory(new PropertyValueFactory<>("MinParticipants"));
+        tcMaxParticipants.setCellValueFactory(new PropertyValueFactory<>("MaxParticipants"));
+        tcActualParticipants.setCellValueFactory(new PropertyValueFactory<>("ActualParticipants"));
+        tcPlace.setCellValueFactory(new PropertyValueFactory<>("Place"));
+        tcPersonal.setCellValueFactory(new PropertyValueFactory<>("MinParticipants"));
+        
+        try {
+            Collection <Event> events = eventinterface.getEvents();
+            ObservableList<Event> eventsForTable = FXCollections.observableArrayList(events);
+            tvTable.setItems(eventsForTable);
+        } catch (ClientLogicException ex) {
+            Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        
+  
         
         stage.show();
     }
@@ -140,4 +184,24 @@ public class MyEventsViewController {
     private void handlePrint(ActionEvent event) {
     }
 
+    private void handleCloseRequest(WindowEvent event) {
+
+        logger.info("Se ha pulsado la opción de cerrar la ventana");
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText(null);
+        alert.setTitle("EXIT");
+
+        alert.setContentText("Quieres cerrar la aplicacion?");
+
+        Optional<ButtonType> resp = alert.showAndWait();
+
+        if (resp.get() == ButtonType.OK) {
+            logger.info("Se ha pulsado Confirm, el programa se va a cerrar");
+            stage.close();
+        } else {
+            logger.info("Se ha cancelado la request, continuua en la misma ventana");
+            event.consume();
+        }
+    }
 }
