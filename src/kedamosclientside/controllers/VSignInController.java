@@ -20,7 +20,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import kedamosclientside.entities.UserBean;
+import kedamosclientside.entities.User;
+import kedamosclientside.logic.UserFactory;
+import kedamosclientside.logic.UserInterface;
 
 /**
  * Clase controladora para la ventana de SignIn
@@ -30,7 +32,7 @@ import kedamosclientside.entities.UserBean;
 public class VSignInController {
 
     private Tooltip tooltip;
-    private final static Logger logger = Logger.getLogger("client.controllers.VSignInController");
+    private final static Logger logger = Logger.getLogger("kedamosclientside.controllers.VSignInController");
 
     private Stage stage;
     @FXML
@@ -108,10 +110,9 @@ public class VSignInController {
 
         //Accion de cerrar desde la barra de titulo
         stage.setOnCloseRequest(this::handleCloseRequest);
-        
+
         //
         //this.hlForgotPasswd.setOnAction(this::handleForgotPasswdAction);
-
         stage.show();
 
     }
@@ -128,40 +129,38 @@ public class VSignInController {
 
         logger.info("Se ha pulsado el boton de inicio de sesion y se intentara"
                 + "iniciar sesion");
-        if (informedFields()) {
 
-        }
+        //try {
+        //Validamos que los campos username y password estan informados con informedFields()
+        //Validamos que la longitud de los dos campos no superen los 50 caracteres con maxCharacters()
+        //if (informedFields() && maxCharacteres()) {
+        User user = new User();
+        user.setUsername(txtUsername.getText());
+        user.setPassword(txtPassword.getText());
+
+        UserInterface ui = UserFactory.getUserImplementation();
         /*
-        try {
-            //Validamos que los campos username y password estan informados con informedFields()
-            //Validamos que la longitud de los dos campos no superen los 50 caracteres con maxCharacters()
-            if (informedFields() && maxCharacteres()) {
-                UserBean user = new UserBean();
-                user.setUsername(txtUsername.getText());
-                user.setPassword(txtPassword.getText());
+            if (dataFac.getDataTraffic().signIn(user) != null) {
 
-                LogicableFactory dataFac = new LogicableFactory();
+                //La ventana actual se cierra
+                stage.close();
 
-                if (dataFac.getDataTraffic().signIn(user) != null) {
-                    
-                    //La ventana actual se cierra
-                    stage.close();
-                    
-                    //El usuario inicia sesion y va a la ventana LogOut
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/controllers/VLogOut.fxml"));
+                //El usuario inicia sesion y va a la ventana LogOut
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/controllers/VLogOut.fxml"));
 
-                    Parent root = loader.load();
-                    Logger.getLogger(VSignInController.class.getName()).info("LOGOUT VENTANA");
-                    
-                    VLogOutController controller = ((VLogOutController) loader.getController());
-                    controller.setStage(stage);
-                    controller.initStage(root);
-                }
+                Parent root = loader.load();
+                Logger.getLogger(VSignInController.class.getName()).info("LOGOUT VENTANA");
+
+                VLogOutController controller = ((VLogOutController) loader.getController());
+                controller.setStage(stage);
+                controller.initStage(root);
             }
+        //}
 
         //Valida que el valor del campo username no exista en la base de datos
         //Valida que el valor del campo password coincida con el password del user
         //Valida el maximo de usuarios conectados
+        /*
         } catch (IncorrectUserException | IncorrectPasswordException | 
                 UserDontExistException | PasswordDontMatchException | 
                 TooManyUsersException | ConnectException | IOException ex) {
@@ -174,7 +173,6 @@ public class VSignInController {
 
         }
          */
-
     }
 
     /**
@@ -252,23 +250,25 @@ public class VSignInController {
      * @throws IOException Excepcion requerida para el load()
      */
     @FXML
-    private void handleSignUpAction(ActionEvent event) throws IOException {
-        /*
-     
-    }   logger.info("Se ha pulsado el hyperlink para ir a la ventana de registro");
-        
-        //La ventana actual se cierra
-        stage.close();
+    private void handleSignUpAction(ActionEvent event) {
 
-        //El usuario es dirigido a la ventana SignUp
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/client/controllers/VSignUp.fxml"));
-
-        Parent root = loader.load();
-
-        VSignUpController controller = ((VSignUpController) loader.getController());
-        controller.setStage(stage);
-        controller.initStage(root);
-         */
+        try {
+            logger.info("Se ha pulsado el hyperlink para ir a la ventana de registro");
+            
+            //La ventana actual se cierra
+            stage.close();
+            
+            //El usuario es dirigido a la ventana SignUp
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VSignUp.fxml"));
+            
+            Parent root = loader.load();
+            
+            VSignUpController controller = ((VSignUpController) loader.getController());
+            controller.setStage(stage);
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(VSignInController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
@@ -281,10 +281,10 @@ public class VSignInController {
             Logger.getLogger(VSignInController.class.getName()).info("VENTANA RESET PASSWORD");
             //El usuario inicia sesion y va a la ventana LogOut
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VResetPassword.fxml"));
-            
+
             Parent root = loader.load();
             //Logger.getLogger(VSignInController.class.getName()).info("LOGOUT VENTANA");
-            
+
             VResetPasswordController controller = ((VResetPasswordController) loader.getController());
             controller.setStage(stage);
             controller.initStage(root);

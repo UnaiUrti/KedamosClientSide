@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Steven Arce
  */
 @XmlRootElement
-public class UserBean implements Serializable {
+public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -28,6 +28,9 @@ public class UserBean implements Serializable {
     private String password;
     private UserPrivilege privilege;
 
+    public User() {
+    }
+    
     public Long getUser_id() {
         return user_id;
     }
@@ -110,7 +113,7 @@ public class UserBean implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final UserBean other = (UserBean) obj;
+        final User other = (User) obj;
         if (!Objects.equals(this.fullName, other.fullName)) {
             return false;
         }

@@ -5,8 +5,9 @@
  */
 package kedamosclientside.logic;
 
+import java.util.Collection;
 import java.util.List;
-import kedamosclientside.entities.UserBean;
+import kedamosclientside.entities.User;
 
 /**
  *
@@ -17,28 +18,52 @@ public interface UserInterface {
      * 
      * @param user 
      */
-    public void createUser(UserBean user);
+    public void createUser(User user);
     /**
      * 
      * @param user 
      */
-    public void editUser(UserBean user);
+    public void editUser(User user);
     /**
      * 
      * @param user 
      */
-    public void removeUser(UserBean user);
+    public void removeUser(User user);
     /**
      * 
      * @param user
      * @return 
      */
-    public UserBean findUser(UserBean user);
+    public User findUser(User user);
     /**
      * 
      * @return 
      */
-    public List<UserBean> findAllUser();
- 
+    public Collection<User> findAllUser();
+    /**
+     * 
+     * @param <T>
+     * @param user
+     * @return 
+     */
+    public <T> T resetPassword(User user);
+    /**
+     * 
+     * @param user
+     * @return 
+     */
+    public User isEmailExisting(User user);
+    /**
+     * 
+     * @param user
+     * @return 
+     */
+    public User isUsernameExisting(User user);
+    /**
+     * 
+     * @param user
+     * @return 
+     */
+    public User userLoginValidation(User user);
     
 }
