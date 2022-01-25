@@ -12,8 +12,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import javax.ws.rs.NotFoundException;
 import kedamosclientside.entities.Client;
 import kedamosclientside.logic.ClientFactory;
+import kedamosclientside.logic.ClientInterface;
 
 /**
  * Clase controladora para la ventana de SignIn
@@ -33,6 +35,8 @@ public class VResetPasswordController {
     @FXML
     private Button btnExit;
 
+    private ClientInterface ci = ClientFactory.getClientImplementation();
+
     public Stage getStage() {
         return stage;
     }
@@ -50,7 +54,6 @@ public class VResetPasswordController {
     public void initStage(Parent root) {
 
         //logger.info("Iniciado el initStage de la ventana ResetPassword");
-
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
@@ -72,12 +75,15 @@ public class VResetPasswordController {
 
     @FXML
     private void handleResetPasswordAction(ActionEvent event) {
-        
-        Client client = new Client();
-        client.setEmail(txtEmail.getText());
-
-        ClientFactory.getClientImplementation().resetPassword(client);
-       
+        try {
+            Client client = new Client();
+            client.setEmail(txtEmail.getText());
+            ci.resetPassword(client);
+        } catch (NotFoundException ex) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setHeaderText(null);
+            alert.setTitle(ex.getMessage());
+        }
     }
 
     @FXML
@@ -85,7 +91,6 @@ public class VResetPasswordController {
 
         //logger.info("Se ha pulsado la X de la barra de titulo y se enviara "
         //        + "un aviso de confirmacion al usuario");
-
         //Se envia un mensaje al usuario confirmando si de verdad quiere salir
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText(null);

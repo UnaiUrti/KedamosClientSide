@@ -18,11 +18,8 @@ import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Client;
-import kedamosclientside.entities.EventManager;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
-import kedamosclientside.logic.EventManagerFactory;
-import kedamosclientside.logic.EventManagerInterface;
 import kedamosclientside.security.Crypt;
 
 /**
@@ -43,6 +40,8 @@ public class VSignUpController {
     @FXML
     private Button btnSignUp, btnBack;
 
+    private ClientInterface ci = ClientFactory.getClientImplementation();
+    
     public Stage getStage() {
         return stage;
     }
@@ -154,7 +153,7 @@ public class VSignUpController {
         client.setFullName(txtFullName.getText());
         client.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
 
-        ClientFactory.getClientImplementation().createClient(client);
+        ci.createClient(client);
         
         // Alerta para mostrar que ha ido bien
         Alert alert = new Alert(Alert.AlertType.INFORMATION);

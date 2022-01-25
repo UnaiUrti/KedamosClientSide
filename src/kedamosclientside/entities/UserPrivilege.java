@@ -6,6 +6,6 @@ package kedamosclientside.entities;
  */
 public enum UserPrivilege {
     
-    USER, ADMIN
+    USER, ADMIN, CLIENT, EVENT_MANAGER
     
 }
