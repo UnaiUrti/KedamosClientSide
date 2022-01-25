@@ -6,6 +6,7 @@
 package kedamosclientside.controllers;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -28,7 +30,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import kedamosclientside.entities.Category;
 import kedamosclientside.entities.Event;
+import kedamosclientside.entities.PersonalResource;
+import kedamosclientside.entities.Place;
 import kedamosclientside.exceptions.ClientLogicException;
 import kedamosclientside.logic.EventInterface;
 
@@ -53,25 +58,25 @@ public class MyEventsViewController {
     @FXML
     private TableColumn<Event, String> tcTable;
     @FXML
-    private TableColumn<?, ?> tcDescription;
+    private TableColumn<Event, String> tcDescription;
     @FXML
-    private TableColumn<?, ?> tcPrice;
+    private TableColumn<Event, Float> tcPrice;
     @FXML
-    private TableColumn<?, ?> tcCategory;
+    private TableColumn<Event, Category> tcCategory;
     @FXML
-    private TableColumn<?, ?> tcDate;
+    private TableColumn<Event, Date> tcDate;
     @FXML
-    private TableColumn<?, ?> tcMinParticipants;
+    private TableColumn<Event, Long> tcMinParticipants;
     @FXML
-    private TableColumn<?, ?> tcMaxParticipants;
+    private TableColumn<Event, Long> tcMaxParticipants;
     @FXML
-    private TableColumn<?, ?> tcActualParticipants;
+    private TableColumn<Event, Long> tcActualParticipants;
     @FXML
-    private TableColumn<?, ?> tcPlace;
+    private TableColumn<Event, Place> tcPlace;
     @FXML
-    private TableColumn<?, ?> tcPersonal;
+    private TableColumn<Event, PersonalResource> tcPersonal;
     @FXML
-    private ComboBox<?> cmbCategory;
+    private ComboBox<Event> cmbCategory;
     @FXML
     private TextField tfTitle;
     @FXML
@@ -135,7 +140,7 @@ public class MyEventsViewController {
         tcMaxParticipants.setCellValueFactory(new PropertyValueFactory<>("MaxParticipants"));
         tcActualParticipants.setCellValueFactory(new PropertyValueFactory<>("ActualParticipants"));
         tcPlace.setCellValueFactory(new PropertyValueFactory<>("Place"));
-        tcPersonal.setCellValueFactory(new PropertyValueFactory<>("MinParticipants"));
+        tcPersonal.setCellValueFactory(new PropertyValueFactory<>("Personal"));
         
         try {
             Collection <Event> events = eventinterface.getEvents();
@@ -144,10 +149,6 @@ public class MyEventsViewController {
         } catch (ClientLogicException ex) {
             Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
-        
-  
         
         stage.show();
     }
@@ -162,6 +163,24 @@ public class MyEventsViewController {
 
     @FXML
     private void handleDelete(ActionEvent event) {
+        logger.info("Boton para borrar Evento de la BD");
+        
+        Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.setTitle("Delete Event");
+        alert.setContentText("Seguro que quieres eliminar el Evento?");
+        Optional<ButtonType> resp = alert.showAndWait();
+        if(resp.get()==ButtonType.OK){
+            try {
+                logger.info("Borrar evento");
+                
+                Event deleteEvent= tvTable.getSelectionModel().getSelectedItem();
+                eventinterface.removeEvent(deleteEvent);
+                
+                tvTable.refresh();
+            } catch (Exception ex) {
+                Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 
     @FXML

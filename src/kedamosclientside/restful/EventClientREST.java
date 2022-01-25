@@ -21,7 +21,7 @@ import javax.ws.rs.core.GenericType;
  *        client.close();
  * </pre>
  *
- * @author Adrian Franco
+ * @author 2dam
  */
 public class EventClientREST {
 
@@ -56,7 +56,7 @@ public class EventClientREST {
     }
 
     public void remove(String id) throws ClientErrorException {
-        webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+        webTarget.path(java.text.MessageFormat.format("deleteById/{0}", new Object[]{id})).request().delete();
     }
 
     public <T> T searchEventByPrice(Class<T> responseType, String price) throws ClientErrorException {

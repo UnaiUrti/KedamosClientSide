@@ -135,44 +135,44 @@ public class Event implements Serializable {
         this.date = date;
     }
 
-    public SimpleLongProperty getMaxParticipants() {
-        return maxParticipants;
+    public Long getMaxParticipants() {
+        return maxParticipants.get();
     }
 
-    public void setMaxParticipants(SimpleLongProperty maxParticipants) {
-        this.maxParticipants = maxParticipants;
+    public void setMaxParticipants(Long maxParticipants) {
+        this.maxParticipants.set(maxParticipants);
     }
 
-    public SimpleLongProperty getMinParticipants() {
-        return minParticipants;
+    public Long getMinParticipants() {
+        return minParticipants.get();
     }
 
-    public void setMinParticipants(SimpleLongProperty minParticipants) {
-        this.minParticipants = minParticipants;
+    public void setMinParticipants(Long minParticipants) {
+        this.minParticipants.set(minParticipants);
     }
 
-    public SimpleLongProperty getActualParticipants() {
-        return actualParticipants;
+    public Long getActualParticipants() {
+        return actualParticipants.get();
     }
 
-    public void setActualParticipants(SimpleLongProperty actualParticipants) {
-        this.actualParticipants = actualParticipants;
+    public void setActualParticipants(Long actualParticipants) {
+        this.actualParticipants.set(actualParticipants);
     }
 
-    public SimpleStringProperty getDescription() {
-        return description;
+    public String getDescription() {
+        return description.get();
     }
 
-    public void setDescription(SimpleStringProperty description) {
-        this.description = description;
+    public void setDescription(String description) {
+        this.description.set(description);
     }
 
-    public SimpleFloatProperty getPrice() {
-        return price;
+    public Float getPrice() {
+        return price.get();
     }
 
-    public void setPrice(SimpleFloatProperty price) {
-        this.price = price;
+    public void setPrice(Float price) {
+        this.price.set(price);
     }
 
     public Set<Category> getCategory() {

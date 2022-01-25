@@ -25,8 +25,6 @@ public interface EventInterface {
     
     public void searchEvent (Event event) throws Exception;
     
-    public void deleteEvent (Event event) throws Exception;
-    
     public Collection <Event> getEvents() throws ClientLogicException;
             
 }

@@ -35,16 +35,11 @@ public class EventImplementation implements EventInterface {
 
     @Override
     public void removeEvent(Event event) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+       eventREST.remove(event.getEvent_id().toString());
     }
 
     @Override
     public void searchEvent(Event event) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void deleteEvent(Event event) throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
