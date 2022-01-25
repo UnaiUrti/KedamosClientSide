@@ -1,30 +1,19 @@
 package kedamosclientside.controllers;
 
-import java.io.IOException;
 import java.util.Optional;
-import java.util.logging.Logger;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Client;
-import kedamosclientside.entities.User;
 import kedamosclientside.logic.ClientFactory;
-import kedamosclientside.logic.UserFactory;
-//import kedamosclientside.logic.UserFactory;
-import kedamosclientside.logic.UserInterface;
 
 /**
  * Clase controladora para la ventana de SignIn
