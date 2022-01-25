@@ -39,10 +39,11 @@ public interface UserInterface {
      * @return 
      */
     public Collection<User> findAllUser();
+    
     /**
      * 
-     * @param <T>
      * @param user
      * @return 
      */
+    public User adminLoginValidation(User user);
 }

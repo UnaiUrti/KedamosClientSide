@@ -32,12 +32,12 @@ public class UserImplementation implements UserInterface {
 
     @Override
     public void editUser(User user) {
-        webClient.edit(user, user.getUser_id().toString());
+        webClient.edit(user, user.getUser_id());
     }
 
     @Override
     public void removeUser(User user) {
-        webClient.remove(user.getUser_id().toString());
+        webClient.remove(user.getUser_id());
     }
 
     @Override
@@ -54,5 +54,13 @@ public class UserImplementation implements UserInterface {
         users = webClient.findAll(new GenericType<Set<User>>(){});
         return users;
 
+    }
+
+    @Override
+    public User adminLoginValidation(User user) {
+        User userBean;
+        userBean = webClient.adminLoginValidation(new GenericType<Client>() {
+        }, user.getUsername(), user.getPassword());
+        return userBean;
     }
 }
