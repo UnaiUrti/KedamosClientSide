@@ -4,6 +4,7 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -26,7 +27,6 @@
                         <Font size="16.0" />
                     </font>
                 </Label>
-                <TextField fx:id="txtPassword" layoutX="260.0" layoutY="39.0" />
                 <Label layoutX="260.0" layoutY="14.0" prefHeight="25.0" prefWidth="79.0" text="Password">
                     <font>
                         <Font size="16.0" />
@@ -50,7 +50,7 @@
                         <Font size="16.0" />
                     </font>
                 </Label>
-                <Button fx:id="btnCreate" layoutX="899.0" layoutY="36.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="102.0" text="Create">
+                <Button fx:id="btnCreate" layoutX="899.0" layoutY="36.0" mnemonicParsing="false" onAction="#handleCreateEventManager" prefHeight="32.0" prefWidth="102.0" text="Create">
                     <font>
                         <Font size="14.0" />
                     </font>
@@ -66,13 +66,14 @@
                   <Font size="16.0" />
                </font>
             </Label>
-            <Label layoutX="48.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" />
-            <Label layoutX="48.0" layoutY="129.0" prefHeight="11.0" prefWidth="149.0" />
-            <Label layoutX="260.0" layoutY="129.0" prefHeight="11.0" prefWidth="149.0" />
-            <Label layoutX="260.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" />
-            <Label layoutX="468.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" />
-            <Label layoutX="468.0" layoutY="129.0" prefHeight="11.0" prefWidth="149.0" />
-            <Label layoutX="689.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" />
+            <Label fx:id="lblUsername" layoutX="48.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <Label fx:id="lblFullName" layoutX="48.0" layoutY="129.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <Label fx:id="lblEmail" layoutX="260.0" layoutY="129.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <Label fx:id="lblPassword" layoutX="260.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <Label fx:id="lblStatus" layoutX="468.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <Label fx:id="lblManagerCategory" layoutX="468.0" layoutY="129.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <Label fx:id="lblLastPasswordChange" layoutX="689.0" layoutY="66.0" prefHeight="11.0" prefWidth="149.0" textFill="RED" />
+            <PasswordField fx:id="txtPassword" layoutX="260.0" layoutY="40.0" />
             </children>
         </Pane>
         <Label layoutX="79.0" layoutY="67.0" prefHeight="38.0" prefWidth="330.0" text="Event Manager Management">

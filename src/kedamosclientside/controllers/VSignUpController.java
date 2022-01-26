@@ -375,7 +375,7 @@ public class VSignUpController {
         alert.setHeaderText(null);
         alert.setTitle("EXIT");
 
-        alert.setContentText("Seguro que quiere salir?");
+        alert.setContentText("Do you want to exit?");
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {

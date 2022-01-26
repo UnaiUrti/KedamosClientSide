@@ -2,6 +2,7 @@ package kedamosclientside.controllers;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,18 +16,23 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import kedamosclientside.entities.Category;
 import kedamosclientside.entities.EventManager;
 import kedamosclientside.entities.Type;
 import kedamosclientside.entities.User;
+import kedamosclientside.entities.UserPrivilege;
 import kedamosclientside.entities.UserStatus;
 import kedamosclientside.logic.EventManagerFactory;
 import kedamosclientside.logic.EventManagerInterface;
+import kedamosclientside.security.Crypt;
 import org.glassfish.jersey.server.monitoring.RequestEvent;
 
 /**
@@ -59,9 +65,9 @@ public class VUserManagementController {
     @FXML
     private TableColumn tlManagetCategory;
     @FXML
-    private ComboBox cbStatus;
+    private ComboBox<UserStatus> cbStatus;
     @FXML
-    private ComboBox cbManagerCategory;
+    private ComboBox<Category> cbManagerCategory;
     @FXML
     private Button btnCreate;
     @FXML
@@ -77,11 +83,25 @@ public class VUserManagementController {
     @FXML
     private TextField txtFullName;
     @FXML
-    private TextField txtPassword;
+    private PasswordField txtPassword;
     @FXML
     private TextField txtUsername;
     @FXML
     private DatePicker dpLastPasswordChange;
+    @FXML
+    private Label lblUsername;
+    @FXML
+    private Label lblFullName;
+    @FXML
+    private Label lblEmail;
+    @FXML
+    private Label lblPassword;
+    @FXML
+    private Label lblStatus;
+    @FXML
+    private Label lblManagerCategory;
+    @FXML
+    private Label lblLastPasswordChange;
 
     public Stage getStage() {
         return stage;
@@ -131,7 +151,7 @@ public class VUserManagementController {
         cbStatus.setItems(FXCollections.observableArrayList(UserStatus.values()));
 
         // ComboBox de ManagerCategorys
-        cbManagerCategory.setItems(FXCollections.observableArrayList(Type.values()));
+        cbManagerCategory.setItems(FXCollections.observableArrayList(Category.values()));
 
         //
         tlView.getSelectionModel().selectedItemProperty()
@@ -145,6 +165,9 @@ public class VUserManagementController {
         btnCreate.setDisable(false);
         btnModify.setDisable(true);
         btnDelete.setDisable(true);
+        
+        //
+        txtUsername.requestFocus();
 
         //stage.setOnCloseRequest(this::handleCloseRequest);
         stage.show();
@@ -172,14 +195,7 @@ public class VUserManagementController {
             btnDelete.setDisable(false);
         } else {
             //If there is not a row selected, clean window fields 
-            txtUsername.setText("");
-            txtFullName.setText("");
-            txtEmail.setText("");
-            cbStatus.getSelectionModel().select("");
-            cbManagerCategory.getSelectionModel().select("");
-            dpLastPasswordChange.setValue(null);
-            dpLastPasswordChange.getEditor().clear();
-
+            clearAllFields();
             btnCreate.setDisable(false);
             btnModify.setDisable(true);
             btnDelete.setDisable(true);
@@ -190,18 +206,112 @@ public class VUserManagementController {
     }
 
     @FXML
+    private void handleCreateEventManager(ActionEvent event) {
+
+        if (informedFields()) {
+            EventManager eventManager = new EventManager();
+            eventManager.setUsername(txtUsername.getText());
+            eventManager.setFullName(txtFullName.getText());
+            eventManager.setEmail(txtEmail.getText());
+            eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+            eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
+            //Date date = eventManager.getLastPasswordChange().toInstant().atZone(ZoneId.systemDefault()).to;
+
+            eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+
+            eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+            eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+
+            emi.createEventManager(eventManager);
+
+            // Cargamos otra vez la tabla con todos los datos
+            usersData = FXCollections.observableArrayList(emi.findAll());
+            //Set table model.
+            tlView.setItems(usersData);
+        }
+    }
+
+    @FXML
     private void handleRemoveEventManger(ActionEvent event) {
 
-        EventManager selectedEventManager=((EventManager)tlView.getSelectionModel()
-                                                        .getSelectedItem());
-        
+        EventManager selectedEventManager = ((EventManager) tlView.getSelectionModel()
+                .getSelectedItem());
+
         emi.removeEventManager(selectedEventManager);
-        
+
         // Cargamos otra vez la tabla con todos los datos
         usersData = FXCollections.observableArrayList(emi.findAll());
         //Set table model.
         tlView.setItems(usersData);
 
+    }
+
+    private void clearAllFields() {
+
+        txtUsername.setText("");
+        txtFullName.setText("");
+        txtEmail.setText("");
+        cbStatus.getSelectionModel().clearSelection();
+        cbManagerCategory.getSelectionModel().clearSelection();
+        dpLastPasswordChange.setValue(null);
+        dpLastPasswordChange.getEditor().clear();
+
+    }
+
+    private boolean informedFields() {
+        //logger.info("Iniciado el evento para controlar si el campo esta vacio");
+
+        boolean informed = false;
+        
+        if (txtUsername.getText().trim().isEmpty()) {
+            lblUsername.setText("Username cannot be empty");
+            txtUsername.setStyle("-fx-border-color: red;");
+            informed = false;
+        } else {
+            lblUsername.setText("");
+            txtUsername.setStyle("default");
+        }
+        if (txtEmail.getText().trim().isEmpty()) {
+            lblEmail.setText("Email cannot be empty");
+            txtEmail.setStyle("-fx-border-color: red;");
+            informed = false;
+        }  else {
+            lblEmail.setText("");
+            txtEmail.setStyle("default");
+        }
+        if (txtFullName.getText().trim().isEmpty()) {
+            lblFullName.setText("Email cannot be empty");
+            txtFullName.setStyle("-fx-border-color: red;");
+            informed = false;
+        }  else {
+            lblFullName.setText("");
+            txtFullName.setStyle("default");
+        }
+        if (txtPassword.getText().trim().isEmpty()) {
+            lblPassword.setText("Email cannot be empty");
+            txtPassword.setStyle("-fx-border-color: red;");
+            informed = false;
+        }  else {
+            lblPassword.setText("");
+            txtPassword.setStyle("default");
+        }
+        if (cbStatus.getSelectionModel().getSelectedIndex() == -1) {
+            lblStatus.setText("Status cannot be empty");
+            cbStatus.setStyle("-fx-border-color: red;");
+            informed = false;
+        }  else {
+            lblStatus.setText("");
+            cbStatus.setStyle("default");
+        }
+        if (cbManagerCategory.getSelectionModel().getSelectedIndex() == -1) {
+            lblManagerCategory.setText("Manager Category cannot be empty");
+            cbManagerCategory.setStyle("-fx-border-color: red;");
+            informed = false;
+        }  else {
+            lblManagerCategory.setText("");
+            cbManagerCategory.setStyle("default");
+        }
+        return informed;
     }
 
     private void handleCloseRequest(WindowEvent event) {
