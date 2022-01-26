@@ -171,42 +171,6 @@ public class VSignUpController {
      */
     /*
     private boolean maxCharacteres() {
-        logger.info("Iniciado el evento para comprobar la longitud del campo");
-
-        if (fieldUsername.getText().trim().length() >= 50) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("El nombre de usuario ha superado los 50 caracteres");
-            alert.setContentText("No se puede superar los 50 caracteres");
-            alert.show();
-            return false;
-        } else if (fieldEmail.getText().trim().length() >= 50) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("El email ha superado los 50 caracteres");
-            alert.setContentText("No se puede superar los 50 caracteres");
-            alert.show();
-            return false;
-        } else if (fieldFullName.getText().trim().length() >= 50) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("El nombre completo ha superado los 50 caracteres");
-            alert.setContentText("No se puede superar los 50 caracteres");
-            alert.show();
-            return false;
-        } else if (fieldPassword.getText().trim().length() >= 50) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("La contraseña ha superado los 50 caracteres");
-            alert.setContentText("No se puede superar los 50 caracteres");
-            alert.show();
-            return false;
-        } else if (fieldConfirmPassword.getText().trim().length() >= 50) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("La contraseña ha superado los 50 caracteres");
-            alert.setContentText("No se puede superar los 50 caracteres");
-            alert.show();
-            return false;
-        } else {
-            return true;
-        }
-
     }
      */
     /**
@@ -285,7 +249,6 @@ public class VSignUpController {
         } else {
             return true;
         }
-
     }
      */
     /**

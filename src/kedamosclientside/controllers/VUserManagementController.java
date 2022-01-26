@@ -1,14 +1,19 @@
 package kedamosclientside.controllers;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -26,14 +31,14 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Category;
 import kedamosclientside.entities.EventManager;
-import kedamosclientside.entities.Type;
 import kedamosclientside.entities.User;
 import kedamosclientside.entities.UserPrivilege;
 import kedamosclientside.entities.UserStatus;
 import kedamosclientside.logic.EventManagerFactory;
 import kedamosclientside.logic.EventManagerInterface;
+import kedamosclientside.logic.UserFactory;
+import kedamosclientside.logic.UserInterface;
 import kedamosclientside.security.Crypt;
-import org.glassfish.jersey.server.monitoring.RequestEvent;
 
 /**
  *
@@ -50,6 +55,7 @@ public class VUserManagementController {
 
     private ObservableList<EventManager> usersData;
 
+    private UserInterface ui = UserFactory.getUserImplementation();
     private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
 
     @FXML
@@ -142,59 +148,73 @@ public class VUserManagementController {
         tlManagetCategory.setCellValueFactory(
                 new PropertyValueFactory<>("managerCategory"));
 
-        // Table Data
-        usersData = FXCollections.observableArrayList(emi.findAll());
-        //Set table model.
-        tlView.setItems(usersData);
+        // Cargamos la tabla con datos
+        loadTableWithData();
 
         // ComboBox de UserStatus
         cbStatus.setItems(FXCollections.observableArrayList(UserStatus.values()));
-
         // ComboBox de ManagerCategorys
         cbManagerCategory.setItems(FXCollections.observableArrayList(Category.values()));
 
-        //
+        // Añadir un evento al seleccionar una fila de la tabla y mostrar sus datos arrtiba
         tlView.getSelectionModel().selectedItemProperty()
-                .addListener(this::handleUsersTableSelectionChanged);
-        //Accion de cerrar desde la barra de titulo
-        //stage.setOnCloseRequest(this::handleCloseRequest);
+                .addListener(this::handleTableSelectionChanged);
+
         //Accion de cerrar desde la barra de titulo
         stage.setOnCloseRequest(this::handleCloseRequest);
 
-        //
+        // Desabilitar el field del date picker
+        dpLastPasswordChange.getEditor().setDisable(true);
+
+        // Habilitar/Desabilitar los botones
         btnCreate.setDisable(false);
         btnModify.setDisable(true);
         btnDelete.setDisable(true);
-        
-        //
+        btnLogOut.setDisable(false);
+
+        // Hacer invisbles los labels
+        lblUsername.setVisible(false);
+        lblFullName.setVisible(false);
+        lblEmail.setVisible(false);
+        lblPassword.setVisible(false);
+        lblStatus.setVisible(false);
+        lblManagerCategory.setVisible(false);
+        lblLastPasswordChange.setVisible(false);
+
+        // Limitar la entrada de caracters 
+        txtUsername.textProperty().addListener(this::limitCharacters);
+        txtEmail.textProperty().addListener(this::limitCharacters);
+        txtFullName.textProperty().addListener(this::limitCharacters);
+        txtPassword.textProperty().addListener(this::limitCharacters);
+
+        // Focus en el Username field
         txtUsername.requestFocus();
 
-        //stage.setOnCloseRequest(this::handleCloseRequest);
         stage.show();
 
     }
 
-    private void handleUsersTableSelectionChanged(ObservableValue observable,
+    private void handleTableSelectionChanged(ObservableValue observable,
             Object oldValue,
             Object newValue) {
-        //If there is a row selected, move row data to corresponding fields in the
-        //window and enable create, modify and delete buttons
+
         if (newValue != null) {
+            txtPassword.clear();
             EventManager eventManager = (EventManager) newValue;
             txtUsername.setText(eventManager.getUsername());
             txtFullName.setText(eventManager.getFullName());
             txtEmail.setText(eventManager.getEmail());
             cbStatus.getSelectionModel().select(eventManager.getStatus());
             cbManagerCategory.getSelectionModel().select(eventManager.getManagerCategory());
-
-            LocalDate date = eventManager.getLastPasswordChange().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate date = eventManager.getLastPasswordChange().toInstant().
+                    atZone(ZoneId.systemDefault()).toLocalDate();
             dpLastPasswordChange.setValue(date);
 
             btnCreate.setDisable(true);
             btnModify.setDisable(false);
             btnDelete.setDisable(false);
         } else {
-            //If there is not a row selected, clean window fields 
+            //Si no hay ninguna fila seleccionada se limpiara los fields de la ventana 
             clearAllFields();
             btnCreate.setDisable(false);
             btnModify.setDisable(true);
@@ -208,27 +228,72 @@ public class VUserManagementController {
     @FXML
     private void handleCreateEventManager(ActionEvent event) {
 
-        if (informedFields()) {
-            EventManager eventManager = new EventManager();
-            eventManager.setUsername(txtUsername.getText());
-            eventManager.setFullName(txtFullName.getText());
-            eventManager.setEmail(txtEmail.getText());
-            eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-            eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
-            //Date date = eventManager.getLastPasswordChange().toInstant().atZone(ZoneId.systemDefault()).to;
+        if (informedFields() & emailPattern()) {
+            if (validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
+                // Creamos el event manager con todos sus datos
+                EventManager eventManager = new EventManager();
+                eventManager.setUsername(txtUsername.getText().trim());
+                eventManager.setFullName(txtFullName.getText().trim());
+                eventManager.setEmail(txtEmail.getText().trim());
+                eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+                eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
 
-            eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                if (dpLastPasswordChange.getValue() != null) {
+                    eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                } else {
+                    eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                }
 
-            eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
-            eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+                eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+                eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
 
-            emi.createEventManager(eventManager);
+                // Enviamos la peticion al servidor para crear el event manager
+                emi.createEventManager(eventManager);
 
-            // Cargamos otra vez la tabla con todos los datos
-            usersData = FXCollections.observableArrayList(emi.findAll());
-            //Set table model.
-            tlView.setItems(usersData);
+                // Alerta para indicar que se ha creado con exito el event manager
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("The account has been created successfully");
+                alert.show();
+
+                // Cargamos otra vez la tabla con todos los datos
+                loadTableWithData();
+            }
         }
+    }
+
+    @FXML
+    private void handleEditEventManger(ActionEvent event) {
+        //informedFields() 
+        if (emailPattern()) {
+            //if (validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
+                // Creamos el event manager con todos sus datos
+                EventManager eventManager = new EventManager();
+                EventManager em = (EventManager) tlView.getSelectionModel().getSelectedItem();
+                eventManager.setUser_id(em.getUser_id());
+                eventManager.setUsername(txtUsername.getText().trim());
+                eventManager.setFullName(txtFullName.getText().trim());
+                eventManager.setEmail(txtEmail.getText().trim());        
+                if (!txtPassword.getText().trim().isEmpty()) {
+                    eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+                }  
+                eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
+                eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+                eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+
+                // Enviamos la peticion al servidor para crear el event manager
+                emi.editEventManager(eventManager);
+
+                // Alerta para indicar que se ha creado con exito el event manager
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("The account has been modified successfully");
+                alert.show();
+
+                // Cargamos otra vez la tabla con todos los datos
+                loadTableWithData();
+            //}
+        }
+
     }
 
     @FXML
@@ -248,9 +313,10 @@ public class VUserManagementController {
 
     private void clearAllFields() {
 
-        txtUsername.setText("");
-        txtFullName.setText("");
-        txtEmail.setText("");
+        txtUsername.clear();
+        txtFullName.clear();
+        txtEmail.clear();
+        txtPassword.clear();
         cbStatus.getSelectionModel().clearSelection();
         cbManagerCategory.getSelectionModel().clearSelection();
         dpLastPasswordChange.setValue(null);
@@ -258,60 +324,130 @@ public class VUserManagementController {
 
     }
 
+    private boolean validateUsernameEmail(String username, String email) {
+
+        boolean find = true;
+
+        lblEmail.setVisible(false);
+        lblEmail.setVisible(false);
+
+        Collection<User> users = ui.findAllUser();
+
+        for (User u : users) {
+            if (u.getUsername().equalsIgnoreCase(username)) {
+                lblUsername.setVisible(true);
+                lblUsername.setText("Username is already in use");
+                txtUsername.setStyle("-fx-border-color: red;");
+                //System.out.println("Se ha encomtrado el usuario");
+                //find = true;
+                find = false;
+            }
+            if (u.getEmail().equalsIgnoreCase(email)) {
+                lblEmail.setVisible(true);
+                lblEmail.setText("Email is already in use");
+                txtEmail.setStyle("-fx-border-color: red;");
+                find = false;
+            }
+        }
+
+        return find;
+    }
+
     private boolean informedFields() {
         //logger.info("Iniciado el evento para controlar si el campo esta vacio");
 
-        boolean informed = false;
-        
+        boolean informed = true;
+
         if (txtUsername.getText().trim().isEmpty()) {
+            lblUsername.setVisible(true);
             lblUsername.setText("Username cannot be empty");
             txtUsername.setStyle("-fx-border-color: red;");
             informed = false;
         } else {
-            lblUsername.setText("");
-            txtUsername.setStyle("default");
+            lblUsername.setVisible(false);
+            txtUsername.setStyle(null);
         }
         if (txtEmail.getText().trim().isEmpty()) {
+            lblEmail.setVisible(true);
             lblEmail.setText("Email cannot be empty");
             txtEmail.setStyle("-fx-border-color: red;");
             informed = false;
-        }  else {
-            lblEmail.setText("");
-            txtEmail.setStyle("default");
+        } else {
+            lblEmail.setVisible(false);
+            txtEmail.setStyle(null);
         }
         if (txtFullName.getText().trim().isEmpty()) {
-            lblFullName.setText("Email cannot be empty");
+            lblFullName.setVisible(true);
+            lblFullName.setText("Full Name cannot be empty");
             txtFullName.setStyle("-fx-border-color: red;");
             informed = false;
-        }  else {
-            lblFullName.setText("");
-            txtFullName.setStyle("default");
+        } else {
+            lblFullName.setVisible(false);
+            txtFullName.setStyle(null);
         }
         if (txtPassword.getText().trim().isEmpty()) {
-            lblPassword.setText("Email cannot be empty");
+            lblPassword.setVisible(true);
+            lblPassword.setText("Password cannot be empty");
             txtPassword.setStyle("-fx-border-color: red;");
             informed = false;
-        }  else {
-            lblPassword.setText("");
-            txtPassword.setStyle("default");
+        } else {
+            lblPassword.setVisible(false);
+            txtPassword.setStyle(null);
         }
         if (cbStatus.getSelectionModel().getSelectedIndex() == -1) {
+            lblStatus.setVisible(true);
             lblStatus.setText("Status cannot be empty");
             cbStatus.setStyle("-fx-border-color: red;");
             informed = false;
-        }  else {
-            lblStatus.setText("");
-            cbStatus.setStyle("default");
+        } else {
+            lblStatus.setVisible(false);
+            cbStatus.setStyle(null);
         }
         if (cbManagerCategory.getSelectionModel().getSelectedIndex() == -1) {
+            lblManagerCategory.setVisible(true);
             lblManagerCategory.setText("Manager Category cannot be empty");
             cbManagerCategory.setStyle("-fx-border-color: red;");
             informed = false;
-        }  else {
-            lblManagerCategory.setText("");
-            cbManagerCategory.setStyle("default");
+        } else {
+            lblManagerCategory.setVisible(false);
+            cbManagerCategory.setStyle(null);
         }
         return informed;
+    }
+
+    private void limitCharacters(ObservableValue<? extends String> observable, String oldValue,
+            String newValue) {
+        //logger.info("Inicio del metodo para limitar la entrada de un maximo de caracteres");
+
+        if (txtUsername.getText().length() > 50) {
+            txtUsername.setText(oldValue);
+        }
+        if (txtFullName.getText().length() > 50) {
+            txtFullName.setText(oldValue);
+        }
+        if (txtEmail.getText().length() > 50) {
+            txtEmail.setText(oldValue);
+        }
+        if (txtPassword.getText().length() > 50) {
+            txtPassword.setText(oldValue);
+        }
+
+    }
+
+    private boolean emailPattern() {
+        //logger.info("Iniciado el evento para controlar si el campo email es valido");
+        boolean pattern = true;
+
+        if (!txtEmail.getText().matches("[\\w.]+@[\\w]+\\.[a-zA-Z]{2,4}")) {
+            lblEmail.setVisible(true);
+            lblEmail.setText("Sorry,only letters (a-z), numbers(0-9), and periods (.) are allowed, plus a required @");
+            txtEmail.setStyle("-fx-border-color: red;");
+            pattern = false;
+        } else {
+            lblEmail.setVisible(false);
+            txtEmail.setStyle(null);
+        }
+        return pattern;
     }
 
     private void handleCloseRequest(WindowEvent event) {
@@ -320,21 +456,47 @@ public class VUserManagementController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText(null);
         alert.setTitle("EXIT");
-
-        alert.setContentText("Seguro que quiere salir?");
+        alert.setContentText("are you sure you want to log out?");
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
             //logger.info("Se ha pulsado OK y el programa va a finalizar");
-
             //El programa finalizara
             stage.close();
         } else {
             //logger.info("Se ha pulsado CANCELAR y el evento va a ser cancelado");
-
             //El aviso se cierra y el usuario continua en la ventana
             event.consume();
         }
+
+    }
+
+    private void loadTableWithData() {
+        // Obtenemos todos los event managers 
+        usersData = FXCollections.observableArrayList(emi.findAll());
+        // Hacemos un set de la lista en la tabla
+        tlView.setItems(usersData);
+    }
+
+    @FXML
+    private void handleLogOut(ActionEvent event) {
+
+        //logger.info("Se ha pulsado el boton back");
+        //logger.info("se volvera a la ventana de VSignIn");
+        stage.close();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VSignIn.fxml"));
+
+        Parent root = null;
+        try {
+            root = (Parent) loader.load();
+        } catch (IOException ex) {
+            //logger.severe("Se ha producido un error al cargarel fxml de la ventana singIn");
+        }
+
+        VSignInController controller = (VSignInController) loader.getController();
+        controller.setStage(stage);
+        controller.initStage(root);
 
     }
 

@@ -49,11 +49,9 @@ public class UserImplementation implements UserInterface {
 
     @Override
     public Collection<User> findAllUser() {
-        
         Set<User> users;
         users = webClient.findAll(new GenericType<Set<User>>(){});
         return users;
-
     }
 
     @Override
