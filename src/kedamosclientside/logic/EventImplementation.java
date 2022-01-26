@@ -24,8 +24,8 @@ public class EventImplementation implements EventInterface {
     private EventClientREST eventREST;
 
     @Override
-    public void createEvent(Event event) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void createEvent(Event event) throws ClientLogicException {
+       eventREST.create(event);
     }
 
     @Override

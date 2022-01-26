@@ -49,7 +49,7 @@
       <Label layoutX="674.0" layoutY="95.0" text="Price" />
       <TextField fx:id="tfPrice" layoutX="738.0" layoutY="91.0" prefHeight="25.0" prefWidth="48.0" promptText="0" />
       <Button fx:id="btnAddPersonal" layoutX="831.0" layoutY="146.0" mnemonicParsing="false" onAction="#handleAddPersonal" prefHeight="25.0" prefWidth="135.0" text="Add Personal..." />
-      <TextArea fx:id="taDescription" layoutX="93.0" layoutY="140.0" prefHeight="82.0" prefWidth="226.0" promptText="In this Event..." />
+      <TextArea fx:id="taDescription" layoutX="93.0" layoutY="140.0" prefHeight="82.0" prefWidth="226.0" promptText="In this Event..." wrapText="true" />
       <CheckBox fx:id="cbAccepted" disable="true" layoutX="1194.0" layoutY="58.0" mnemonicParsing="false" text="Accepted" />
       <Button fx:id="btnPrint" layoutX="956.0" layoutY="664.0" mnemonicParsing="false" onAction="#handlePrint" prefHeight="25.0" prefWidth="81.0" text="Print" />
    </children>

@@ -62,7 +62,7 @@ public class Event implements Serializable {
      * Enumeracion de todas las categorias que puede seleccionar el Cliente al
      * crear Eventos
      */
-    private Set<Category> category;
+    private SimpleStringProperty category;
 
     /**
      * Titulo que asigna el cliente al Evento
@@ -109,7 +109,7 @@ public class Event implements Serializable {
         this.description=new SimpleStringProperty();
         this.price=new SimpleFloatProperty();
         this.title= new SimpleStringProperty();
-        this.category=new HashSet<>();
+        this.category=new SimpleStringProperty();
         this.comment=new HashSet<>();
         this.personalResource=new HashSet<>();
         this.eventRevisions=new HashSet<>();
@@ -175,13 +175,14 @@ public class Event implements Serializable {
         this.price.set(price);
     }
 
-    public Set<Category> getCategory() {
-        return category;
+    public String getCategory() {
+        return category.get();
     }
 
-    public void setCategory(Set<Category> category) {
-        this.category = category;
+    public void setCategory(String category) {
+        this.category.set(category);
     }
+
 
     public String getTitle() {
         return title.get();
