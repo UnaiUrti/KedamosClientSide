@@ -6,6 +6,7 @@ import java.util.Optional;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -178,20 +179,31 @@ public class VUserManagementController {
             cbManagerCategory.getSelectionModel().select("");
             dpLastPasswordChange.setValue(null);
             dpLastPasswordChange.getEditor().clear();
-            
+
             btnCreate.setDisable(false);
             btnModify.setDisable(true);
             btnDelete.setDisable(true);
             //ctToggle(rbUsuario);
-
         }
         //Focus username field
         txtUsername.requestFocus();
     }
 
-    
-    
-    
+    @FXML
+    private void handleRemoveEventManger(ActionEvent event) {
+
+        EventManager selectedEventManager=((EventManager)tlView.getSelectionModel()
+                                                        .getSelectedItem());
+        
+        emi.removeEventManager(selectedEventManager);
+        
+        // Cargamos otra vez la tabla con todos los datos
+        usersData = FXCollections.observableArrayList(emi.findAll());
+        //Set table model.
+        tlView.setItems(usersData);
+
+    }
+
     private void handleCloseRequest(WindowEvent event) {
 
         //Se envia un mensaje al usuario confirmando si de verdad quiere salir
