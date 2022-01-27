@@ -7,9 +7,11 @@ package kedamosclientside.security;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
@@ -28,7 +30,7 @@ import javax.crypto.NoSuchPaddingException;
  * @author Steven Arce
  */
 public class Crypt {
-    
+
     private static ResourceBundle rbp = ResourceBundle.getBundle("kedamosclientside.security.Public");
 
     /**
@@ -54,6 +56,23 @@ public class Crypt {
         }
 
         return byteArrayToHexString(encodedMessage);
+
+    }
+
+    public static String hash(String passwd) {
+
+        byte[] hash = null;
+
+        try {
+
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            hash = md.digest(passwd.getBytes(StandardCharsets.UTF_8));
+
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Crypt.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return byteArrayToHexString(hash);
 
     }
 

@@ -51,7 +51,7 @@ public class VUserManagementController {
     //private final static Logger logger = Logger.getLogger("kedamosclientside.controllers.VResetPasswordController");
     private Stage stage;
     @FXML
-    private TableView tlView;
+    private TableView<EventManager> tlView;
 
     private ObservableList<EventManager> usersData;
 
@@ -228,70 +228,71 @@ public class VUserManagementController {
     @FXML
     private void handleCreateEventManager(ActionEvent event) {
 
-        if (informedFields() & emailPattern()) {
-            if (validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
-                // Creamos el event manager con todos sus datos
-                EventManager eventManager = new EventManager();
-                eventManager.setUsername(txtUsername.getText().trim());
-                eventManager.setFullName(txtFullName.getText().trim());
-                eventManager.setEmail(txtEmail.getText().trim());
-                eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-                eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
+        if (informedFields() & emailPattern() & validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
 
-                if (dpLastPasswordChange.getValue() != null) {
-                    eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-                } else {
-                    eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-                }
+            // Creamos el event manager con todos sus datos
+            EventManager eventManager = new EventManager();
+            eventManager.setUsername(txtUsername.getText().trim());
+            eventManager.setFullName(txtFullName.getText().trim());
+            eventManager.setEmail(txtEmail.getText().trim());
+            eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+            eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
 
-                eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
-                eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
-
-                // Enviamos la peticion al servidor para crear el event manager
-                emi.createEventManager(eventManager);
-
-                // Alerta para indicar que se ha creado con exito el event manager
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText("The account has been created successfully");
-                alert.show();
-
-                // Cargamos otra vez la tabla con todos los datos
-                loadTableWithData();
+            if (dpLastPasswordChange.getValue() != null) {
+                eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            } else {
+                eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             }
+
+            eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+            eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+
+            // Enviamos la peticion al servidor para crear el event manager
+            emi.createEventManager(eventManager);
+
+            // Cargamos otra vez la tabla con todos los datos
+            loadTableWithData();
+
+            // Alerta para indicar que se ha creado con exito el event manager
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("The account has been created successfully");
+            alert.show();
         }
+
     }
 
     @FXML
     private void handleEditEventManger(ActionEvent event) {
-        //informedFields() 
-        if (emailPattern()) {
+        //informedFields() &
+        EventManager em = tlView.getSelectionModel().getSelectedItem();
+        if (emailPattern() & validateEditUsernameEmail(txtUsername.getText().trim(), em)) {
             //if (validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
-                // Creamos el event manager con todos sus datos
-                EventManager eventManager = new EventManager();
-                EventManager em = (EventManager) tlView.getSelectionModel().getSelectedItem();
-                eventManager.setUser_id(em.getUser_id());
-                eventManager.setUsername(txtUsername.getText().trim());
-                eventManager.setFullName(txtFullName.getText().trim());
-                eventManager.setEmail(txtEmail.getText().trim());        
-                if (!txtPassword.getText().trim().isEmpty()) {
-                    eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-                }  
-                eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
-                eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-                eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
-                eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+            // Creamos el event manager con todos sus datos
+            EventManager eventManager = new EventManager();
+            eventManager.setUser_id(em.getUser_id());
+            eventManager.setUsername(txtUsername.getText().trim());
+            eventManager.setFullName(txtFullName.getText().trim());
+            eventManager.setEmail(txtEmail.getText().trim());
+            if (!txtPassword.getText().trim().isEmpty()) {
+                eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+            } else {
+                eventManager.setPassword(em.getPassword());
+            }
+            eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
+            eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+            eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
 
-                // Enviamos la peticion al servidor para crear el event manager
-                emi.editEventManager(eventManager);
+            // Enviamos la peticion al servidor para crear el event manager
+            emi.editEventManager(eventManager);
 
-                // Alerta para indicar que se ha creado con exito el event manager
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setHeaderText("The account has been modified successfully");
-                alert.show();
+            // Cargamos otra vez la tabla con todos los datos
+            loadTableWithData();
 
-                // Cargamos otra vez la tabla con todos los datos
-                loadTableWithData();
-            //}
+            // Alerta para indicar que se ha creado con exito el event manager
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("The account has been modified successfully");
+            alert.show();
         }
 
     }
@@ -299,15 +300,10 @@ public class VUserManagementController {
     @FXML
     private void handleRemoveEventManger(ActionEvent event) {
 
-        EventManager selectedEventManager = ((EventManager) tlView.getSelectionModel()
+        emi.removeEventManager(tlView.getSelectionModel()
                 .getSelectedItem());
 
-        emi.removeEventManager(selectedEventManager);
-
-        // Cargamos otra vez la tabla con todos los datos
-        usersData = FXCollections.observableArrayList(emi.findAll());
-        //Set table model.
-        tlView.setItems(usersData);
+        loadTableWithData();
 
     }
 
@@ -351,6 +347,26 @@ public class VUserManagementController {
         }
 
         return find;
+    }
+
+    private boolean validateEditUsernameEmail(String username, EventManager em) {
+
+        //txtUsername.setStyle("");
+        lblUsername.setVisible(false);
+        //lblEmail.setVisible(false);
+
+        Collection<User> users = ui.findAllUser();
+
+        if (users.stream().filter(u -> u.getUsername().equals(username)).count()
+                == 0 | em.getUsername().equalsIgnoreCase(username)) {
+            return true;
+        } else {
+            lblUsername.setVisible(true);
+            lblUsername.setText("Username is already in use");
+            txtUsername.setStyle("-fx-border-color: red;");
+            return false;
+        }
+
     }
 
     private boolean informedFields() {
