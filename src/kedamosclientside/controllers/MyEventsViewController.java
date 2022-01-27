@@ -117,6 +117,8 @@ public class MyEventsViewController {
      *
      * @param root
      */
+    //Acordarme q urti e irkus me devuelven el objeto event con place y/o personal
+    //resoruce añadido
     public void initStage(Parent root) {
 
         Scene scene = new Scene(root);
@@ -164,7 +166,13 @@ public class MyEventsViewController {
         } catch (ClientLogicException ex) {
             Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+            btnCreate.setDisable(true);
+            btnAddPersonal.setDisable(true);
+            btnAddPlace.setDisable(true);
+            btnModify.setDisable(true);
+            btnDelete.setDisable(true);
+            
+            tfTitle.requestFocus();
         stage.show();
     }
 
@@ -274,15 +282,28 @@ public class MyEventsViewController {
                     .toLocalDate();
             dpDate.setValue(localdateConverted);
             cmbCategory.getSelectionModel().select(Category.valueOf(event.getCategory()));
-            
-            
-            
+            tfPrice.setText(Float.toString(event.getPrice()));
+            tfMinParticipants.setText(Long.toString(event.getMinParticipants()));
+            tfMaxParticipants.setText(Long.toString(event.getMaxParticipants()));
+            btnModify.setDisable(false);
+            btnAddPersonal.setDisable(false);
+            btnAddPlace.setDisable(false);
 
         } else {
             //CUANDO DES-SELECCIONA
             tfTitle.setText("");
             taDescription.setText("");
-
+            dpDate.setValue(null);
+            cmbCategory.setValue(null);
+            tfPrice.setText("");
+            tfMinParticipants.setText("");
+            tfMaxParticipants.setText("");
+            
+            //Deshabilitar los botones 
+            btnCreate.setDisable(true);
+            btnAddPersonal.setDisable(true);
+            btnAddPlace.setDisable(true);
+            btnModify.setDisable(true);
         }
     }
 
@@ -292,6 +313,15 @@ public class MyEventsViewController {
 
     @FXML
     private void handleModify(ActionEvent event) {
+        
+        Event newEvent = new Event();
+        
+        newEvent.setTitle(tfTitle.getText());
+        newEvent.setDescription(taDescription.getText());
+
+        
+        
+        
     }
 
     @FXML
