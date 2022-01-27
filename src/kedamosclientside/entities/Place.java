@@ -23,10 +23,10 @@ public class Place implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public Place() {
-        this.place_id = new SimpleLongProperty();
-        this.address = new SimpleStringProperty();
-        this.name = new SimpleStringProperty();
-        this.price = new SimpleFloatProperty();
+        this.place_id = null;
+        this.address = "";
+        this.name = "";
+        this.price = Float.valueOf(0);
         this.dateRenewal = new Date();
         this.events = new HashSet<>();
     }
@@ -37,27 +37,27 @@ public class Place implements Serializable {
     /**
      * Atributo id de la entidad
      */
-    private SimpleLongProperty place_id;
+    private Long place_id;
     
     /**
      * Atributo de la direccion del lugar
      * Es unico porque no puede mas de un sitio con la misma direccion
      */
     @NotNull
-    private SimpleStringProperty address;
+    private String address;
     
     /**
      * Atributo del nombre del lugar
      * Es un campo que no puede dejarse nulo
      */
     @NotNull
-    private SimpleStringProperty name;
+    private String name;
     
     /**
      * Atributo del precio que vale el lugar (polideportivos y tal)
      * Es un campo que se puede dejar nulo porque puede que el sitio sea gratuito
      */
-    private SimpleFloatProperty price;
+    private Float price;
     
     /**
      * Atributo de la fecha de renovacion del sitio
@@ -77,7 +77,7 @@ public class Place implements Serializable {
      * @return devuelve la id
      */
     public Long getId() {
-        return this.place_id.get();
+        return this.place_id;
     }
 
     /**
@@ -85,7 +85,7 @@ public class Place implements Serializable {
      * @param place_id 
      */
     public void setId(Long place_id) {
-        this.place_id.set(place_id);
+        this.place_id = place_id;
     }
 
     /**
@@ -93,7 +93,7 @@ public class Place implements Serializable {
      * @return devuelve la direccion
      */
     public String getAddress() {
-        return this.address.get();
+        return this.address;
     }
 
     /**
@@ -101,7 +101,7 @@ public class Place implements Serializable {
      * @param address 
      */
     public void setAddress(String address) {
-        this.address.set(address);
+        this.address = address;
     }
 
     /**
@@ -109,7 +109,7 @@ public class Place implements Serializable {
      * @return devuelve el nombre
      */
     public String getName() {
-        return this.name.get();
+        return this.name;
     }
 
     /**
@@ -117,7 +117,7 @@ public class Place implements Serializable {
      * @param name 
      */
     public void setName(String name) {
-        this.name.set(name);
+        this.name = name;
     }
 
     /**
@@ -125,7 +125,7 @@ public class Place implements Serializable {
      * @return devuelve el precio
      */
     public Float getPrice() {
-        return this.price.get();
+        return this.price;
     }
     
     /**
@@ -133,7 +133,7 @@ public class Place implements Serializable {
      * @param price 
      */
     public void setPrice(Float price) {
-        this.price.set(price);
+        this.price = price;
     }
 
     /**

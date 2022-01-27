@@ -9,6 +9,8 @@ import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -27,6 +29,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Event;
 import kedamosclientside.entities.Place;
 import kedamosclientside.logic.PlaceInterface;
@@ -81,6 +84,14 @@ public class VPlaceController {
     private TextField tfPrice;
     @FXML
     private Button btnPrint;
+    @FXML
+    private Label lblAddressError;
+    @FXML
+    private Label lblPriceError;
+    @FXML
+    private Label lblDateError;
+    @FXML
+    private Label lblNameError;
 
     public Stage getStage() {
         return stage;
@@ -123,14 +134,15 @@ public class VPlaceController {
         tfPrice.setDisable(false);
         dpDateRenewal.setDisable(false);
 
+        //Mensajes de error
+        lblAddressError.setVisible(false);
+        lblNameError.setVisible(false);
+        lblPriceError.setVisible(false);
+        lblDateError.setVisible(false);
+
         //Se enfocará en el campo Address
         tfAddress.requestFocus();
-              
-        //Comprobar los campos Name y Address
-        tfName.setOnKeyTyped(this::handleTextChanged);
-        tfAddress.setOnKeyTyped(this::handleTextChanged);
-        tfPrice.setOnKeyTyped(this::handleTextChanged);
-         
+
         //La tabla mostrará todos los Places que existan
         tcAddress.setCellValueFactory(
                 new PropertyValueFactory<>("address"));
@@ -140,17 +152,60 @@ public class VPlaceController {
                 new PropertyValueFactory<>("price"));
         tcDateRenewal.setCellValueFactory(
                 new PropertyValueFactory<>("dateRenewal"));
+        updateTable();
 
-        try {
-            Collection<Place> places = placeInterface.getAllPlaces();
+        //Comprobar los campos Name y Address
+        tfName.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                lblNameError.setVisible(false);
+                tfName.setStyle("-fx-border-color: none;");
 
-            ObservableList<Place> placesForTable
-                    = FXCollections.observableArrayList(places);
+                //Comprobar que los campos Name estén informados
+                if (tfName.getText().trim().equals("")) {
+                    //En caso de que no lo estén los los botones Crear y Modificar se deshabilitarán
+                    btnCreate.setDisable(true);
+                    btnModify.setDisable(true);
+                } else if (!tfAddress.getText().trim().equals("")) {
+                    //En caso de que sí lo estén el botón Create se habilitará
+                    btnCreate.setDisable(false);
 
-            table.setItems(placesForTable);
-        } catch (Exception e) {
+                    //Si hay una fila seleccionada en la tabla se habilitará el botón Modify
+                    if (!table.getSelectionModel().isEmpty()) {
+                        btnModify.setDisable(false);
+                    }
 
-        }
+                }
+            }
+        });
+        tfAddress.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                lblAddressError.setVisible(false);
+                tfAddress.setStyle("-fx-border-color: none;");
+
+                //Comprobar que los campos Address estén informados
+                if (tfAddress.getText().trim().equals("")) {
+                    //En caso de que no lo estén los los botones Crear y Modificar se deshabilitarán
+                    btnCreate.setDisable(true);
+                    btnModify.setDisable(true);
+                } else if (!tfName.getText().trim().equals("")) {
+                    //En caso de que sí lo estén el botón Create se habilitará
+                    btnCreate.setDisable(false);
+
+                    //Si hay una fila seleccionada en la tabla se habilitará el botón Modify
+                    if (!table.getSelectionModel().isEmpty()) {
+                        btnModify.setDisable(false);
+                    }
+
+                }
+            }
+        });
+
+        //Comprobar selección de la tabla
+        table.getSelectionModel().selectedItemProperty().addListener(this::handleTableSelected);
+
+        stage.setOnCloseRequest(this::handleCloseRequest);
 
         stage.show();
 
@@ -159,16 +214,49 @@ public class VPlaceController {
     @FXML
     private void handleCreatePlace(ActionEvent event) {
 
-        //Comprobar que no exista ya un place con el Address introducido
         Place place = new Place();
         place.setAddress(tfAddress.getText());
 
+        //Comprobar que no exista ya un place con el Address introducido
         if (placeInterface.getPlaceByAddress(place) == null) {
-            place.setName(tfName.getText());
-            place.setPrice(Float.parseFloat(tfPrice.getText()));
-            place.setDateRenewal(Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-            placeInterface.createPlace(place);
+            if (!tfPrice.getText().matches("[0-9]{1,5}[.][0-9]{1,2}") && !tfPrice.getText().matches("")) {
+                lblPriceError.setVisible(true);
+                tfPrice.setStyle("-fx-border-color: red;");
+            } else {
+                
+                lblPriceError.setVisible(false);
+                tfPrice.setStyle("-fx-border-color: none;");
+
+                //Si no existe añadir un Place con todos los datos introducidos
+                place.setName(tfName.getText());
+                if (!tfPrice.getText().equals("")) {
+                    place.setPrice(Float.parseFloat(tfPrice.getText()));
+                } else {
+                    place.setPrice(Float.valueOf(0));
+                }
+                if (dpDateRenewal.getValue() != null) {
+                    place.setDateRenewal(Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                } else {
+                    place.setDateRenewal(null);
+                }
+                placeInterface.createPlace(place);
+
+                
+                
+                //Vaciar todos los campos
+                tfAddress.setText("");
+                tfName.setText("");
+                tfPrice.setText("");
+                dpDateRenewal.setValue(null);
+
+                //Actualizar la tabla con nuevos datos
+                updateTable();
+            }
+
+        } else {
+            lblAddressError.setVisible(true);
+            tfAddress.setStyle("-fx-border-color: red;");
         }
 
     }
@@ -182,14 +270,63 @@ public class VPlaceController {
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
             try {
+                //Si le da a SI eliminar el Place
                 Place place = table.getSelectionModel().getSelectedItem();
-
                 placeInterface.deletePlaceAlternative(place);
 
-                table.refresh();
-            }catch(Exception e){
-                
+                //Vacíar los todos los campos
+                tfAddress.setText("");
+                tfName.setText("");
+                tfPrice.setText("");
+                dpDateRenewal.setValue(null);
+
+                //Deseleccionar la tabla y actualizarla con los nuevos datos
+                updateTable();
+            } catch (Exception e) {
+
             }
+        }
+
+    }
+
+    @FXML
+    private void handleModifyPlace(ActionEvent event) {
+
+        Place place = new Place();
+        place.setAddress(tfAddress.getText());
+
+        //Comprobar que el campo Address sea el mismo que el seleccionado en la tabla
+        if (tfAddress.getText().equals(table.getSelectionModel()
+                .getSelectedItem().getAddress()) || placeInterface.getPlaceByAddress(place)==null) {
+
+            //Si coinciden, modificar los campos del Place seleccionado
+            place.setName(tfName.getText());
+            if (!tfPrice.getText().equals("")) {
+                place.setPrice(Float.parseFloat(tfPrice.getText()));
+            } else {
+                place.setPrice(Float.valueOf(0));
+            }
+            if (dpDateRenewal.getValue() != null) {
+                place.setDateRenewal(Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            } else {
+                place.setDateRenewal(null);
+            }
+            place.setId(table.getSelectionModel().getSelectedItem().getId());
+
+            placeInterface.updatePlace(place);
+
+            //Actualizar la tabla con los nuevos campos
+            updateTable();
+            
+            //Vaciar todos los campos
+            tfAddress.setText("");
+            tfName.setText("");
+            tfPrice.setText("");
+            dpDateRenewal.setValue(null);
+
+        }else{
+            lblAddressError.setVisible(true);
+            tfAddress.setStyle("-fx-border-color: red;");
         }
 
     }
@@ -199,34 +336,66 @@ public class VPlaceController {
     }
 
     @FXML
-    private void handleModifyPlace(ActionEvent event) {
-    }
-
-    @FXML
     private void handlePrintPlace(ActionEvent event) {
     }
 
-    @FXML
-    private void handleTextChanged(KeyEvent event) {
+    private void handleTableSelected(ObservableValue observable, Object oldValue, Object newValue) {
 
-        //Comprobar que los campos Address y Name estén informados
-        if (tfName.getText().isEmpty() || tfAddress.getText().isEmpty()) {
-            //En caso de que no lo estén los los botones Crear y Modificar se deshabilitarán
+        //Si se ha seleccionado una fila informar todos los campos con los datos del Place seleccionado
+        if (newValue != null) {
+            Place place = (Place) newValue;
+            tfAddress.setText(place.getAddress());
+            tfName.setText(place.getName());
+            tfPrice.setText(place.getPrice().toString());
+            dpDateRenewal.setValue(place.getDateRenewal().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+            //Habilitar los botones Modify y Delete y deshabilitar el botón Create
+            btnModify.setDisable(false);
+            btnDelete.setDisable(false);
+            btnCreate.setDisable(true);
+
+        } else {
+            //Si se ha deseleccionado una fila desinformar todos los campos
+            tfAddress.setText("");
+            tfName.setText("");
+            tfPrice.setText("");
+            dpDateRenewal.setValue(null);
+
+            //Deshablitar los botones Create, Modify y Delete
             btnCreate.setDisable(true);
             btnModify.setDisable(true);
-        } else {
-            //En caso de que sí lo estén el botón Create se habilitará
-            btnCreate.setDisable(false);
-
-            btnModify.setDisable(false);
+            btnDelete.setDisable(true);
         }
 
-        if (tfPrice.getText().trim().contains("-")) {
-            btnCreate.setDisable(true);
-            btnModify.setDisable(true);
+    }
+
+    private void updateTable() {
+
+        try {
+            Collection<Place> places = placeInterface.getAllPlaces();
+
+            ObservableList<Place> placesForTable
+                    = FXCollections.observableArrayList(places);
+
+            table.setItems(placesForTable);
+        } catch (Exception e) {
+
+        }
+    }
+
+    private void handleCloseRequest(WindowEvent event) {
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText(null);
+        alert.setTitle("EXIT");
+
+        alert.setContentText("Sure you want to go out?");
+
+        Optional<ButtonType> answer = alert.showAndWait();
+        if (answer.get() == ButtonType.OK) {
+            stage.close();
         } else {
-            btnCreate.setDisable(true);
-            btnModify.setDisable(true);
+            event.consume();
         }
 
     }
