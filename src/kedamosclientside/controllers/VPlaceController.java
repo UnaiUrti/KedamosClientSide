@@ -6,9 +6,12 @@
 package kedamosclientside.controllers;
 
 import java.time.ZoneId;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -32,6 +35,10 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Event;
 import kedamosclientside.entities.Place;
+import kedamosclientside.exceptions.placeAddressExistException;
+import kedamosclientside.exceptions.placeDateBadException;
+import kedamosclientside.exceptions.placeNameBadException;
+import kedamosclientside.exceptions.placePriceBadException;
 import kedamosclientside.logic.PlaceInterface;
 
 /**
@@ -201,6 +208,18 @@ public class VPlaceController {
                 }
             }
         });
+        tfPrice.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                lblPriceError.setVisible(false);
+                tfPrice.setStyle("-fx-border-color: none;");
+            }
+
+        });
+        dpDateRenewal.valueProperty().addListener((observable, oldValue, newValue) -> {
+            lblDateError.setVisible(false);
+            dpDateRenewal.setStyle("-fx-border-color: none;");
+        });
 
         //Comprobar selección de la tabla
         table.getSelectionModel().selectedItemProperty().addListener(this::handleTableSelected);
@@ -214,47 +233,50 @@ public class VPlaceController {
     @FXML
     private void handleCreatePlace(ActionEvent event) {
 
-        Place place = new Place();
-        place.setAddress(tfAddress.getText());
+        try {
+            Place place = new Place();
+            place.setAddress(tfAddress.getText());
 
-        //Comprobar que no exista ya un place con el Address introducido
-        if (placeInterface.getPlaceByAddress(place) == null) {
+            validarCampos();
 
-            if (!tfPrice.getText().matches("[0-9]{1,5}[.][0-9]{1,2}") && !tfPrice.getText().matches("")) {
-                lblPriceError.setVisible(true);
-                tfPrice.setStyle("-fx-border-color: red;");
-            } else {
-                
-                lblPriceError.setVisible(false);
-                tfPrice.setStyle("-fx-border-color: none;");
-
-                //Si no existe añadir un Place con todos los datos introducidos
-                place.setName(tfName.getText());
-                if (!tfPrice.getText().equals("")) {
-                    place.setPrice(Float.parseFloat(tfPrice.getText()));
-                } else {
-                    place.setPrice(Float.valueOf(0));
-                }
-                if (dpDateRenewal.getValue() != null) {
-                    place.setDateRenewal(Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-                } else {
-                    place.setDateRenewal(null);
-                }
-                placeInterface.createPlace(place);
-
-                
-                
-                //Vaciar todos los campos
-                tfAddress.setText("");
-                tfName.setText("");
-                tfPrice.setText("");
-                dpDateRenewal.setValue(null);
-
-                //Actualizar la tabla con nuevos datos
-                updateTable();
+            //Comprobar que no exista ya un place con el Address introducido
+            if (placeInterface.getPlaceByAddress(place) != null) {
+                throw new placeAddressExistException("");
             }
 
-        } else {
+            //Si no existe añadir un Place con todos los datos introducidos
+            place.setName(tfName.getText());
+            if (!tfPrice.getText().equals("")) {
+                place.setPrice(Float.parseFloat(tfPrice.getText()));
+            } else {
+                place.setPrice(Float.valueOf(0));
+            }
+            if (dpDateRenewal.getValue() != null) {
+                place.setDateRenewal(Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            } else {
+                place.setDateRenewal(null);
+            }
+            placeInterface.createPlace(place);
+
+            //Vaciar todos los campos
+            tfAddress.setText("");
+            tfName.setText("");
+            tfPrice.setText("");
+            dpDateRenewal.setValue(null);
+
+            //Actualizar la tabla con nuevos datos
+            updateTable();
+
+        } catch (placePriceBadException ex) {
+            lblPriceError.setVisible(true);
+            tfPrice.setStyle("-fx-border-color: red;");
+        } catch (placeNameBadException ex) {
+            lblNameError.setVisible(true);
+            tfName.setStyle("-fx-border-color: red;");
+        } catch (placeDateBadException ex) {
+            lblDateError.setVisible(true);
+            dpDateRenewal.setStyle("-fx-border-color: red;");
+        } catch (placeAddressExistException ex) {
             lblAddressError.setVisible(true);
             tfAddress.setStyle("-fx-border-color: red;");
         }
@@ -290,15 +312,25 @@ public class VPlaceController {
     }
 
     @FXML
-    private void handleModifyPlace(ActionEvent event) {
+    private void handleModifyPlace(ActionEvent event) throws placePriceBadException {
 
         Place place = new Place();
         place.setAddress(tfAddress.getText());
+        boolean everythingCorrect = false;
 
         //Comprobar que el campo Address sea el mismo que el seleccionado en la tabla
         if (tfAddress.getText().equals(table.getSelectionModel()
-                .getSelectedItem().getAddress()) || placeInterface.getPlaceByAddress(place)==null) {
+                .getSelectedItem().getAddress()) || placeInterface.getPlaceByAddress(place) == null) {
 
+            everythingCorrect = true;
+
+        } else {
+            lblAddressError.setVisible(true);
+            tfAddress.setStyle("-fx-border-color: red;");
+            everythingCorrect = false;
+        }
+
+        if (validarCampos()) {
             //Si coinciden, modificar los campos del Place seleccionado
             place.setName(tfName.getText());
             if (!tfPrice.getText().equals("")) {
@@ -317,16 +349,12 @@ public class VPlaceController {
 
             //Actualizar la tabla con los nuevos campos
             updateTable();
-            
+
             //Vaciar todos los campos
             tfAddress.setText("");
             tfName.setText("");
             tfPrice.setText("");
             dpDateRenewal.setValue(null);
-
-        }else{
-            lblAddressError.setVisible(true);
-            tfAddress.setStyle("-fx-border-color: red;");
         }
 
     }
@@ -372,6 +400,7 @@ public class VPlaceController {
     private void updateTable() {
 
         try {
+            table.getItems().clear();
             Collection<Place> places = placeInterface.getAllPlaces();
 
             ObservableList<Place> placesForTable
@@ -398,6 +427,25 @@ public class VPlaceController {
             event.consume();
         }
 
+    }
+
+    private void validarCampos() throws placePriceBadException, placeNameBadException, placeDateBadException {
+
+        if(!tfAddress.getText().toLowerCase().matches("[0-9]{1-}")){}
+        
+        if (!tfPrice.getText().matches("[0-9]{1,5}[.][0-9]{1,2}") && !tfPrice.getText().matches("[0-9]{1,5}") && !tfPrice.getText().matches("")) {
+            throw new placePriceBadException("");
+        }
+
+        if (!tfName.getText().toLowerCase().matches("[a-z]{1,255}")) {
+            throw new placeNameBadException("");
+        }
+
+        if (dpDateRenewal.getValue() != null) {
+            if (Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()).after(Calendar.getInstance().getTime())) {
+                throw new placeDateBadException("");
+            }
+        }
     }
 
 }
