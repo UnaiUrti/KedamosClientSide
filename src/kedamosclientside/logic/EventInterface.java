@@ -17,13 +17,13 @@ import kedamosclientside.exceptions.ClientLogicException;
  */
 public interface EventInterface {
     
-    public void createEvent(Event event) throws Exception;
+    public void createEvent(Event event) throws ClientLogicException;
     
-    public void editEvent (Event event) throws Exception;
+    public void editEvent (Event event) throws ClientLogicException;
     
-    public void removeEvent (Event event) throws Exception;
+    public void removeEvent (Event event) throws ClientLogicException;
     
-    public void searchEvent (Event event) throws Exception;
+    public void searchEvent (Event event) throws ClientLogicException;
     
     public Collection <Event> getEvents() throws ClientLogicException;
             

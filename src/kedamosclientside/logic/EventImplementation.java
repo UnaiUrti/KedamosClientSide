@@ -29,17 +29,21 @@ public class EventImplementation implements EventInterface {
     }
 
     @Override
-    public void editEvent(Event event) throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void editEvent(Event event) throws ClientLogicException {
+        try{
+            eventREST.edit(event,String.valueOf(event.getEvent_id()));
+        }catch(ClientErrorException e){
+            throw new ClientLogicException(e.getMessage());
+        }
     }
 
     @Override
-    public void removeEvent(Event event) throws Exception {
+    public void removeEvent(Event event) throws ClientLogicException {
        eventREST.remove(event.getEvent_id().toString());
     }
 
     @Override
-    public void searchEvent(Event event) throws Exception {
+    public void searchEvent(Event event) throws ClientLogicException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

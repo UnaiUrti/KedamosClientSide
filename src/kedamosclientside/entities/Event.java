@@ -119,12 +119,12 @@ public class Event implements Serializable {
     
     //Getters & Setters   
 
-    public SimpleLongProperty getEvent_id() {
-        return event_id;
+    public Long getEvent_id() {
+        return event_id.get();
     }
 
-    public void setEvent_id(SimpleLongProperty event_id) {
-        this.event_id = event_id;
+    public void setEvent_id(Long event_id) {
+        this.event_id.set(event_id);
     }
 
     public Date getDate() {

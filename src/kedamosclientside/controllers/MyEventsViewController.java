@@ -1,5 +1,6 @@
 package kedamosclientside.controllers;
 
+import kedamosclientside.exceptions.EmptyFieldsException;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
@@ -22,6 +23,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.SingleSelectionModel;
 import java.time.LocalDate;
+import java.util.EmptyStackException;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -34,6 +36,7 @@ import kedamosclientside.entities.Event;
 import kedamosclientside.entities.PersonalResource;
 import kedamosclientside.entities.Place;
 import kedamosclientside.exceptions.ClientLogicException;
+import kedamosclientside.exceptions.MaxCharacterException;
 import kedamosclientside.logic.EventInterface;
 
 /**
@@ -43,7 +46,7 @@ import kedamosclientside.logic.EventInterface;
  */
 public class MyEventsViewController {
 
-    private final static Logger logger = Logger.getLogger("client.controllers.MyEventsViewController");
+    private final static Logger LOGGER = Logger.getLogger("client.controllers.MyEventsViewController");
     private Stage stage;
     private EventInterface eventinterface;
 
@@ -166,13 +169,13 @@ public class MyEventsViewController {
         } catch (ClientLogicException ex) {
             Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
         }
-            btnCreate.setDisable(true);
-            btnAddPersonal.setDisable(true);
-            btnAddPlace.setDisable(true);
-            btnModify.setDisable(true);
-            btnDelete.setDisable(true);
-            
-            tfTitle.requestFocus();
+        btnCreate.setDisable(false);
+        btnAddPersonal.setDisable(true);
+        btnAddPlace.setDisable(true);
+        btnModify.setDisable(true);
+        btnDelete.setDisable(true);
+
+        tfTitle.requestFocus();
         stage.show();
     }
 
@@ -182,30 +185,31 @@ public class MyEventsViewController {
      * @return Devuelve una variable booleana que dice hay algun campo vacio (si
      * es false hay un campo vacio, si es true esta todo informado)
      */
-    private boolean informedFields() {
+    private boolean informedFields() throws EmptyFieldsException, MaxCharacterException {
 
-        logger.info("Se esta comprobando si algun campo esta vacio");
+        LOGGER.info("Se esta comprobando si algun campo esta vacio");
 
-        if (tfTitle.getText().trim().isEmpty()) {
-            logger.info("El campo Title esta vacio y se va a enviar un mensaje "
-                    + "al usuario");
+        if (tfTitle.getText().trim().isEmpty()
+                || taDescription.getText().isEmpty()
+                || dpDate.getValue() == null
+                || tfPrice.getText().trim().isEmpty()
+                || tfMinParticipants.getText().isEmpty()
+                || tfMaxParticipants.getText().isEmpty()) {
+            LOGGER.warning("Algun campo esta vacio");
+            throw new EmptyFieldsException("Algunos campos estan vacios");
 
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Introduce el Titulo del evento");
-            alert.setContentText("No puedes dejar el campo vacio");
-            alert.show();
-            return false;
-        } else if (taDescription.getText().trim().isEmpty()) {
-            logger.info("El campo Description esta vacio y se va a enviar un "
-                    + "mensaje al usuario");
+        }
+        if (tfTitle.getText().trim().length() > 255
+                || taDescription.getText().trim().length() > 255
+                || tfPrice.getText().trim().length() > 255
+                || tfMinParticipants.getText().trim().length() > 255
+                || tfMaxParticipants.getText().trim().length() > 255) {
+            LOGGER.warning("Algun campo tiene mas de 255 caracteres");
+            throw new MaxCharacterException("Algun campo tiene mas de 255 caracteres");
 
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Introduce una breve descripcion");
-            alert.setContentText("No puedes dejar el campo vacio");
-            alert.show();
-            return false;
-        } else if (dpDate.getValue() == null) {
-            logger.info("El campo Date esta vacio y se va a enviar un "
+        }
+        if (dpDate.getValue() == null) {
+            LOGGER.info("El campo Date esta vacio y se va a enviar un "
                     + "mensaje al usuario");
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -213,8 +217,9 @@ public class MyEventsViewController {
             alert.setContentText("No puedes dejar el campo vacio");
             alert.show();
             return false;
-        } else if (cmbCategory.getValue() == null) {
-            logger.info("El campo Category esta vacio y se va a enviar un "
+        }
+        if (cmbCategory.getValue() == null) {
+            LOGGER.info("El campo Category esta vacio y se va a enviar un "
                     + "mensaje al usuario");
 
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -223,8 +228,9 @@ public class MyEventsViewController {
             alert.show();
             return false;
 
-        } else {
-            logger.info("Todos los campos estan informados");
+        }
+        {
+            LOGGER.info("Todos los campos estan informados");
 
             return true;
         }
@@ -236,13 +242,38 @@ public class MyEventsViewController {
     }
 
     @FXML
-    private void handleCreate(ActionEvent event) {
+    private void handleCreate(ActionEvent event) throws ClientLogicException {
+
+        Event newEvent = new Event();
+
+        newEvent.setTitle(tfTitle.getText().trim());
+        newEvent.setDescription(taDescription.getText().trim());
+        newEvent.setDate(Date.from(dpDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        //newEvent.setCategory(cmbCategory.getValue());
+        newEvent.setPrice(Float.valueOf(0));
+        newEvent.setMinParticipants(Long.valueOf(0));
+        newEvent.setMaxParticipants(Long.valueOf(0));
+
+        newEvent.setEvent_id(null);
+
+        eventinterface.createEvent(newEvent);
+
+        tfTitle.setText("");
+        taDescription.setText("");
+        dpDate.setValue(null);
+        cmbCategory.setValue(null);
+        tfPrice.setText("");
+        tfMinParticipants.setText("");
+        tfMaxParticipants.setText("");
+        //Aqui hacer update
+
+        modifyTable();
 
     }
 
     @FXML
     private void handleDelete(ActionEvent event) {
-        logger.info("Boton para borrar Evento de la BD");
+        LOGGER.info("Boton para borrar Evento de la BD");
 
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle("Delete Event");
@@ -250,7 +281,7 @@ public class MyEventsViewController {
         Optional<ButtonType> resp = alert.showAndWait();
         if (resp.get() == ButtonType.OK) {
             try {
-                logger.info("Borrar evento");
+                LOGGER.info("Borrar evento");
 
                 Event deleteEvent = tvTable.getSelectionModel().getSelectedItem();
                 eventinterface.removeEvent(deleteEvent);
@@ -298,7 +329,7 @@ public class MyEventsViewController {
             tfPrice.setText("");
             tfMinParticipants.setText("");
             tfMaxParticipants.setText("");
-            
+
             //Deshabilitar los botones 
             btnCreate.setDisable(true);
             btnAddPersonal.setDisable(true);
@@ -313,15 +344,40 @@ public class MyEventsViewController {
 
     @FXML
     private void handleModify(ActionEvent event) {
-        
-        Event newEvent = new Event();
-        
-        newEvent.setTitle(tfTitle.getText());
-        newEvent.setDescription(taDescription.getText());
 
-        
-        
-        
+        try {
+            if (informedFields()) {
+                Event newEvent = new Event();
+
+                newEvent.setTitle(tfTitle.getText().trim());
+                newEvent.setDescription(taDescription.getText().trim());
+                newEvent.setDate(Date.from(dpDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                newEvent.setCategory(String.valueOf(cmbCategory.getValue()));
+                newEvent.setPrice(Float.valueOf(tfPrice.getText().trim()));
+                newEvent.setMinParticipants(Long.valueOf(tfMinParticipants.getText().trim()));
+                newEvent.setMaxParticipants(Long.valueOf(tfMaxParticipants.getText().trim()));
+                newEvent.setEvent_id(tvTable.getSelectionModel().getSelectedItem().getEvent_id());
+
+                eventinterface.editEvent(newEvent);
+                //Aqui hacer update
+                modifyTable();
+                tfTitle.setText("");
+                taDescription.setText("");
+                dpDate.setValue(null);
+                cmbCategory.setValue(null);
+                tfPrice.setText("");
+                tfMinParticipants.setText("");
+                tfMaxParticipants.setText("");
+           }
+
+       } catch (EmptyFieldsException ex) {
+            //alerta
+            // en el set context header ponerle ex.getMessage()
+      } catch (MaxCharacterException ex) {
+            //alerta
+        } catch (ClientLogicException ex) {
+            Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @FXML
@@ -339,7 +395,7 @@ public class MyEventsViewController {
     @FXML
     private void handleCloseRequest(WindowEvent event) {
 
-        logger.info("Se ha pulsado la opción de cerrar la ventana");
+        LOGGER.info("Se ha pulsado la opción de cerrar la ventana");
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText(null);
@@ -350,11 +406,24 @@ public class MyEventsViewController {
         Optional<ButtonType> resp = alert.showAndWait();
 
         if (resp.get() == ButtonType.OK) {
-            logger.info("Se ha pulsado Confirm, el programa se va a cerrar");
+            LOGGER.info("Se ha pulsado Confirm, el programa se va a cerrar");
             stage.close();
         } else {
-            logger.info("Se ha cancelado la request, continuua en la misma ventana");
+            LOGGER.info("Se ha cancelado la request, continuua en la misma ventana");
             event.consume();
         }
     }
+
+    private void modifyTable() {
+        tvTable.getItems().clear();
+        try {
+            Collection<Event> events = eventinterface.getEvents();
+            ObservableList<Event> eventsInTable = FXCollections.observableArrayList(events);
+            tvTable.setItems(eventsInTable);
+
+        } catch (Exception e) {
+
+        }
+    }
+
 }
