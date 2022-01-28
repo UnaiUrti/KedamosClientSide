@@ -24,11 +24,11 @@
          <children>
             <TextField fx:id="txtUsername" promptText="Username" />
             <Separator opacity="0.0" prefHeight="0.0" prefWidth="200.0" />
-            <Label fx:id="lblErrorUsername" prefHeight="22.0" prefWidth="199.0" textFill="RED" />
+            <Label fx:id="lblUsername" prefHeight="22.0" prefWidth="199.0" textFill="RED" />
             <Separator opacity="0.0" prefHeight="9.0" prefWidth="200.0" />
             <PasswordField fx:id="txtPassword" promptText="Password" />
             <Separator prefWidth="200.0" />
-            <Label fx:id="lblErrorPasswd" prefHeight="17.0" prefWidth="196.0" textFill="RED" />
+            <Label fx:id="lblPassword" prefHeight="17.0" prefWidth="196.0" textFill="RED" />
             <Separator opacity="0.0" prefHeight="39.0" prefWidth="200.0" />
             <Button fx:id="btnSignIn" mnemonicParsing="false" onAction="#handleSignInAction" text="SignIn" />
          </children>

@@ -21,7 +21,7 @@ import javax.ws.rs.core.GenericType;
  *        client.close();
  * </pre>
  *
- * @author Freak
+ * @author 2dam
  */
 public class UserREST {
 
@@ -38,12 +38,6 @@ public class UserREST {
         WebTarget resource = webTarget;
         resource = resource.path("count");
         return resource.request(javax.ws.rs.core.MediaType.TEXT_PLAIN).get(String.class);
-    }
-
-    public <T> T adminLoginValidation(GenericType<T> responseType, String username, String passwd) throws ClientErrorException {
-        WebTarget resource = webTarget;
-        resource = resource.path(java.text.MessageFormat.format("adminLoginValidation/{0}/{1}", new Object[]{username, passwd}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public void edit(Object requestEntity, Long id) throws ClientErrorException {
@@ -73,6 +67,12 @@ public class UserREST {
 
     public void remove(Long id) throws ClientErrorException {
         webTarget.path(java.text.MessageFormat.format("{0}", new Object[]{id})).request().delete();
+    }
+
+    public <T> T validateLogin(GenericType<T> responseType, String username, String password) throws ClientErrorException {
+        WebTarget resource = webTarget;
+        resource = resource.path(java.text.MessageFormat.format("validateLogin/{0}/{1}", new Object[]{username, password}));
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
     }
 
     public void close() {

@@ -1,6 +1,7 @@
 package kedamosclientside.controllers;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,6 +19,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javax.ws.rs.NotAuthorizedException;
@@ -25,8 +28,6 @@ import javax.ws.rs.NotFoundException;
 import kedamosclientside.entities.Client;
 import kedamosclientside.entities.EventManager;
 import kedamosclientside.entities.User;
-import kedamosclientside.entities.UserPrivilege;
-import kedamosclientside.entities.UserStatus;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
 import kedamosclientside.logic.EventManagerFactory;
@@ -71,6 +72,20 @@ public class VSignInController {
     private final String ADMIN = "ADMIN";
     private final String CLIENT = "CLIENT";
     private final String EVENT_MANAGER = "EVENT_MANAGER";
+    @FXML
+    private Pane signInPane;
+    @FXML
+    private Label lblUsername;
+    @FXML
+    private Label lblPassword;
+    @FXML
+    private ImageView imgUserIco;
+    @FXML
+    private ImageView imgPassIco;
+    @FXML
+    private Label lblSignIn;
+    @FXML
+    private ImageView imgTItlePic;
 
     public Stage getStage() {
         return stage;
@@ -121,8 +136,8 @@ public class VSignInController {
         this.txtPassword.setTooltip(tooltip);
 
         //Labels no estan visibles
-        this.lblErrorUsername.setVisible(false);
-        this.lblErrorPasswd.setVisible(false);
+        this.lblUsername.setVisible(false);
+        this.lblPassword.setVisible(false);
 
         //Limitar la entrada de maximo 50 caracteres (ChangeListener)
         this.txtUsername.textProperty().addListener(this::limitCharacters);
@@ -150,87 +165,41 @@ public class VSignInController {
         logger.info("Se ha pulsado el boton de inicio de sesion");
 
         // Vamos a comprobar que tipo de usuario se va a logear
-        User user;
-        Client client;
-        EventManager eventManager;
         try {
-            // Vamos a comprobar si es un cliente
-            client = new Client();
-            client.setUsername(txtUsername.getText());
-            client.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-            // Validamos las credenciales y miramos si es un Cliente
-            client = ci.clientLoginValidation(client);
-            chooseWindowByUserType(CLIENT);
 
-        } catch (NotFoundException ex) {
-            logger.info("No se ha encontrado al cliente");
-            //Alert alert = new Alert(Alert.AlertType.ERROR);
-            //alert.setHeaderText(ex.getMessage());
-            //alert.show();
-        } catch (NotAuthorizedException ex) {
-            logger.info("La contraseña del cliente no coincide");
-        }
-        try {
-            // Vamos a comprobar a ver si es un event manager
-            eventManager = new EventManager();
-            eventManager.setUsername(txtUsername.getText());
-            eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-            // Validamos las credenciales y miramos si es un EventManager
-            eventManager = emi.eventManagerLoginValidation(eventManager);
-            logger.info("Un Event Manager se acaba de logear");
-            chooseWindowByUserType(EVENT_MANAGER);
+            lblUsername.setVisible(false);
+            lblPassword.setVisible(false);
 
-        } catch (NotFoundException ex) {
-            logger.info("No se ha encontrado al event manager");
-        } catch (NotAuthorizedException ex) {
-            logger.info("La contraseña del event manager no coincide");
-        }
+            User u = new User();
+            u.setUsername(txtUsername.getText().trim());
+            u.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
 
-        try {
-            // Vamos a comprobar si es un administrador
-            user = new User();
-            user.setUsername(txtUsername.getText());
-            user.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-            // Validamos las credenciales y miramos si es un Cliente
-            user = ui.adminLoginValidation(user);
-            chooseWindowByUserType(ADMIN);
+            Collection<User> users = ui.LoginValidation(u);
+            User user = users.stream().findFirst().get();
+            //System.out.println("TODO HA SALIDO BIEN");
+            switch (user.getPrivilege()) {
+                case CLIENT:
 
-        } catch (NotFoundException ex) {
-            logger.info("No se ha encontrado al administrador");
-        } catch (NotAuthorizedException ex) {
-            logger.info("La contraseña del administrador no coincide");
-        }
+                    break;
+                case EVENT_MANAGER:
 
-    }
-
-    private void chooseWindowByUserType(String userType) {
-        try {
-            stage.close();
-            FXMLLoader loader;
-            Parent root;
-            switch (userType) {
+                    break;
                 case ADMIN:
-                    loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                    root = loader.load();
+                    stage.close();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
+                    Parent root = loader.load();
                     Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
                     VUserManagementController controller = ((VUserManagementController) loader.getController());
                     controller.setStage(stage);
                     controller.initStage(root);
-                case CLIENT:
-                //loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                //root = loader.load();
-                //Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del cliente");
-                //VUserManagementController controller = ((VUserManagementController) loader.getController());
-                //controller.setStage(stage);
-                //controller.initStage(root);
-                case EVENT_MANAGER:
-                //loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                //root = loader.load();
-                //Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del cliente");
-                //VUserManagementController controller = ((VUserManagementController) loader.getController());
-                //controller.setStage(stage);
-                //controller.initStage(root);
+                    break;
             }
+        } catch (NotFoundException ex) {
+            lblUsername.setVisible(true);
+            lblUsername.setText("Usernmae does not exist");
+        } catch (NotAuthorizedException ex) {
+            lblPassword.setVisible(true);
+            lblPassword.setText("Password incorrect");
         } catch (IOException ex) {
             Logger.getLogger(VSignInController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -396,7 +365,6 @@ public class VSignInController {
      *
      * @param event Respresenta la accion del evento handleCloseRequest
      */
-    @FXML
     private void handleCloseRequest(WindowEvent event) {
 
         logger.info("Se ha pulsado la X de la barra de titulo y se enviara "

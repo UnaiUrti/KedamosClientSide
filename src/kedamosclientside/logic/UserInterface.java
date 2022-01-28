@@ -45,5 +45,5 @@ public interface UserInterface {
      * @param user
      * @return 
      */
-    public User adminLoginValidation(User user);
+    public Collection<User> LoginValidation(User user);
 }

@@ -55,10 +55,9 @@ public class UserImplementation implements UserInterface {
     }
 
     @Override
-    public User adminLoginValidation(User user) {
-        User userBean;
-        userBean = webClient.adminLoginValidation(new GenericType<Client>() {
-        }, user.getUsername(), user.getPassword());
-        return userBean;
+    public Collection<User> LoginValidation(User user) {
+        Set<User> users;
+        users = webClient.validateLogin(new GenericType<Set<User>>(){}, user.getUsername(), user.getPassword());
+        return users;
     }
 }
