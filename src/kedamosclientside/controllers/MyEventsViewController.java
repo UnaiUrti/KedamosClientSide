@@ -242,32 +242,36 @@ public class MyEventsViewController {
     }
 
     @FXML
-    private void handleCreate(ActionEvent event) throws ClientLogicException {
+    private void handleCreate(ActionEvent event){
 
-        Event newEvent = new Event();
+        try {
+            Event newEvent = new Event();
+            
+            newEvent.setTitle(tfTitle.getText().trim());
+            newEvent.setDescription(taDescription.getText().trim());
+            newEvent.setDate(Date.from(dpDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            newEvent.setCategory(String.valueOf(cmbCategory.getValue()));
+            newEvent.setPrice(Float.valueOf(0));
+            newEvent.setMinParticipants(Long.valueOf(0));
+            newEvent.setMaxParticipants(Long.valueOf(0));
+            
+            newEvent.setEvent_id(null);
+            
+            eventinterface.createEvent(newEvent);
+            
+            tfTitle.setText("");
+            taDescription.setText("");
+            dpDate.setValue(null);
+            cmbCategory.setValue(null);
+            tfPrice.setText("");
+            tfMinParticipants.setText("");
+            tfMaxParticipants.setText("");
+            //Aqui hacer update
 
-        newEvent.setTitle(tfTitle.getText().trim());
-        newEvent.setDescription(taDescription.getText().trim());
-        newEvent.setDate(Date.from(dpDate.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-        //newEvent.setCategory(cmbCategory.getValue());
-        newEvent.setPrice(Float.valueOf(0));
-        newEvent.setMinParticipants(Long.valueOf(0));
-        newEvent.setMaxParticipants(Long.valueOf(0));
-
-        newEvent.setEvent_id(null);
-
-        eventinterface.createEvent(newEvent);
-
-        tfTitle.setText("");
-        taDescription.setText("");
-        dpDate.setValue(null);
-        cmbCategory.setValue(null);
-        tfPrice.setText("");
-        tfMinParticipants.setText("");
-        tfMaxParticipants.setText("");
-        //Aqui hacer update
-
-        modifyTable();
+            modifyTable();
+        } catch (ClientLogicException ex) {
+            Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
     }
 
