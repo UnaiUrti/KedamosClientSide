@@ -19,28 +19,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.NotFoundException;
-import kedamosclientside.entities.Client;
-import kedamosclientside.entities.EventManager;
 import kedamosclientside.entities.User;
-import kedamosclientside.logic.ClientFactory;
-import kedamosclientside.logic.ClientInterface;
-import kedamosclientside.logic.EventManagerFactory;
-import kedamosclientside.logic.EventManagerInterface;
+import kedamosclientside.exceptions.PasswordIncorrect;
+import kedamosclientside.exceptions.ServerDown;
+import kedamosclientside.exceptions.UsernameDoesNotExist;
 import kedamosclientside.logic.UserFactory;
-//import kedamosclientside.logic.UserFactory;
 import kedamosclientside.logic.UserInterface;
 import kedamosclientside.security.Crypt;
 
 /**
  * Clase controladora para la ventana de SignIn
  *
- * @author UnaiUrtiaga, AdrianFranco
+ * @author Steven Arce
  */
 public class VSignInController {
 
@@ -55,38 +47,20 @@ public class VSignInController {
     @FXML
     private TextField txtUsername;
     @FXML
-    private Label lblErrorUsername;
-    @FXML
     private PasswordField txtPassword;
-    @FXML
-    private Label lblErrorPasswd;
     @FXML
     private Hyperlink hlSignUp;
     @FXML
-    private Hyperlink hlForgotPasswd;
-
-    private UserInterface ui = UserFactory.getUserImplementation();
-    private ClientInterface ci = ClientFactory.getClientImplementation();
-    private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
-
-    private final String ADMIN = "ADMIN";
-    private final String CLIENT = "CLIENT";
-    private final String EVENT_MANAGER = "EVENT_MANAGER";
-    @FXML
-    private Pane signInPane;
+    private Hyperlink hlForgotPassword;
     @FXML
     private Label lblUsername;
     @FXML
     private Label lblPassword;
-    @FXML
-    private ImageView imgUserIco;
-    @FXML
-    private ImageView imgPassIco;
-    @FXML
-    private Label lblSignIn;
-    @FXML
-    private ImageView imgTItlePic;
 
+    private UserInterface ui = UserFactory.getUserImplementation();
+
+    //private ClientInterface ci = ClientFactory.getClientImplementation();
+    //private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
     public Stage getStage() {
         return stage;
     }
@@ -106,7 +80,6 @@ public class VSignInController {
         logger.info("Iniciado el initStage de la ventana SignIn");
 
         Scene scene = new Scene(root);
-
         stage.setScene(scene);
         stage.setTitle("SignIn");
 
@@ -121,7 +94,7 @@ public class VSignInController {
         this.hlSignUp.setDisable(false);
 
         //Hyperlink Forgot password? habilitado
-        this.hlForgotPasswd.setDisable(false);
+        this.hlForgotPassword.setDisable(false);
 
         //Se enfoca en el campo username
         this.txtUsername.requestFocus();
@@ -152,6 +125,13 @@ public class VSignInController {
 
     }
 
+    private void clearLabels() {
+        txtUsername.setStyle(null);
+        lblUsername.setVisible(false);
+        txtPassword.setStyle(null);
+        lblPassword.setVisible(false);
+    }
+
     /*
     /**
      * Metodo que se va a ejecutar una vez pulsado el boton signIn en el cual se
@@ -164,46 +144,63 @@ public class VSignInController {
 
         logger.info("Se ha pulsado el boton de inicio de sesion");
 
-        // Vamos a comprobar que tipo de usuario se va a logear
-        try {
+        clearLabels();
 
-            lblUsername.setVisible(false);
-            lblPassword.setVisible(false);
+        if (informedFields()) {
+            try {
+                // Vamos a comprobar que tipo de usuario se va a logear
+                User u = new User();
+                u.setUsername(txtUsername.getText().trim());
+                u.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
 
-            User u = new User();
-            u.setUsername(txtUsername.getText().trim());
-            u.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-
-            Collection<User> users = ui.LoginValidation(u);
-            User user = users.stream().findFirst().get();
-            //System.out.println("TODO HA SALIDO BIEN");
-            switch (user.getPrivilege()) {
-                case CLIENT:
-
-                    break;
-                case EVENT_MANAGER:
-
-                    break;
-                case ADMIN:
-                    stage.close();
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                    Parent root = loader.load();
-                    Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
-                    VUserManagementController controller = ((VUserManagementController) loader.getController());
-                    controller.setStage(stage);
-                    controller.initStage(root);
-                    break;
+                Collection<User> users = ui.LoginValidation(u);
+                User user = users.stream().findFirst().get();
+                //System.out.println("TODO HA SALIDO BIEN");
+                switch (user.getPrivilege()) {
+                    case CLIENT:
+                        /*stage.close();
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
+                        Parent root = loader.load();
+                        Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
+                        VUserManagementController controller = ((VUserManagementController) loader.getController());
+                        controller.setStage(stage);
+                        controller.initStage(root);*/
+                        break;
+                    case EVENT_MANAGER:
+                        /*stage.close();
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
+                        Parent root = loader.load();
+                        Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
+                        VUserManagementController controller = ((VUserManagementController) loader.getController());
+                        controller.setStage(stage);
+                        controller.initStage(root);*/
+                        break;
+                    case ADMIN:
+                        stage.close();
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
+                        Parent root = loader.load();
+                        Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
+                        VUserManagementController controller = ((VUserManagementController) loader.getController());
+                        controller.setStage(stage);
+                        controller.initStage(root);
+                        break;
+                }
+            } catch (UsernameDoesNotExist ex) {
+                txtUsername.setStyle("-fx-border-color: red;");
+                lblUsername.setText("Username does not exist");
+                lblUsername.setVisible(true);
+            } catch (PasswordIncorrect ex) {
+                txtPassword.setStyle("-fx-border-color: red;");
+                lblPassword.setText("Incorrect password");
+                lblPassword.setVisible(true);
+            } catch (IOException ex) {
+                Logger.getLogger(VSignInController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ServerDown ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(ex.getMessage());
+                alert.show();
             }
-        } catch (NotFoundException ex) {
-            lblUsername.setVisible(true);
-            lblUsername.setText("Usernmae does not exist");
-        } catch (NotAuthorizedException ex) {
-            lblPassword.setVisible(true);
-            lblPassword.setText("Password incorrect");
-        } catch (IOException ex) {
-            Logger.getLogger(VSignInController.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }
 
     /**
@@ -216,39 +213,20 @@ public class VSignInController {
 
         logger.info("Se esta comprobando si algun campo esta vacio");
 
+        boolean informed = true;
         if (txtUsername.getText().trim().isEmpty()) {
-            logger.info("El campo usuario esta vacio y se va a enviar un mensaje "
-                    + "al usuario");
             txtUsername.setStyle("-fx-border-color: red;");
-            lblErrorUsername.setVisible(true);
-            lblErrorUsername.setText("Username field can not be empty");
-            /*
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Introduce un nombre de usuario");
-            alert.setContentText("No puedes dejar el campo vacio");
-            alert.show();
-             */
-            return false;
-
+            lblUsername.setText("Username cannot be empty");
+            lblUsername.setVisible(true);
+            informed = false;
         }
         if (txtPassword.getText().trim().isEmpty()) {
-            logger.info("El campo password esta vacio y se va a enviar un "
-                    + "mensaje al usuario");
             txtPassword.setStyle("-fx-border-color: red;");
-            lblErrorPasswd.setVisible(true);
-            lblErrorPasswd.setText("Username field can not be empty");
-            /*
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText("Introduce una contraseña");
-            alert.setContentText("No puedes dejar el campo vacio");
-            alert.show();
-             */
-            return false;
-
+            lblPassword.setText("Username field can not be empty");
+            lblPassword.setVisible(true);
+            informed = false;
         }
-
-        logger.info("Todos los campos estan informados");
-        return true;
+        return informed;
 
     }
 
@@ -288,12 +266,9 @@ public class VSignInController {
 
             //La ventana actual se cierra
             stage.close();
-
             //El usuario es dirigido a la ventana SignUp
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VSignUp.fxml"));
-
             Parent root = loader.load();
-
             VSignUpController controller = ((VSignUpController) loader.getController());
             controller.setStage(stage);
             controller.initStage(root);
@@ -309,13 +284,11 @@ public class VSignInController {
         try {
             //La ventana actual se cierra
             stage.close();
-            Logger.getLogger(VSignInController.class.getName()).info("VENTANA RESET PASSWORD");
+            //Logger.getLogger(VSignInController.class.getName()).info("VENTANA RESET PASSWORD");
             //El usuario inicia sesion y va a la ventana LogOut
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VResetPassword.fxml"));
-
             Parent root = loader.load();
             //Logger.getLogger(VSignInController.class.getName()).info("LOGOUT VENTANA");
-
             VResetPasswordController controller = ((VResetPasswordController) loader.getController());
             controller.setStage(stage);
             controller.initStage(root);
@@ -342,7 +315,7 @@ public class VSignInController {
         alert.setHeaderText(null);
         alert.setTitle("EXIT");
 
-        alert.setContentText("Seguro que quiere salir?");
+        alert.setContentText("Are you sure you want to go out?");
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
@@ -375,7 +348,7 @@ public class VSignInController {
         alert.setHeaderText(null);
         alert.setTitle("EXIT");
 
-        alert.setContentText("Seguro que quiere salir?");
+        alert.setContentText("Are you sure you want to go out?");
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {

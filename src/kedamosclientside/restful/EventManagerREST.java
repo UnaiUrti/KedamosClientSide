@@ -5,6 +5,7 @@
  */
 package kedamosclientside.restful;
 
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -21,13 +22,14 @@ import javax.ws.rs.core.GenericType;
  *        client.close();
  * </pre>
  *
- * @author Freak
+ * @author Steven Arce
  */
 public class EventManagerREST {
 
+    private static final ResourceBundle RB = ResourceBundle.getBundle("kedamosclientside.config.RESTParameters");
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:8080/KedamosServerSide/webresources";
+    private static final String BASE_URI = RB.getString("ClientURI");
 
     public EventManagerREST() {
         client = javax.ws.rs.client.ClientBuilder.newClient();

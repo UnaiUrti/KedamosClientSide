@@ -1,26 +1,31 @@
 package kedamosclientside.controllers;
 
+import java.io.IOException;
 import java.util.Optional;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
+import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
-import javax.ws.rs.NotFoundException;
 import kedamosclientside.entities.Client;
+import kedamosclientside.exceptions.EmailDoesNotExist;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
 
 /**
  * Clase controladora para la ventana de SignIn
  *
- * @author UnaiUrtiaga, AdrianFranco
+ * @author Steven Arce
  */
 public class VResetPasswordController {
 
@@ -31,9 +36,15 @@ public class VResetPasswordController {
     @FXML
     private TextField txtEmail;
     @FXML
-    private Button bntResetPassword;
+    private Button btnBack;
     @FXML
-    private Button btnExit;
+    private Button btnResetPassword;
+    @FXML
+    private ImageView imgPassIco;
+    @FXML
+    private Label lblSignIn;
+    @FXML
+    private Label lblEmail;
 
     private ClientInterface ci = ClientFactory.getClientImplementation();
 
@@ -67,8 +78,15 @@ public class VResetPasswordController {
         //Accion de cerrar desde la barra de titulo
         stage.setOnCloseRequest(this::handleCloseRequest);
 
+        // Se enfoca en el campo email
+        txtEmail.requestFocus();
+
+        // Limtar la entrada de caracteres
+        this.txtEmail.textProperty().addListener(this::limitCharacters);
+        
         //Accion de cerrar desde la barra de titulo
-        //stage.setOnCloseRequest(this::handleCloseRequest);
+        stage.setOnCloseRequest(this::handleCloseRequest);
+        
         stage.show();
 
     }
@@ -76,17 +94,54 @@ public class VResetPasswordController {
     @FXML
     private void handleResetPasswordAction(ActionEvent event) {
         try {
+            lblEmail.setVisible(false);
+            txtEmail.setStyle(null);
             Client client = new Client();
             client.setEmail(txtEmail.getText());
             ci.resetPassword(client);
-        } catch (NotFoundException ex) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setHeaderText(null);
-            alert.setTitle(ex.getMessage());
+            txtEmail.clear();
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setHeaderText("Password reset successfully");
+            alert.show();
+        } catch (EmailDoesNotExist ex) {
+            txtEmail.setStyle("-fx-border-color: red;");
+            lblEmail.setText(ex.getMessage());
+            lblEmail.setVisible(true);
         }
+
+    }
+
+    private void limitCharacters(ObservableValue observable, String oldValue,
+            String newValue) {
+        //logger.info("Inicio del metodo para limitar la entrada de un maximo de caracteres");
+
+        if (txtEmail.getText().length() > 50) {
+            txtEmail.setText(oldValue);
+        }
+
     }
 
     @FXML
+    private void handleBack(ActionEvent event) {
+        //logger.info("Se ha pulsado el boton back");
+        //logger.info("se volvera a la ventana de VSignIn");
+        stage.close();
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VSignIn.fxml"));
+
+        Parent root = null;
+        try {
+            root = (Parent) loader.load();
+        } catch (IOException ex) {
+            //logger.severe("Se ha producido un error al cargarel fxml de la ventana singIn");
+        }
+
+        VSignInController controller = (VSignInController) loader.getController();
+        controller.setStage(stage);
+        controller.initStage(root);
+
+    }
+
     private void handleCloseRequest(WindowEvent event) {
 
         //logger.info("Se ha pulsado la X de la barra de titulo y se enviara "
@@ -96,7 +151,7 @@ public class VResetPasswordController {
         alert.setHeaderText(null);
         alert.setTitle("EXIT");
 
-        alert.setContentText("Seguro que quiere salir?");
+        alert.setContentText("Are you sure you want to go out?");
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {

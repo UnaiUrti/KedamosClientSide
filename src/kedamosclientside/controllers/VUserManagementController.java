@@ -1,13 +1,12 @@
 package kedamosclientside.controllers;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Optional;
-import java.util.Set;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -52,12 +51,6 @@ public class VUserManagementController {
     private Stage stage;
     @FXML
     private TableView<EventManager> tlView;
-
-    private ObservableList<EventManager> usersData;
-
-    private UserInterface ui = UserFactory.getUserImplementation();
-    private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
-
     @FXML
     private TableColumn tlEmail;
     @FXML
@@ -108,6 +101,11 @@ public class VUserManagementController {
     private Label lblManagerCategory;
     @FXML
     private Label lblLastPasswordChange;
+
+    private ObservableList<EventManager> usersData;
+
+    private UserInterface ui = UserFactory.getUserImplementation();
+    private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
 
     public Stage getStage() {
         return stage;
@@ -227,8 +225,8 @@ public class VUserManagementController {
 
     @FXML
     private void handleCreateEventManager(ActionEvent event) {
-
-        if (informedFields() & emailPattern() & validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
+        clearAllLabels();
+        if (informedCreateFields() & emailPattern() & validateCreateUsernameEmail()) {
 
             // Creamos el event manager con todos sus datos
             EventManager eventManager = new EventManager();
@@ -241,7 +239,7 @@ public class VUserManagementController {
             if (dpLastPasswordChange.getValue() != null) {
                 eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             } else {
-                eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                eventManager.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
             }
 
             eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
@@ -252,7 +250,8 @@ public class VUserManagementController {
 
             // Cargamos otra vez la tabla con todos los datos
             loadTableWithData();
-
+            // Limpiamos los labels y los bordes de los fields
+            clearAllLabels();
             // Alerta para indicar que se ha creado con exito el event manager
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText("The account has been created successfully");
@@ -263,10 +262,10 @@ public class VUserManagementController {
 
     @FXML
     private void handleEditEventManger(ActionEvent event) {
-        //informedFields() &
+        clearAllLabels();
         EventManager em = tlView.getSelectionModel().getSelectedItem();
-        if (emailPattern() & validateEditUsernameEmail(txtUsername.getText().trim(), em)) {
-            //if (validateUsernameEmail(txtUsername.getText().trim(), txtEmail.getText().trim())) {
+        if (informedEditFields() & emailPattern() & validateEditUsernameEmail(em)) {
+
             // Creamos el event manager con todos sus datos
             EventManager eventManager = new EventManager();
             eventManager.setUser_id(em.getUser_id());
@@ -275,11 +274,17 @@ public class VUserManagementController {
             eventManager.setEmail(txtEmail.getText().trim());
             if (!txtPassword.getText().trim().isEmpty()) {
                 eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+                eventManager.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
             } else {
                 eventManager.setPassword(em.getPassword());
+                eventManager.setLastPasswordChange(em.getLastPasswordChange());
+            }
+            if (dpLastPasswordChange.getValue().equals(em.getLastPasswordChange().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
+                eventManager.setLastPasswordChange(em.getLastPasswordChange());
+            } else {
+                eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             }
             eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
-            eventManager.setLastPasswordChange(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
             eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
             eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
 
@@ -288,7 +293,8 @@ public class VUserManagementController {
 
             // Cargamos otra vez la tabla con todos los datos
             loadTableWithData();
-
+            // Limpiamos los labels y los bordes de los fields
+            clearAllLabels();
             // Alerta para indicar que se ha creado con exito el event manager
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setHeaderText("The account has been modified successfully");
@@ -302,7 +308,9 @@ public class VUserManagementController {
 
         emi.removeEventManager(tlView.getSelectionModel()
                 .getSelectedItem());
-
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText("The account has been deleted successfully");
+        alert.show();
         loadTableWithData();
 
     }
@@ -320,56 +328,68 @@ public class VUserManagementController {
 
     }
 
-    private boolean validateUsernameEmail(String username, String email) {
+    private void clearAllLabels() {
+
+        txtEmail.setStyle(null);
+        txtFullName.setStyle(null);
+        txtPassword.setStyle(null);
+        txtUsername.setStyle(null);
+        dpLastPasswordChange.setStyle(null);
+
+        lblUsername.setVisible(false);
+        lblFullName.setVisible(false);
+        lblEmail.setVisible(false);
+        lblPassword.setVisible(false);
+        lblStatus.setVisible(false);
+        lblManagerCategory.setVisible(false);
+        lblLastPasswordChange.setVisible(false);
+
+    }
+
+    private boolean validateCreateUsernameEmail() {
 
         boolean find = true;
-
-        lblEmail.setVisible(false);
-        lblEmail.setVisible(false);
-
         Collection<User> users = ui.findAllUser();
 
-        for (User u : users) {
-            if (u.getUsername().equalsIgnoreCase(username)) {
-                lblUsername.setVisible(true);
-                lblUsername.setText("Username is already in use");
-                txtUsername.setStyle("-fx-border-color: red;");
-                //System.out.println("Se ha encomtrado el usuario");
-                //find = true;
-                find = false;
-            }
-            if (u.getEmail().equalsIgnoreCase(email)) {
-                lblEmail.setVisible(true);
-                lblEmail.setText("Email is already in use");
-                txtEmail.setStyle("-fx-border-color: red;");
-                find = false;
-            }
+        if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText().trim())).count() != 0) {
+            txtUsername.setStyle("-fx-border-color: red;");
+            lblUsername.setText("Username is already in use");
+            lblUsername.setVisible(true);
+            find = false;
         }
-
+        if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText().trim())).count() != 0) {
+            txtEmail.setStyle("-fx-border-color: red;");
+            lblEmail.setText("Email is already in use");
+            lblEmail.setVisible(true);
+            find = false;
+        }
         return find;
     }
 
-    private boolean validateEditUsernameEmail(String username, EventManager em) {
+    private boolean validateEditUsernameEmail(EventManager em) {
 
-        //txtUsername.setStyle("");
-        lblUsername.setVisible(false);
-        //lblEmail.setVisible(false);
-
+        boolean find = true;
         Collection<User> users = ui.findAllUser();
 
-        if (users.stream().filter(u -> u.getUsername().equals(username)).count()
-                == 0 | em.getUsername().equalsIgnoreCase(username)) {
-            return true;
-        } else {
-            lblUsername.setVisible(true);
-            lblUsername.setText("Username is already in use");
+        if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText().trim())).count() != 0 & !em.getUsername().
+                equalsIgnoreCase(txtUsername.getText().trim())) {
             txtUsername.setStyle("-fx-border-color: red;");
-            return false;
+            lblUsername.setText("Username is already in use");
+            lblUsername.setVisible(true);
+            find = false;
         }
+        if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText().trim())).count() != 0
+                & !em.getEmail().equalsIgnoreCase(txtEmail.getText().trim())) {
+            txtEmail.setStyle("-fx-border-color: red;");
+            lblEmail.setText("Email is already in use");
+            lblEmail.setVisible(true);
+            find = false;
+        }
+        return find;
 
     }
 
-    private boolean informedFields() {
+    private boolean informedCreateFields() {
         //logger.info("Iniciado el evento para controlar si el campo esta vacio");
 
         boolean informed = true;
@@ -379,59 +399,79 @@ public class VUserManagementController {
             lblUsername.setText("Username cannot be empty");
             txtUsername.setStyle("-fx-border-color: red;");
             informed = false;
-        } else {
-            lblUsername.setVisible(false);
-            txtUsername.setStyle(null);
         }
         if (txtEmail.getText().trim().isEmpty()) {
             lblEmail.setVisible(true);
             lblEmail.setText("Email cannot be empty");
             txtEmail.setStyle("-fx-border-color: red;");
             informed = false;
-        } else {
-            lblEmail.setVisible(false);
-            txtEmail.setStyle(null);
         }
         if (txtFullName.getText().trim().isEmpty()) {
             lblFullName.setVisible(true);
             lblFullName.setText("Full Name cannot be empty");
             txtFullName.setStyle("-fx-border-color: red;");
             informed = false;
-        } else {
-            lblFullName.setVisible(false);
-            txtFullName.setStyle(null);
         }
         if (txtPassword.getText().trim().isEmpty()) {
             lblPassword.setVisible(true);
             lblPassword.setText("Password cannot be empty");
             txtPassword.setStyle("-fx-border-color: red;");
             informed = false;
-        } else {
-            lblPassword.setVisible(false);
-            txtPassword.setStyle(null);
         }
         if (cbStatus.getSelectionModel().getSelectedIndex() == -1) {
             lblStatus.setVisible(true);
             lblStatus.setText("Status cannot be empty");
             cbStatus.setStyle("-fx-border-color: red;");
             informed = false;
-        } else {
-            lblStatus.setVisible(false);
-            cbStatus.setStyle(null);
         }
         if (cbManagerCategory.getSelectionModel().getSelectedIndex() == -1) {
             lblManagerCategory.setVisible(true);
             lblManagerCategory.setText("Manager Category cannot be empty");
             cbManagerCategory.setStyle("-fx-border-color: red;");
             informed = false;
-        } else {
-            lblManagerCategory.setVisible(false);
-            cbManagerCategory.setStyle(null);
         }
         return informed;
     }
 
-    private void limitCharacters(ObservableValue<? extends String> observable, String oldValue,
+    private boolean informedEditFields() {
+        //logger.info("Iniciado el evento para controlar si el campo esta vacio");
+
+        boolean informed = true;
+
+        if (txtUsername.getText().trim().isEmpty()) {
+            lblUsername.setVisible(true);
+            lblUsername.setText("Username cannot be empty");
+            txtUsername.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (txtEmail.getText().trim().isEmpty()) {
+            lblEmail.setVisible(true);
+            lblEmail.setText("Email cannot be empty");
+            txtEmail.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (txtFullName.getText().trim().isEmpty()) {
+            lblFullName.setVisible(true);
+            lblFullName.setText("Full Name cannot be empty");
+            txtFullName.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (cbStatus.getSelectionModel().getSelectedIndex() == -1) {
+            lblStatus.setVisible(true);
+            lblStatus.setText("Status cannot be empty");
+            cbStatus.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (cbManagerCategory.getSelectionModel().getSelectedIndex() == -1) {
+            lblManagerCategory.setVisible(true);
+            lblManagerCategory.setText("Manager Category cannot be empty");
+            cbManagerCategory.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        return informed;
+    }
+
+    private void limitCharacters(ObservableValue observable, String oldValue,
             String newValue) {
         //logger.info("Inicio del metodo para limitar la entrada de un maximo de caracteres");
 

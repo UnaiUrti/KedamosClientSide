@@ -7,8 +7,10 @@ package kedamosclientside.logic;
 
 import java.util.Collection;
 import java.util.Set;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.GenericType;
 import kedamosclientside.entities.Client;
+import kedamosclientside.exceptions.EmailDoesNotExist;
 import kedamosclientside.restful.ClientREST;
 
 /**
@@ -55,10 +57,14 @@ public class ClientImplementation implements ClientInterface {
     }
 
     @Override
-    public Client resetPassword(Client client) {
-        Client clientBean;
-        clientBean = webClient.resetPassword(new GenericType<Client>() {
-        }, client.getEmail());
+    public Client resetPassword(Client client) throws EmailDoesNotExist{
+        Client clientBean = null;
+        try {
+            clientBean = webClient.resetPassword(new GenericType<Client>() {
+            }, client.getEmail());
+        } catch (NotFoundException ex) {
+            throw new EmailDoesNotExist("The email does not exist");
+        }
         return clientBean;
     }
 

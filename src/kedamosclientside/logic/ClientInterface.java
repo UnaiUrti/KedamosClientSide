@@ -7,6 +7,7 @@ package kedamosclientside.logic;
 
 import java.util.Collection;
 import kedamosclientside.entities.Client;
+import kedamosclientside.exceptions.EmailDoesNotExist;
 
 /**
  *
@@ -24,7 +25,7 @@ public interface ClientInterface {
 
     public Collection<Client> findAllClient();
  
-    public Client resetPassword(Client client);
+    public Client resetPassword(Client client) throws EmailDoesNotExist;
  
     public void changePassword(Client client);
  

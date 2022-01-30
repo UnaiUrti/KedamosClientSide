@@ -14,58 +14,54 @@
 
 <Pane fx:id="signUpPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kedamosclientside.controllers.VSignUpController">
    <children>
-      <VBox layoutX="211.0" layoutY="100.0" prefHeight="202.0" prefWidth="178.0">
+      <VBox layoutX="191.0" layoutY="77.0" prefHeight="300.0" prefWidth="209.0">
          <children>
             <TextField fx:id="txtUsername" promptText="Username" />
-            <Label prefHeight="17.0" prefWidth="178.0" textFill="RED" />
-            <Separator opacity="0.0" prefHeight="20.0" prefWidth="178.0" />
-            <TextField fx:id="txtEmail" prefHeight="41.0" prefWidth="178.0" promptText="Email" />
-            <Label prefHeight="17.0" prefWidth="179.0" textFill="RED" />
-            <Separator opacity="0.0" prefHeight="20.0" prefWidth="178.0" />
+            <Label fx:id="lblUsername" prefHeight="65.0" prefWidth="209.0" textFill="RED" />
+            <TextField fx:id="txtEmail" prefHeight="0.0" prefWidth="178.0" promptText="Email" />
+            <Label fx:id="lblEmail" prefHeight="65.0" prefWidth="209.0" textFill="RED" />
             <TextField fx:id="txtFullName" promptText="Full Name" />
-            <Label prefHeight="17.0" prefWidth="191.0" textFill="RED" />
-            <Separator opacity="0.0" prefHeight="20.0" prefWidth="178.0" />
+            <Label fx:id="lblFullName" prefHeight="65.0" prefWidth="227.0" textFill="RED" />
             <PasswordField fx:id="txtPassword" promptText="Password" />
-            <Label prefHeight="17.0" prefWidth="194.0" textFill="RED" />
-            <Separator opacity="0.0" prefHeight="20.0" prefWidth="178.0" />
+            <Label fx:id="lblPassword" prefHeight="65.0" prefWidth="209.0" textFill="RED" />
             <PasswordField fx:id="txtConfirmPassword" promptText="Confirm Password" />
-            <Label prefHeight="17.0" prefWidth="229.0" textFill="RED" />
+            <Label fx:id="lblConfirmPassword" prefHeight="65.0" prefWidth="209.0" textFill="RED" />
          </children>
       </VBox>
-      <VBox alignment="TOP_RIGHT" layoutX="103.0" layoutY="96.0" prefHeight="234.0" prefWidth="100.0">
+      <VBox alignment="TOP_RIGHT" layoutX="85.0" layoutY="73.0" prefHeight="276.0" prefWidth="100.0">
          <children>
             <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../Img/usuario.png" />
+                  <Image url="@../img/usuario.png" />
                </image>
             </ImageView>
-            <Separator minHeight="-Infinity" opacity="0.0" prefHeight="16.0" prefWidth="100.0" />
+            <Separator minHeight="-Infinity" opacity="0.0" prefHeight="30.0" prefWidth="100.0" />
             <ImageView fitHeight="59.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../Img/mail.png" />
+                  <Image url="@../img/mail.png" />
                </image>
             </ImageView>
-            <Separator maxHeight="-Infinity" minHeight="-Infinity" opacity="0.0" prefHeight="15.0" prefWidth="100.0" />
+            <Separator maxHeight="-Infinity" minHeight="-Infinity" opacity="0.0" prefHeight="34.0" prefWidth="100.0" />
             <ImageView fitHeight="36.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../Img/pencil.png" />
+                  <Image url="@../img/pencil.png" />
                </image>
             </ImageView>
-            <Separator minHeight="-Infinity" opacity="0.0" prefHeight="18.0" prefWidth="100.0" />
+            <Separator minHeight="-Infinity" opacity="0.0" prefHeight="29.0" prefWidth="100.0" />
             <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../Img/key.png" />
+                  <Image url="@../img/key.png" />
                </image>
             </ImageView>
-            <Separator minHeight="-Infinity" opacity="0.0" prefHeight="15.0" prefWidth="100.0" />
-            <ImageView fitHeight="50.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+            <Separator minHeight="-Infinity" opacity="0.0" prefHeight="28.0" prefWidth="100.0" />
+            <ImageView fitHeight="49.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../Img/key.png" />
+                  <Image url="@../img/key.png" />
                </image>
             </ImageView>
          </children>
       </VBox>
-      <HBox alignment="CENTER_RIGHT" layoutX="2.0" layoutY="300.0" prefHeight="100.0" prefWidth="594.0">
+      <HBox alignment="CENTER_RIGHT" layoutX="2.0" layoutY="345.0" prefHeight="55.0" prefWidth="594.0">
          <children>
             <Button fx:id="btnSignUp" mnemonicParsing="false" text="SignUp" />
             <Separator opacity="0.0" orientation="VERTICAL" prefHeight="100.0" prefWidth="34.0" />
@@ -73,7 +69,7 @@
             <Separator opacity="0.0" orientation="VERTICAL" prefHeight="100.0" prefWidth="39.0" />
          </children>
       </HBox>
-      <HBox alignment="CENTER" layoutX="199.0" prefHeight="100.0" prefWidth="200.0">
+      <HBox alignment="CENTER" layoutX="185.0" prefHeight="73.0" prefWidth="209.0">
          <children>
             <Label text="SignUp">
                <font>

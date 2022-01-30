@@ -7,6 +7,9 @@ package kedamosclientside.logic;
 
 import java.util.Collection;
 import kedamosclientside.entities.User;
+import kedamosclientside.exceptions.PasswordIncorrect;
+import kedamosclientside.exceptions.ServerDown;
+import kedamosclientside.exceptions.UsernameDoesNotExist;
 
 /**
  *
@@ -44,6 +47,10 @@ public interface UserInterface {
      * 
      * @param user
      * @return 
+     * @throws kedamosclientside.exceptions.UsernameDoesNotExist 
+     * @throws kedamosclientside.exceptions.PasswordIncorrect 
+     * @throws kedamosclientside.exceptions.ServerDown 
      */
-    public Collection<User> LoginValidation(User user);
+    public Collection<User> LoginValidation(User user) throws UsernameDoesNotExist,
+            PasswordIncorrect, ServerDown;
 }
