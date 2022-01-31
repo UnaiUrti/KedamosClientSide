@@ -7,10 +7,12 @@ package kedamosclientside.logic;
 
 import java.util.Collection;
 import java.util.Set;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.GenericType;
 import kedamosclientside.entities.Client;
 import kedamosclientside.exceptions.EmailDoesNotExist;
+import kedamosclientside.exceptions.PasswordIncorrect;
 import kedamosclientside.restful.ClientREST;
 
 /**
@@ -57,7 +59,7 @@ public class ClientImplementation implements ClientInterface {
     }
 
     @Override
-    public Client resetPassword(Client client) throws EmailDoesNotExist{
+    public Client resetPassword(Client client) throws EmailDoesNotExist {
         Client clientBean = null;
         try {
             clientBean = webClient.resetPassword(new GenericType<Client>() {
@@ -74,10 +76,15 @@ public class ClientImplementation implements ClientInterface {
     }
 
     @Override
-    public Client validatePassword(Client client) {
-        Client clientBean;
-        clientBean = webClient.validatePassword(new GenericType<Client>() {
-        }, client.getUsername(), client.getPassword());
+    public Client validatePassword(Client client) throws PasswordIncorrect {
+        Client clientBean = null;
+        try {
+            clientBean = webClient.validatePassword(new GenericType<Client>() {
+            }, client.getUsername(), client.getPassword());
+
+        } catch (NotAuthorizedException ex) {
+            throw new PasswordIncorrect("Incorrect Password");
+        }
         return clientBean;
     }
 

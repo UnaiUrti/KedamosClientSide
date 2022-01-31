@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kedamosclientside.controllers.VMainMenuController">
+   <children>
+      <fx:include fx:id="hBoxMenu" source="Menu.fxml" />
+      <ImageView fitHeight="360.0" fitWidth="680.0" layoutX="309.0" layoutY="87.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/kedamos.png" />
+         </image>
+      </ImageView>
+      <Label alignment="CENTER" layoutX="274.0" layoutY="485.0" prefHeight="106.0" prefWidth="731.0" text="FROM CREATING CHESS GAMES TO THE BEST PARTIES&#10;IF YOU HAVE AN ELEGANT EVENT...&#10;">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <TextField layoutX="720.0" layoutY="538.0" prefHeight="28.0" prefWidth="187.0" />
+   </children>
+</Pane>

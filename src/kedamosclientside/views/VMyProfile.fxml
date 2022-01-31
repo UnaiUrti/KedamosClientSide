@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane fx:id="signInPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kedamosclientside.controllers.VMyProfileController">
+   <children>
+      <fx:include fx:id="hBoxMenu" source="Menu.fxml" />
+      <Label alignment="CENTER" layoutX="49.0" layoutY="94.0" prefHeight="66.0" prefWidth="254.0" text="My Profile">
+         <font>
+            <Font size="50.0" />
+         </font>
+      </Label>
+      <ImageView fitHeight="66.0" fitWidth="113.0" layoutX="309.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../../../../2dam/Reto2/KedamosClientSide/src/kedamosclientside/img/usuario.png" />
+         </image>
+      </ImageView>
+      <Pane layoutX="106.0" layoutY="239.0" prefHeight="337.0" prefWidth="627.0" style="-fx-border-width: 2; -fx-border-color: black; -fx-border-radius: 10;">
+         <children>
+            <TextField fx:id="txtEmail" layoutX="56.0" layoutY="47.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <Label layoutX="56.0" layoutY="30.0" text="Email Address" />
+            <TextField fx:id="txtFullName" layoutX="56.0" layoutY="120.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <Label layoutX="56.0" layoutY="103.0" text="Full Name" />
+            <TextField fx:id="txtUsername" layoutX="56.0" layoutY="197.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <Label layoutX="56.0" layoutY="180.0" text="Username" />
+            <TextField fx:id="txtAccountNumber" layoutX="346.0" layoutY="47.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <Label layoutX="348.0" layoutY="30.0" text="Account Number" />
+            <Label layoutX="348.0" layoutY="103.0" text="Premium" />
+            <Button fx:id="bntSave" layoutX="496.0" layoutY="260.0" mnemonicParsing="false" onAction="#handleSaveUserInformation" prefHeight="39.0" prefWidth="74.0" text="Save" />
+            <ComboBox fx:id="cbPremium" layoutX="348.0" layoutY="120.0" prefHeight="36.0" prefWidth="224.0" />
+            <Label fx:id="lblEmail" layoutX="56.0" layoutY="86.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Label fx:id="lblAccountNumber" layoutX="346.0" layoutY="86.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Label fx:id="lblFullName" layoutX="56.0" layoutY="160.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Label fx:id="lblPremium" layoutX="348.0" layoutY="160.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Label fx:id="lblUsername" layoutX="56.0" layoutY="236.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+         </children>
+      </Pane>
+      <Pane layoutX="845.0" layoutY="239.0" prefHeight="337.0" prefWidth="327.0" style="-fx-border-width: 2; -fx-border-color: black; -fx-border-radius: 10;">
+         <children>
+            <Label layoutX="56.0" layoutY="30.0" text="Current Password" />
+            <Label layoutX="56.0" layoutY="103.0" text="New Password" />
+            <Label layoutX="58.0" layoutY="180.0" text="Confirm New Password" />
+            <Button fx:id="bntSaveChangePassword" layoutX="206.0" layoutY="259.0" mnemonicParsing="false" onAction="#handleChangePassword" prefHeight="39.0" prefWidth="74.0" text="Save" />
+            <PasswordField fx:id="txtNewPassword" layoutX="56.0" layoutY="120.0" prefHeight="39.0" prefWidth="224.0" />
+            <PasswordField fx:id="txtConfirmNewPassword" layoutX="56.0" layoutY="197.0" prefHeight="39.0" prefWidth="224.0" />
+            <PasswordField fx:id="txtCurrentPassword" layoutX="56.0" layoutY="47.0" prefHeight="39.0" prefWidth="224.0" />
+            <Label fx:id="lblCurrentPassword" layoutX="58.0" layoutY="86.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Label fx:id="lblNewPassword" layoutX="58.0" layoutY="160.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Label fx:id="lblConfirmNewPassword" layoutX="56.0" layoutY="236.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+         </children>
+      </Pane>
+      <Label layoutX="106.0" layoutY="190.0" text="Personal Information">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <Label layoutX="845.0" layoutY="190.0" text="Change Password">
+         <font>
+            <Font size="25.0" />
+         </font>
+      </Label>
+      <Button fx:id="bntDeleteAccount" layoutX="61.0" layoutY="626.0" mnemonicParsing="false" onAction="#handleDeleteAccount" prefHeight="39.0" prefWidth="141.0" text="Delete Account" textFill="RED">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Button>
+   </children>
+</Pane>

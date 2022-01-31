@@ -21,10 +21,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import kedamosclientside.entities.Client;
+import kedamosclientside.entities.ClientHolder;
 import kedamosclientside.entities.User;
 import kedamosclientside.exceptions.PasswordIncorrect;
 import kedamosclientside.exceptions.ServerDown;
 import kedamosclientside.exceptions.UsernameDoesNotExist;
+import kedamosclientside.logic.ClientFactory;
+import kedamosclientside.logic.ClientInterface;
 import kedamosclientside.logic.UserFactory;
 import kedamosclientside.logic.UserInterface;
 import kedamosclientside.security.Crypt;
@@ -58,8 +62,8 @@ public class VSignInController {
     private Label lblPassword;
 
     private UserInterface ui = UserFactory.getUserImplementation();
+    private ClientInterface ci = ClientFactory.getClientImplementation();
 
-    //private ClientInterface ci = ClientFactory.getClientImplementation();
     //private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
     public Stage getStage() {
         return stage;
@@ -148,6 +152,8 @@ public class VSignInController {
 
         if (informedFields()) {
             try {
+                FXMLLoader loader;
+                Parent root;
                 // Vamos a comprobar que tipo de usuario se va a logear
                 User u = new User();
                 u.setUsername(txtUsername.getText().trim());
@@ -158,13 +164,19 @@ public class VSignInController {
                 //System.out.println("TODO HA SALIDO BIEN");
                 switch (user.getPrivilege()) {
                     case CLIENT:
-                        /*stage.close();
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                        Parent root = loader.load();
-                        Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
-                        VUserManagementController controller = ((VUserManagementController) loader.getController());
-                        controller.setStage(stage);
-                        controller.initStage(root);*/
+                        // Hacemos un setter a la clase singleton para tener ese cliente en cualquier momento
+                        ClientHolder holder = ClientHolder.getInstance();
+                        Client client = new Client();
+                        client.setUsername(user.getUsername());
+                        holder.setClient(ci.getClientByUsername(client));
+                        // 
+                        stage.close();
+                        loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VMainMenu.fxml"));
+                        root = loader.load();
+                        Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del cliente");
+                        VMainMenuController MainMenu = ((VMainMenuController) loader.getController());
+                        MainMenu.setStage(stage);
+                        MainMenu.initStage(root);
                         break;
                     case EVENT_MANAGER:
                         /*stage.close();
@@ -177,12 +189,12 @@ public class VSignInController {
                         break;
                     case ADMIN:
                         stage.close();
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                        Parent root = loader.load();
+                        loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
+                        root = loader.load();
                         Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
-                        VUserManagementController controller = ((VUserManagementController) loader.getController());
-                        controller.setStage(stage);
-                        controller.initStage(root);
+                        VUserManagementController UserManagement = ((VUserManagementController) loader.getController());
+                        UserManagement.setStage(stage);
+                        UserManagement.initStage(root);
                         break;
                 }
             } catch (UsernameDoesNotExist ex) {

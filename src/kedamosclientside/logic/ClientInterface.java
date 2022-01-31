@@ -8,6 +8,7 @@ package kedamosclientside.logic;
 import java.util.Collection;
 import kedamosclientside.entities.Client;
 import kedamosclientside.exceptions.EmailDoesNotExist;
+import kedamosclientside.exceptions.PasswordIncorrect;
 
 /**
  *
@@ -29,7 +30,7 @@ public interface ClientInterface {
  
     public void changePassword(Client client);
  
-    public Client validatePassword(Client client);
+    public Client validatePassword(Client client) throws PasswordIncorrect;
  
     public Client getClientByUsername(Client client);
 

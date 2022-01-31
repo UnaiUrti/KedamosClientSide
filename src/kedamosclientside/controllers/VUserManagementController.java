@@ -195,7 +195,7 @@ public class VUserManagementController {
         txtEmail.textProperty().addListener(this::limitCharacters);
         txtFullName.textProperty().addListener(this::limitCharacters);
         txtPassword.textProperty().addListener(this::limitCharacters);
-
+        
         // Focus en el Username field
         txtUsername.requestFocus();
 
@@ -552,7 +552,7 @@ public class VUserManagementController {
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.tlView.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
             Logger.getLogger(VUserManagementController.class.getName()).log(Level.SEVERE, null, ex);
