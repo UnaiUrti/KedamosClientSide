@@ -96,7 +96,7 @@
                 <Font size="14.0" />
             </font>
         </Button>
-        <Button fx:id="btnPrint" layoutX="1047.0" layoutY="390.0" mnemonicParsing="false" prefHeight="32.0" prefWidth="102.0" text="Print">
+        <Button fx:id="btnPrint" layoutX="1047.0" layoutY="390.0" mnemonicParsing="false" onAction="#handleEventManagerReport" prefHeight="32.0" prefWidth="102.0" text="Print">
             <font>
                 <Font size="14.0" />
             </font>
