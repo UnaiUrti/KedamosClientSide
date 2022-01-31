@@ -546,6 +546,20 @@ public class VUserManagementController {
     }
 
     @FXML
+    private void handleEventManagerReport(ActionEvent event) {
+        try {
+            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/views/EventManagerReport.jrxml");
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.tlView.getItems());
+            Map<String, Object> parameters = new HashMap<>();
+            JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            jasperViewer.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(VUserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @FXML
     private void handleLogOut(ActionEvent event) {
 
         //logger.info("Se ha pulsado el boton back");
@@ -564,25 +578,6 @@ public class VUserManagementController {
         VSignInController controller = (VSignInController) loader.getController();
         controller.setStage(stage);
         controller.initStage(root);
-
-    }
-
-    @FXML
-    private void handleEventManagerReport(ActionEvent event) {
-        String dir = System.getProperty("user.dir");
-        // directory from where the program was launched
-        // e.g /home/mkyong/projects/core-java/java-io
-        System.out.println(dir);
-        try {
-            JasperReport report = JasperCompileManager.compileReport("/src/java/kedamosclientside/views/EventManagerReport.jrxml");
-            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.tlView.getItems());
-            Map<String, Object> parameters = new HashMap<>();
-            JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
-            jasperViewer.setVisible(true);
-        } catch (JRException ex) {
-            Logger.getLogger(VUserManagementController.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
     }
 

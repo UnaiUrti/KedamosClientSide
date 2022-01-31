@@ -3,6 +3,12 @@
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
+	<field name="username" class="java.lang.String"/>
+	<field name="fullName" class="java.lang.String"/>
+	<field name="email" class="java.lang.String"/>
+	<field name="lastPasswordChange" class="java.util.Date"/>
+	<field name="status" class="kedamosclientside.entities.UserStatus"/>
+	<field name="managerCategory" class="kedamosclientside.entities.Category"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -23,92 +29,92 @@
 	<columnHeader>
 		<band height="61" splitType="Stretch">
 			<staticText>
-				<reportElement x="0" y="8" width="100" height="20" uuid="e2cd087b-32e0-4889-97bd-7fb1882dc891"/>
+				<reportElement x="0" y="21" width="100" height="20" uuid="e2cd087b-32e0-4889-97bd-7fb1882dc891"/>
 				<textElement textAlignment="Center">
-					<font size="14" isUnderline="true"/>
+					<font size="12" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Username]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="100" y="8" width="100" height="20" uuid="497bb267-cdc9-4d83-9ab5-192458c8aec8"/>
+				<reportElement x="100" y="21" width="100" height="20" uuid="497bb267-cdc9-4d83-9ab5-192458c8aec8"/>
 				<textElement textAlignment="Center">
-					<font size="14" isUnderline="true"/>
+					<font size="12" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Full Name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="200" y="8" width="100" height="20" uuid="37315400-90f0-4753-bdbf-c8eac35e3b4f"/>
+				<reportElement x="200" y="21" width="95" height="20" uuid="37315400-90f0-4753-bdbf-c8eac35e3b4f"/>
 				<textElement textAlignment="Center">
-					<font size="14" isUnderline="true"/>
+					<font size="12" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Email]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="300" y="8" width="95" height="40" uuid="42482190-cec3-4cb7-9914-2686eefdf978"/>
+				<reportElement x="300" y="21" width="83" height="40" uuid="42482190-cec3-4cb7-9914-2686eefdf978"/>
 				<textElement textAlignment="Center">
-					<font size="14" isUnderline="true"/>
+					<font size="12" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[LastPasswordChange]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="395" y="8" width="70" height="40" uuid="ed710413-6f4f-4a0b-b47a-14da02eb39be"/>
+				<reportElement x="395" y="21" width="70" height="40" uuid="ed710413-6f4f-4a0b-b47a-14da02eb39be"/>
 				<textElement textAlignment="Center">
-					<font size="14" isUnderline="true"/>
+					<font size="12" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Status]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="465" y="8" width="90" height="40" uuid="fdcc0bfa-cc2a-4988-a407-878d52865a7a"/>
+				<reportElement x="465" y="21" width="90" height="40" uuid="fdcc0bfa-cc2a-4988-a407-878d52865a7a"/>
 				<textElement textAlignment="Center">
-					<font size="14" isUnderline="true"/>
+					<font size="12" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Manager Category]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="125" splitType="Stretch">
+		<band height="24" splitType="Stretch">
 			<textField>
 				<reportElement x="0" y="0" width="100" height="20" uuid="8741730f-9d09-40f3-881c-7213ad2e747c"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
+				<textElement>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{USERNAME}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{username}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="100" y="0" width="100" height="20" uuid="2b7f4bca-4e04-4fdd-b985-2a21da7ae725"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
+				<textElement>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{FULLNAME}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{fullName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="200" y="0" width="100" height="20" uuid="ec3498fa-73ef-448c-9e0b-145ffc0428de"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
+				<textElement>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{email}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="295" y="0" width="100" height="20" uuid="a7d9ef8e-e1e9-4152-870c-1c972999ccfa"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
+				<textElement>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{LAST PASSWORD CHANGE}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{lastPasswordChange}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="395" y="0" width="70" height="20" uuid="47b5aab1-e575-46f8-901a-8381b707387a"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
+				<textElement>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{STATUS}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="465" y="0" width="90" height="20" uuid="20e544c3-b959-4e6e-a44a-71094276cdbd"/>
-				<textElement textAlignment="Center">
-					<font size="12"/>
+				<textElement>
+					<font size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{MANAGER CATEGORY}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{managerCategory}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
