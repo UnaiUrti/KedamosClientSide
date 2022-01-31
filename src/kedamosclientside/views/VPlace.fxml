@@ -34,9 +34,10 @@
       <Button fx:id="btnModify" layoutX="1004.0" layoutY="168.0" mnemonicParsing="false" onAction="#handleModifyPlace" prefHeight="25.0" prefWidth="150.0" text="Modify" />
       <TextField fx:id="tfPrice" layoutX="587.0" layoutY="168.0" prefHeight="25.0" prefWidth="84.0" promptText="Ej. 12.5" />
       <Button fx:id="btnPrint" layoutX="1061.0" layoutY="400.0" mnemonicParsing="false" onAction="#handlePrintPlace" prefHeight="25.0" prefWidth="150.0" text="Print" />
-      <Label fx:id="lblAddressError" layoutX="183.0" layoutY="136.0" text="Address already exists!" textFill="RED" />
+      <Label fx:id="lblAddressExists" layoutX="183.0" layoutY="136.0" text="Address already exists!" textFill="RED" />
       <Label fx:id="lblPriceError" layoutX="587.0" layoutY="193.0" text="Price can only contain numbers!" textFill="RED" />
       <Label fx:id="lblDateError" layoutX="587.0" layoutY="136.0" text="Renewal date has to be earlier than today!" textFill="RED" />
       <Label fx:id="lblNameError" layoutX="183.0" layoutY="193.0" text="Name cannot contain non letter characters!" textFill="RED" />
+      <Label fx:id="lblAddressError" layoutX="183.0" layoutY="136.0" text="Address can only contain letters, numbers, commas and dots!!" textFill="RED" />
    </children>
 </Pane>

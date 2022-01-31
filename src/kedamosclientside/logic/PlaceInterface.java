@@ -5,6 +5,7 @@
  */
 package kedamosclientside.logic;
 
+import java.net.ConnectException;
 import java.util.Collection;
 import java.util.Set;
 import javax.ws.rs.ClientErrorException;
@@ -15,17 +16,17 @@ import kedamosclientside.entities.Place;
  * @author UnaiUrtiaga
  */
 public interface PlaceInterface {
-    
-    public Collection<Place> getAllPlaces();
-    
-    public void createPlace(Place place);
-    
-    public void updatePlace(Place place);
-    
-    public void deletePlace(Place place);
-    
-    public void deletePlaceAlternative(Place place);
-    
-    public Place getPlaceByAddress(Place place);
-    
+
+    public Collection<Place> getAllPlaces() throws ConnectException;
+
+    public void createPlace(Place place) throws ConnectException;
+
+    public void updatePlace(Place place) throws ConnectException;
+
+    public void deletePlace(Place place) throws ConnectException;
+
+    public void deletePlaceAlternative(Place place) throws ConnectException;
+
+    public Place getPlaceByAddress(Place place) throws ConnectException;
+
 }

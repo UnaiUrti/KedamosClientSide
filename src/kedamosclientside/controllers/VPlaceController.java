@@ -5,6 +5,7 @@
  */
 package kedamosclientside.controllers;
 
+import java.net.ConnectException;
 import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Collection;
@@ -35,6 +36,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Event;
 import kedamosclientside.entities.Place;
+import kedamosclientside.exceptions.placeAddressBadException;
 import kedamosclientside.exceptions.placeAddressExistException;
 import kedamosclientside.exceptions.placeDateBadException;
 import kedamosclientside.exceptions.placeNameBadException;
@@ -50,6 +52,8 @@ public class VPlaceController {
 
     private Stage stage;
     private PlaceInterface placeInterface;
+    @FXML
+    private Label lblAddressExists;
 
     public void setPlace(PlaceInterface placeInterface) {
         this.placeInterface = placeInterface;
@@ -129,7 +133,7 @@ public class VPlaceController {
         //Los botones Create, Modify y Delete estarán deshabilitados
         btnCreate.setDisable(true);
         btnModify.setDisable(true);
-        btnDelete.setDisable(false);
+        btnDelete.setDisable(true);
 
         //Los botones Print y Back estarán habilitados
         btnBack.setDisable(false);
@@ -146,6 +150,7 @@ public class VPlaceController {
         lblNameError.setVisible(false);
         lblPriceError.setVisible(false);
         lblDateError.setVisible(false);
+        lblAddressExists.setVisible(false);
 
         //Se enfocará en el campo Address
         tfAddress.requestFocus();
@@ -189,6 +194,7 @@ public class VPlaceController {
             @Override
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 lblAddressError.setVisible(false);
+                lblAddressExists.setVisible(false);
                 tfAddress.setStyle("-fx-border-color: none;");
 
                 //Comprobar que los campos Address estén informados
@@ -276,9 +282,17 @@ public class VPlaceController {
         } catch (placeDateBadException ex) {
             lblDateError.setVisible(true);
             dpDateRenewal.setStyle("-fx-border-color: red;");
-        } catch (placeAddressExistException ex) {
+        } catch (placeAddressBadException ex) {
             lblAddressError.setVisible(true);
             tfAddress.setStyle("-fx-border-color: red;");
+        } catch (placeAddressExistException ex) {
+            lblAddressExists.setVisible(true);
+            tfAddress.setStyle("-fx-border-color: red;");
+        } catch (ConnectException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("CONNECTION ERROR");
+            alert.setContentText("There was an error connecting with the server. Try again later.");
+            alert.showAndWait();
         }
 
     }
@@ -291,6 +305,7 @@ public class VPlaceController {
         alert.setContentText("Are you sure you want to delete this Place?");
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
+
             try {
                 //Si le da a SI eliminar el Place
                 Place place = table.getSelectionModel().getSelectedItem();
@@ -304,9 +319,13 @@ public class VPlaceController {
 
                 //Deseleccionar la tabla y actualizarla con los nuevos datos
                 updateTable();
-            } catch (Exception e) {
-
+            } catch (ConnectException ex) {
+                Alert alert2 = new Alert(Alert.AlertType.ERROR);
+                alert2.setTitle("CONNECTION ERROR");
+                alert2.setContentText("There was an error connecting with the server. Try again later.");
+                alert2.showAndWait();
             }
+
         }
 
     }
@@ -314,23 +333,19 @@ public class VPlaceController {
     @FXML
     private void handleModifyPlace(ActionEvent event) throws placePriceBadException {
 
-        Place place = new Place();
-        place.setAddress(tfAddress.getText());
-        boolean everythingCorrect = false;
+        try {
 
-        //Comprobar que el campo Address sea el mismo que el seleccionado en la tabla
-        if (tfAddress.getText().equals(table.getSelectionModel()
-                .getSelectedItem().getAddress()) || placeInterface.getPlaceByAddress(place) == null) {
+            Place place = new Place();
+            place.setAddress(tfAddress.getText());
 
-            everythingCorrect = true;
+            validarCampos();
 
-        } else {
-            lblAddressError.setVisible(true);
-            tfAddress.setStyle("-fx-border-color: red;");
-            everythingCorrect = false;
-        }
+            //Comprobar que el campo Address sea el mismo que el seleccionado en la tabla
+            if (!tfAddress.getText().equals(table.getSelectionModel()
+                    .getSelectedItem().getAddress()) && placeInterface.getPlaceByAddress(place) != null) {
+                throw new placeAddressExistException("");
+            }
 
-        if (validarCampos()) {
             //Si coinciden, modificar los campos del Place seleccionado
             place.setName(tfName.getText());
             if (!tfPrice.getText().equals("")) {
@@ -355,6 +370,27 @@ public class VPlaceController {
             tfName.setText("");
             tfPrice.setText("");
             dpDateRenewal.setValue(null);
+
+        } catch (placePriceBadException ex) {
+            lblPriceError.setVisible(true);
+            tfPrice.setStyle("-fx-border-color: red;");
+        } catch (placeNameBadException ex) {
+            lblNameError.setVisible(true);
+            tfName.setStyle("-fx-border-color: red;");
+        } catch (placeDateBadException ex) {
+            lblDateError.setVisible(true);
+            dpDateRenewal.setStyle("-fx-border-color: red;");
+        } catch (placeAddressBadException ex) {
+            lblAddressError.setVisible(true);
+            tfAddress.setStyle("-fx-border-color: red;");
+        } catch (placeAddressExistException ex) {
+            lblAddressExists.setVisible(true);
+            tfAddress.setStyle("-fx-border-color: red;");
+        } catch (ConnectException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("CONNECTION ERROR");
+            alert.setContentText("There was an error connecting with the server. Try again later.");
+            alert.showAndWait();
         }
 
     }
@@ -429,15 +465,17 @@ public class VPlaceController {
 
     }
 
-    private void validarCampos() throws placePriceBadException, placeNameBadException, placeDateBadException {
+    private void validarCampos() throws placePriceBadException, placeNameBadException, placeDateBadException, placeAddressBadException {
 
-        if(!tfAddress.getText().toLowerCase().matches("[0-9]{1-}")){}
-        
+        if (!tfAddress.getText().trim().toLowerCase().matches("[0-9]*[a-záéíóú]*[.]*[,]*")) {
+            throw new placeAddressBadException("");
+        }
+
         if (!tfPrice.getText().matches("[0-9]{1,5}[.][0-9]{1,2}") && !tfPrice.getText().matches("[0-9]{1,5}") && !tfPrice.getText().matches("")) {
             throw new placePriceBadException("");
         }
 
-        if (!tfName.getText().toLowerCase().matches("[a-z]{1,255}")) {
+        if (!tfName.getText().trim().toLowerCase().matches("[a-zA-ZáéíóúÁÉÍÓÚ]{2,}[\\\\s[a-zA-ZáéíóúÁÉÍÓÚ]{2,}]*")) {
             throw new placeNameBadException("");
         }
 
@@ -447,5 +485,4 @@ public class VPlaceController {
             }
         }
     }
-
 }

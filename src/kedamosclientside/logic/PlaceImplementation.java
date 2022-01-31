@@ -5,6 +5,7 @@
  */
 package kedamosclientside.logic;
 
+import java.net.ConnectException;
 import java.util.Collection;
 import java.util.List;
 import javax.ws.rs.core.GenericType;
@@ -16,67 +17,75 @@ import kedamosclientside.restful.PlaceClientREST;
  * @author UnaiUrtiaga
  */
 public class PlaceImplementation implements PlaceInterface {
-    
+
     private PlaceClientREST webPlace;
 
     public PlaceImplementation() {
         webPlace = new PlaceClientREST();
     }
-    
-    
+
     @Override
-    public Collection<Place> getAllPlaces(){
-        
+    public Collection<Place> getAllPlaces() throws ConnectException {
+
         Collection<Place> places = null;
-        
-        try{
-            places = webPlace.findAll(new GenericType<Collection<Place>>(){});
-            
-        }catch(Exception e){
-            
+
+        try {
+            places = webPlace.findAll(new GenericType<Collection<Place>>() {
+            });
+
+        } catch (Exception e) {
+            throw new ConnectException("No se ha podido conectar con la base de datos");
         }
-        
+
         return places;
     }
-    
-    
-    @Override
-    public void createPlace(Place place) {
-        
-        webPlace.create(place);
-        
-    }
-    
-    
-    @Override
-    public void updatePlace(Place place) {
 
-        webPlace.edit(place, place.getId().toString());
-
-    }
-    
     @Override
-    public void deletePlace(Place place){
-        
-        webPlace.deletePlaceByAddress(place.getAddress());
-        
-    }
-    
-    @Override
-    public void deletePlaceAlternative(Place place){
-        
-        webPlace.remove(place.getId().toString());
-        
+    public void createPlace(Place place) throws ConnectException {
+        try {
+            webPlace.create(place);
+        } catch (Exception e) {
+            throw new ConnectException("No se ha podido conectar con la base de datos");
+        }
     }
 
     @Override
-    public Place getPlaceByAddress(Place place) {
-        
+    public void updatePlace(Place place) throws ConnectException {
+        try {
+            webPlace.edit(place, place.getId().toString());
+        } catch (Exception e) {
+            throw new ConnectException("No se ha podido conectar con la base de datos");
+        }
+    }
+
+    @Override
+    public void deletePlace(Place place) throws ConnectException {
+        try {
+            webPlace.deletePlaceByAddress(place.getAddress());
+        } catch (Exception e) {
+            throw new ConnectException("No se ha podido conectar con la base de datos");
+        }
+    }
+
+    @Override
+    public void deletePlaceAlternative(Place place) throws ConnectException {
+        try {
+            webPlace.remove(place.getId().toString());
+        } catch (Exception e) {
+            throw new ConnectException("No se ha podido conectar con la base de datos");
+        }
+    }
+
+    @Override
+    public Place getPlaceByAddress(Place place) throws ConnectException {
+
         Place tempPlace = null;
-        
-        tempPlace = webPlace.getPlaceByAddress(Place.class, place.getAddress());    
-        
+        try {
+            tempPlace = webPlace.getPlaceByAddress(Place.class, place.getAddress());
+        } catch (Exception e) {
+            throw new ConnectException("No se ha podido conectar con la base de datos");
+        }
         return tempPlace;
     }
-    
+
 }
