@@ -36,6 +36,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Event;
 import kedamosclientside.entities.Place;
+import kedamosclientside.exceptions.MaxCharacterException;
 import kedamosclientside.exceptions.placeAddressBadException;
 import kedamosclientside.exceptions.placeAddressExistException;
 import kedamosclientside.exceptions.placeDateBadException;
@@ -293,6 +294,11 @@ public class VPlaceController {
             alert.setTitle("CONNECTION ERROR");
             alert.setContentText("There was an error connecting with the server. Try again later.");
             alert.showAndWait();
+        } catch (MaxCharacterException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("TOO MUCH CHARACTERS");
+            alert.setContentText("The fields Name and Address cannot contain more than 255 characters");
+            alert.showAndWait();
         }
 
     }
@@ -391,6 +397,11 @@ public class VPlaceController {
             alert.setTitle("CONNECTION ERROR");
             alert.setContentText("There was an error connecting with the server. Try again later.");
             alert.showAndWait();
+        } catch (MaxCharacterException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("TOO MUCH CHARACTERS");
+            alert.setContentText("The fields Name and Address cannot contain more than 255 characters");
+            alert.showAndWait();
         }
 
     }
@@ -465,23 +476,30 @@ public class VPlaceController {
 
     }
 
-    private void validarCampos() throws placePriceBadException, placeNameBadException, placeDateBadException, placeAddressBadException {
+    private void validarCampos() throws placePriceBadException, placeNameBadException, placeDateBadException, placeAddressBadException, MaxCharacterException {
 
+        if(tfAddress.getText().getBytes().length>=255){
+            throw new MaxCharacterException("Los campos no pueden contener mas de 255 caracteres");
+        }
+        if(tfName.getText().getBytes().length>=255){
+            throw new MaxCharacterException("Los campos no pueden contener mas de 255 caracteres");
+        }
+        
         if (!tfAddress.getText().trim().toLowerCase().matches("[0-9]*[a-záéíóú]*[.]*[,]*")) {
-            throw new placeAddressBadException("");
+            throw new placeAddressBadException("El campo Address solo puede contener numeros, letras, puntos y comas");
         }
 
         if (!tfPrice.getText().matches("[0-9]{1,5}[.][0-9]{1,2}") && !tfPrice.getText().matches("[0-9]{1,5}") && !tfPrice.getText().matches("")) {
-            throw new placePriceBadException("");
+            throw new placePriceBadException("El campo Price solo puede contener numeros");
         }
 
         if (!tfName.getText().trim().toLowerCase().matches("[a-zA-ZáéíóúÁÉÍÓÚ]{2,}[\\\\s[a-zA-ZáéíóúÁÉÍÓÚ]{2,}]*")) {
-            throw new placeNameBadException("");
+            throw new placeNameBadException("El campo Name solo puede contener letras");
         }
 
         if (dpDateRenewal.getValue() != null) {
             if (Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()).after(Calendar.getInstance().getTime())) {
-                throw new placeDateBadException("");
+                throw new placeDateBadException("La fecha introducida no puede ser posterior a la fecha actual");
             }
         }
     }
