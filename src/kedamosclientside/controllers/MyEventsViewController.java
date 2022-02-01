@@ -540,7 +540,7 @@ public class MyEventsViewController {
                 tfTitle.setText("");
                 taDescription.setText("");
                 dpDate.setValue(null);
-                cmbCategory.setValue(null);
+                cmbCategory.getSelectionModel().selectFirst();
                 tfPrice.setText("");
                 tfMinParticipants.setText("");
                 tfMaxParticipants.setText("");
