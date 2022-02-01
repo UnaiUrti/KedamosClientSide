@@ -1,6 +1,8 @@
 package kedamosclientside.controllers;
 
+import java.io.IOException;
 import java.net.ConnectException;
+import java.text.SimpleDateFormat;
 import kedamosclientside.exceptions.EmptyFieldsException;
 import java.time.ZoneId;
 import java.util.Collection;
@@ -28,6 +30,8 @@ import java.util.Calendar;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -44,6 +48,7 @@ import kedamosclientside.exceptions.EventDateBadException;
 import kedamosclientside.exceptions.EventParticipantsException;
 import kedamosclientside.exceptions.EventPriceException;
 import kedamosclientside.exceptions.MaxCharacterException;
+import kedamosclientside.logic.EventFactory;
 import kedamosclientside.logic.EventInterface;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -166,6 +171,25 @@ public class MyEventsViewController {
         tcPrice.setCellValueFactory(new PropertyValueFactory<>("Price"));
         tcCategory.setCellValueFactory(new PropertyValueFactory<>("Category"));
         tcDate.setCellValueFactory(new PropertyValueFactory<>("Date"));
+        tcDate.setCellFactory(column -> {
+        TableCell<Event, Date> cell = new TableCell<Event, Date>() {
+            private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+
+            @Override
+            protected void updateItem(Date item, boolean empty) {
+                super.updateItem(item, empty);
+                if(empty) {
+                    setText(null);
+                }
+                else {
+                    this.setText(format.format(item));
+
+                }
+            }
+        };
+
+        return cell;
+    });
         tcMinParticipants.setCellValueFactory(new PropertyValueFactory<>("MinParticipants"));
         tcMaxParticipants.setCellValueFactory(new PropertyValueFactory<>("MaxParticipants"));
         tcActualParticipants.setCellValueFactory(new PropertyValueFactory<>("ActualParticipants"));
@@ -299,11 +323,10 @@ public class MyEventsViewController {
 
     }
 
-    
     @FXML
     private void handleComboCategory(ActionEvent event) {
     }
-     
+
     /**
      * Metodo para crear eventos con las excepciones correspondientes
      *
@@ -443,7 +466,7 @@ public class MyEventsViewController {
             btnAddPersonal.setDisable(false);
             btnAddPlace.setDisable(false);
             btnDelete.setDisable(false);
-
+            btnCreate.setDisable(true);
         } else {
             //CUANDO DES-SELECCIONA
             tfTitle.setText("");
@@ -456,8 +479,8 @@ public class MyEventsViewController {
 
             //Deshabilitar los botones 
             btnCreate.setDisable(false);
-            btnAddPersonal.setDisable(true);
-            btnAddPlace.setDisable(true);
+            btnAddPersonal.setDisable(false);
+            btnAddPlace.setDisable(false);
             btnModify.setDisable(true);
             btnDelete.setDisable(true);
         }
@@ -469,7 +492,25 @@ public class MyEventsViewController {
      * @param event recibido con datos de place o personal
      */
     @FXML
-    private void handleBack(ActionEvent event) {
+    private void handleBack(ActionEvent event) throws IOException {
+        
+        
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setHeaderText(null);
+        alert.setTitle("BACK");
+
+        alert.setContentText("Quieres cerrar la ventana?");
+
+        Optional<ButtonType> resp = alert.showAndWait();
+
+        if (resp.get() == ButtonType.OK) {
+            LOGGER.info("Se ha pulsado Confirm, el programa se va a cerrar");
+            this.stage.close();
+        } else {
+            LOGGER.info("Se ha cancelado la request, continua en la misma ventana");
+            event.consume();
+        }
+        
     }
 
     /**
@@ -550,7 +591,18 @@ public class MyEventsViewController {
      * @param event le enviamos event con datos
      */
     @FXML
-    private void handleAddPlace(ActionEvent event) {
+    private void handleAddPlace(ActionEvent event) throws IOException {
+
+        FXMLLoader loader;
+        loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VPlace.fxml"));
+
+        Parent root = (Parent) loader.load();
+
+        MyEventsViewController controller = ((MyEventsViewController) loader.getController());
+        controller.setEventinterface(EventFactory.getEvent());
+        controller.setStage(new Stage());
+        controller.initStage(root, null);
+
     }
 
     /**
@@ -559,7 +611,18 @@ public class MyEventsViewController {
      * @param event enviamos event con datos
      */
     @FXML
-    private void handleAddPersonal(ActionEvent event) {
+    private void handleAddPersonal(ActionEvent event) throws IOException {
+
+        FXMLLoader loader;
+        loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VPersonalResource.fxml"));
+
+        Parent root = (Parent) loader.load();
+
+        MyEventsViewController controller = ((MyEventsViewController) loader.getController());
+        controller.setEventinterface(EventFactory.getEvent());
+        controller.setStage(new Stage());
+        //controller.setEvent
+        controller.initStage(root, null);
     }
 
     /**
@@ -591,9 +654,11 @@ public class MyEventsViewController {
         alert3.setContentText(null);
         alert3.showAndWait();
     }
+
     /**
      * Metodo para salir de la aplicacion si pulsa el usuario
-     * @param event 
+     *
+     * @param event
      */
     @FXML
     private void handleCloseRequest(WindowEvent event) {
@@ -616,6 +681,7 @@ public class MyEventsViewController {
             event.consume();
         }
     }
+
     /**
      * Metodo para actualizar la tabla
      */
@@ -630,10 +696,13 @@ public class MyEventsViewController {
             LOGGER.info("No se ha podido modificar la tabla");
         }
     }
+
     /**
      * Metodo para hacer todas las validaciones de los campos
+     *
      * @throws EventDateBadException excepcion para problemas con la fecha
-     * @throws EventParticipantsException excepcion para problemas con min y max participants
+     * @throws EventParticipantsException excepcion para problemas con min y max
+     * participants
      * @throws EventPriceException excepcion para problemas con el precio
      */
     private void fieldsValidations() throws EventDateBadException, EventParticipantsException, EventPriceException {

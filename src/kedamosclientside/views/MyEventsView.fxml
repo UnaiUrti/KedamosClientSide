@@ -20,12 +20,16 @@
         <columns>
           <TableColumn fx:id="tcTable" prefWidth="194.3999605178833" text="TITLE" />
           <TableColumn fx:id="tcDescription" prefWidth="286.4000701904297" text="DESCRIPTION" />
-            <TableColumn fx:id="tcPrice" minWidth="4.00006103515625" prefWidth="68.0" text="PRICE" />
+            <TableColumn fx:id="tcPrice" minWidth="4.00006103515625" prefWidth="68.0" style="-fx-alignment: CENTER-RIGHT;" text="PRICE" />
             <TableColumn fx:id="tcCategory" minWidth="0.0" prefWidth="127.20001220703125" text="CATEGORY" />
-            <TableColumn fx:id="tcDate" prefWidth="120.7999267578125" text="DATE" />
-            <TableColumn fx:id="tcMinParticipants" prefWidth="64.800048828125" text="MIN. P" />
-            <TableColumn fx:id="tcMaxParticipants" prefWidth="66.39996337890625" text="MAX. P" />
-            <TableColumn fx:id="tcActualParticipants" prefWidth="94.39996337890625" text="ACTUAL P" />
+            <TableColumn fx:id="tcDate" prefWidth="108.79998779296875" text="DATE" />
+            <TableColumn prefWidth="220.79998779296875" text="PARTICIPANTS">
+               <columns>
+                  <TableColumn fx:id="tcMinParticipants" prefWidth="64.800048828125" style="-fx-alignment: CENTER-RIGHT;" text="MIN" />
+                  <TableColumn fx:id="tcMaxParticipants" prefWidth="66.39996337890625" style="-fx-alignment: CENTER-RIGHT;" text="MAX" />
+                  <TableColumn fx:id="tcActualParticipants" prefWidth="94.39996337890625" style="-fx-alignment: CENTER-RIGHT;" text="ACTUAL" />
+               </columns>
+            </TableColumn>
         </columns>
       </TableView>
       <ComboBox fx:id="cmbCategory" layoutX="399.0" layoutY="155.0" onAction="#handleComboCategory" prefHeight="25.0" prefWidth="165.0" />
