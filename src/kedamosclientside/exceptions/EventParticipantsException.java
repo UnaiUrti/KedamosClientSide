@@ -8,6 +8,7 @@ package kedamosclientside.exceptions;
 /**
  *
  * @author Adrian Franco
+ * Excepcion para problemas con min y max participants
  */
 public class EventParticipantsException extends Exception{
     

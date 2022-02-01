@@ -8,6 +8,7 @@ package kedamosclientside.logic;
 /**
  *
  * @author Adrian Franco
+ * Factoria que implementa la interfaz
  */
 public class EventFactory {
     

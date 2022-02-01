@@ -8,6 +8,7 @@ package kedamosclientside.exceptions;
 /**
  *
  * @author Adrian Franco
+ * Excepcion para cuando se superan 255caracteres
  */
 public class MaxCharacterException extends Exception{
 

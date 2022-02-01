@@ -8,6 +8,7 @@ package kedamosclientside.exceptions;
 /**
  *
  * @author Adrian Franco, Unai Urtiaga
+ * Excepcion para campos vacios
  */
 public class EmptyFieldsException extends Exception {
 

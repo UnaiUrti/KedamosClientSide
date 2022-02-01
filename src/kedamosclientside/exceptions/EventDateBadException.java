@@ -8,6 +8,7 @@ package kedamosclientside.exceptions;
 /**
  *
  * @author Adrian Franco
+ * Excepcion para fechas erroneas
  */
 public class EventDateBadException extends Exception{
     

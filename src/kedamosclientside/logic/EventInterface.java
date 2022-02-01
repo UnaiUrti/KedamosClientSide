@@ -13,7 +13,7 @@ import kedamosclientside.entities.Event;
 
 
 /**
- *
+ *Interfaz con las excepciones añadidas
  * @author Adrian Franco
  */
 public interface EventInterface {

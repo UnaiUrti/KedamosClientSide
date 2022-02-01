@@ -8,6 +8,7 @@ package kedamosclientside.exceptions;
 /**
  *
  * @author Adrian Franco
+ * Excepcion para campos del precio no validos
  */
 public class EventPriceException extends Exception{
     

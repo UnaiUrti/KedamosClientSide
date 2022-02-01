@@ -15,6 +15,7 @@ import kedamosclientside.restful.EventClientREST;
 /**
  *
  * @author Adrian Franco
+ * Implementacion de la interfaz
  */
 public class EventImplementation implements EventInterface {
 

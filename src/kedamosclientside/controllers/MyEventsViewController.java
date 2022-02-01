@@ -64,6 +64,11 @@ public class MyEventsViewController {
     private Stage stage;
     private EventInterface eventinterface;
 
+    /**
+     * Set de la interfaz evento
+     *
+     * @param eventinterface
+     */
     public void setEventinterface(EventInterface eventinterface) {
         this.eventinterface = eventinterface;
     }
@@ -121,6 +126,11 @@ public class MyEventsViewController {
     @FXML
     private Button btnPrint;
 
+    /**
+     * Return de la ventana
+     *
+     * @return
+     */
     public Stage getStage() {
         return stage;
     }
@@ -132,11 +142,12 @@ public class MyEventsViewController {
     /**
      * Initializes the controller class.
      *
-     * @param root
-     * @param event
+     * @param root nodo del grafo de la escena
+     * @param event Parametro que puede llegar con datos de personal o place
+     *
+     * Este metodo pretende inicializar la escena y el escenario.
      */
     //Acordarme q urti e irkus me devuelven el objeto event con place y/o personal
-    //resoruce añadido
     public void initStage(Parent root, Event event) {
 
         Scene scene = new Scene(root);
@@ -200,13 +211,12 @@ public class MyEventsViewController {
         btnPrint.setDisable(false);
         btnBack.setDisable(false);
 
-        //Validar que Title, 
-        //Mensajes de error
         stage.show();
     }
 
     /**
-     * Metodo tipo booleano que comprueba si los campos estan informados o no
+     * Metodo tipo booleano que comprueba si los campos estan informados o no o
+     * superan el limite de caracteres
      *
      * @return Devuelve una variable booleana que dice hay algun campo vacio (si
      * es false hay un campo vacio, si es true esta todo informado)
@@ -289,10 +299,16 @@ public class MyEventsViewController {
 
     }
 
+    
     @FXML
     private void handleComboCategory(ActionEvent event) {
     }
-
+     
+    /**
+     * Metodo para crear eventos con las excepciones correspondientes
+     *
+     * @param event parametro que puede recibir con datos de place o personal
+     */
     @FXML
     private void handleCreate(ActionEvent event) {
 
@@ -362,6 +378,11 @@ public class MyEventsViewController {
 
     }
 
+    /**
+     * Metodo para borrar eventos de la BD
+     *
+     * @param event parametro que puede recibir con datos de place o personal
+     */
     @FXML
     private void handleDelete(ActionEvent event) {
         LOGGER.info("Boton para borrar Evento de la BD");
@@ -396,7 +417,7 @@ public class MyEventsViewController {
     }
 
     /**
-     * Method to control if there's a item selected in the table
+     * Metodo para controlar cuando clicka una fila
      *
      * @param observableValue
      * @param oldValue
@@ -442,10 +463,20 @@ public class MyEventsViewController {
         }
     }
 
+    /**
+     * Metodo para volver a la ventana anterior
+     *
+     * @param event recibido con datos de place o personal
+     */
     @FXML
     private void handleBack(ActionEvent event) {
     }
 
+    /**
+     * Metodo para modificar eventos en la BD
+     *
+     * @param event recibido con datos de place o personal
+     */
     @FXML
     private void handleModify(ActionEvent event) {
 
@@ -513,57 +544,57 @@ public class MyEventsViewController {
         }
     }
 
+    /**
+     * Mettodo para abrir la ventana Place
+     *
+     * @param event le enviamos event con datos
+     */
     @FXML
     private void handleAddPlace(ActionEvent event) {
     }
 
+    /**
+     * Metodo para abrir la ventana Personal
+     *
+     * @param event enviamos event con datos
+     */
     @FXML
     private void handleAddPersonal(ActionEvent event) {
     }
 
+    /**
+     * Metrodo para imprimir el informe
+     *
+     * @param event
+     */
     @FXML
     private void handlePrint(ActionEvent event) {
-        LOGGER.info("Option to print clients information");
 
-        Alert alert1 = new Alert(AlertType.CONFIRMATION);
-        alert1.setTitle("Print Information");
-        alert1.setHeaderText(null);
-        alert1.setContentText("Do you want to print the information?");
-        Optional<ButtonType> result = alert1.showAndWait();
-        if (result.get() == ButtonType.OK) {
+        LOGGER.info("Opcion para imprimir el informe");
+        try {
+            LOGGER.info("Imprimiendo informe...");
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/EventReport.jrxml"));
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Event>) this.tvTable.getItems());
+            Map<String, Object> parameters = new HashMap<>();
+            JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
+            jasperViewer.setVisible(true);
 
-            try {
-                LOGGER.info("Beginning printing action...");
-                JasperReport report
-                        = JasperCompileManager.compileReport(getClass()
-                                .getResourceAsStream("/kedamosclientside/report/EventReport.jrxml"));
-                //Data for the report: a collection of UserBean passed as a JRDataSource 
-                //implementation 
-                JRBeanCollectionDataSource dataItems
-                        = new JRBeanCollectionDataSource((Collection<Event>) this.tvTable.getItems());
-                //Map of parameter to be passed to the report
-                Map<String, Object> parameters = new HashMap<>();
-                //Fill report with data
-                JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-                //Create and show the report window. The second parameter false value makes 
-                //report window not to close app.
-                JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
-                jasperViewer.setVisible(true);
-                // jasperViewer.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-            } catch (JRException ex) {
-                //hacer el catch 
-                ex.printStackTrace();
-            }
-            //Information alert when you dismiss the confirmation alert
-        } else {
-            Alert alert3 = new Alert(AlertType.INFORMATION);
-            alert3.setTitle("Non printed information");
-            alert3.setHeaderText(null);
-            alert3.setContentText(null);
-            alert3.showAndWait();
+        } catch (JRException ex) {
+            //hacer el catch 
+            ex.printStackTrace();
         }
+        //Information alert when you dismiss the confirmation alert
+        Alert alert3 = new Alert(AlertType.INFORMATION);
+        alert3.setTitle("Non printed information");
+        alert3.setHeaderText(null);
+        alert3.setContentText(null);
+        alert3.showAndWait();
     }
-
+    /**
+     * Metodo para salir de la aplicacion si pulsa el usuario
+     * @param event 
+     */
     @FXML
     private void handleCloseRequest(WindowEvent event) {
 
@@ -585,7 +616,9 @@ public class MyEventsViewController {
             event.consume();
         }
     }
-
+    /**
+     * Metodo para actualizar la tabla
+     */
     private void modifyTable() {
         tvTable.getItems().clear();
         try {
@@ -597,7 +630,12 @@ public class MyEventsViewController {
             LOGGER.info("No se ha podido modificar la tabla");
         }
     }
-
+    /**
+     * Metodo para hacer todas las validaciones de los campos
+     * @throws EventDateBadException excepcion para problemas con la fecha
+     * @throws EventParticipantsException excepcion para problemas con min y max participants
+     * @throws EventPriceException excepcion para problemas con el precio
+     */
     private void fieldsValidations() throws EventDateBadException, EventParticipantsException, EventPriceException {
 
         if (dpDate.getValue() != null) {
