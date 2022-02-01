@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kedamosclientside.entities;
 
 import java.io.Serializable;
@@ -12,6 +7,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Entidad que representa a todos los usuarios.
+ *
  * @author Steven Arce
  */
 @XmlRootElement
@@ -21,8 +17,8 @@ public class User implements Serializable {
 
     private Long user_id;
     private String fullName;
-    private UserStatus status; 
-    private Date lastPasswordChange;  
+    private UserStatus status;
+    private Date lastPasswordChange;
     private String email;
     private String username;
     private String password;
@@ -30,7 +26,7 @@ public class User implements Serializable {
 
     public User() {
     }
-    
+
     public Long getUser_id() {
         return user_id;
     }
@@ -146,7 +142,4 @@ public class User implements Serializable {
         return "UserBean{" + "user_id=" + user_id + ", fullName=" + fullName + ", status=" + status + ", lastPasswordChange=" + lastPasswordChange + ", email=" + email + ", username=" + username + ", password=" + password + ", privilege=" + privilege + '}';
     }
 
-    
-    
-    
 }

@@ -1,11 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kedamosclientside.entities;
 
 /**
+ * Este clase pretende instanciar un unico objeto ClientHolder donde se guarda
+ * la informacion de un cliente.
  *
  * @author Steven Arce
  */
@@ -14,7 +11,8 @@ public class ClientHolder {
     private final static ClientHolder INSTANCE = new ClientHolder();
     private Client client;
 
-    private ClientHolder() {}
+    private ClientHolder() {
+    }
 
     public static ClientHolder getInstance() {
         return INSTANCE;

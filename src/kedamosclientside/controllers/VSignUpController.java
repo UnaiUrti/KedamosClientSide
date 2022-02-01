@@ -125,10 +125,7 @@ public class VSignUpController {
     }
 
     /**
-     * Este metodo pretende validar todos los campos, si todo es valido mandara
-     * un mensaje al servidor diciendo que hara un signUp. Si todo va bien,
-     * aparecera una alerta diciendo que todo ha salido bien. En caso de haber
-     * algun error saldra una alerta indicando el tipo de error.
+     * Este metodo pretende registrar un nuevo cliente.
      *
      * @param event representa la accion del evento handleSignUp
      */
@@ -167,6 +164,9 @@ public class VSignUpController {
         }
     }
 
+    /**
+     * Este metodo pretende limpiar todos los campos.
+     */
     private void clearFields() {
         txtUsername.clear();
         txtEmail.clear();
@@ -175,6 +175,9 @@ public class VSignUpController {
         txtConfirmPassword.clear();
     }
 
+    /**
+     * Este metodo pretende limpiar todos los labels
+     */
     private void clearLabels() {
         txtUsername.setStyle(null);
         lblUsername.setVisible(false);
@@ -220,10 +223,9 @@ public class VSignUpController {
 
     /**
      * Este metodo pretende controlar si algun campo de la ventana singUp esta
-     * vacio mediante una alerta.
+     * vacio.
      *
-     * @return Devuelve el estado del campo, false si esta vacio y true si esta
-     * informado
+     * @return
      */
     private boolean informedFields() {
 
@@ -303,6 +305,12 @@ public class VSignUpController {
 
     }
 
+    /**
+     * Este metodo pretende controlar si ya existe el email o username que se ha
+     * introducido.
+     *
+     * @return
+     */
     private boolean isEmailUsernameExists() {
         boolean find = true;
         try {

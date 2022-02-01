@@ -26,14 +26,14 @@ import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
 
 /**
- * Clase controladora para la ventana de SignIn
+ * Clase controladora para la ventana de VResetPassword
  *
  * @author Steven Arce
  */
 public class VResetPasswordController {
 
     private Tooltip tooltip;
-    //private final static Logger logger = Logger.getLogger("kedamosclientside.controllers.VResetPasswordController");
+    private final static Logger logger = Logger.getLogger("kedamosclientside.controllers.VResetPasswordController");
 
     private Stage stage;
     @FXML
@@ -67,7 +67,7 @@ public class VResetPasswordController {
      */
     public void initStage(Parent root) {
 
-        //logger.info("Iniciado el initStage de la ventana ResetPassword");
+        logger.info("Iniciado el initStage de la ventana ResetPassword");
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
@@ -86,14 +86,20 @@ public class VResetPasswordController {
 
         // Limtar la entrada de caracteres
         this.txtEmail.textProperty().addListener(this::limitCharacters);
-        
+
         //Accion de cerrar desde la barra de titulo
         stage.setOnCloseRequest(this::handleCloseRequest);
-        
+
         stage.show();
 
     }
 
+    /**
+     * Este metodo pretende resetear la contraseña del cliente y enviarlo a su
+     * correo electronico.
+     *
+     * @param event
+     */
     @FXML
     private void handleResetPasswordAction(ActionEvent event) {
         try {
@@ -111,11 +117,21 @@ public class VResetPasswordController {
             lblEmail.setText(ex.getMessage());
             lblEmail.setVisible(true);
         } catch (ServerDown ex) {
-            Logger.getLogger(VResetPasswordController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.severe("Error el servidor esta caido o apagado");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(ex.getMessage());
+            alert.show();
         }
 
     }
 
+    /**
+     * Este metodo limita la entrada de caracteres a 50.
+     *
+     * @param observable
+     * @param oldValue
+     * @param newValue
+     */
     private void limitCharacters(ObservableValue observable, String oldValue,
             String newValue) {
         //logger.info("Inicio del metodo para limitar la entrada de un maximo de caracteres");
@@ -126,10 +142,15 @@ public class VResetPasswordController {
 
     }
 
+    /**
+     * Este metodo pretende volver a la ventana SignIn
+     *
+     * @param event
+     */
     @FXML
     private void handleBack(ActionEvent event) {
-        //logger.info("Se ha pulsado el boton back");
-        //logger.info("se volvera a la ventana de VSignIn");
+        logger.info("Se ha pulsado el boton back");
+        logger.info("se volvera a la ventana de VSignIn");
         stage.close();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VSignIn.fxml"));
@@ -147,10 +168,16 @@ public class VResetPasswordController {
 
     }
 
+    /**
+     * Este metodo pretende controlar la salida de la ventana cuando se pulse la
+     * X de la barra de titulo.
+     *
+     * @param event
+     */
     private void handleCloseRequest(WindowEvent event) {
 
-        //logger.info("Se ha pulsado la X de la barra de titulo y se enviara "
-        //        + "un aviso de confirmacion al usuario");
+        logger.info("Se ha pulsado la X de la barra de titulo y se enviara "
+                + "un aviso de confirmacion al usuario");
         //Se envia un mensaje al usuario confirmando si de verdad quiere salir
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText(null);
@@ -160,13 +187,11 @@ public class VResetPasswordController {
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
-            //logger.info("Se ha pulsado OK y el programa va a finalizar");
-
+            logger.info("Se ha pulsado OK y el programa va a finalizar");
             //El programa finalizara
             stage.close();
         } else {
-            //logger.info("Se ha pulsado CANCELAR y el evento va a ser cancelado");
-
+            logger.info("Se ha pulsado CANCELAR y el evento va a ser cancelado");
             //El aviso se cierra y el usuario continua en la ventana
             event.consume();
         }

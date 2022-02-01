@@ -63,8 +63,8 @@ public class VSignInController {
 
     private UserInterface ui = UserFactory.getUserImplementation();
     private ClientInterface ci = ClientFactory.getClientImplementation();
-
     //private EventManagerInterface emi = EventManagerFactory.getEventManagerImplementation();
+
     public Stage getStage() {
         return stage;
     }
@@ -123,8 +123,6 @@ public class VSignInController {
         //Accion de cerrar desde la barra de titulo
         stage.setOnCloseRequest(this::handleCloseRequest);
 
-        //
-        //this.hlForgotPasswd.setOnAction(this::handleForgotPasswdAction);
         stage.show();
 
     }
@@ -179,13 +177,9 @@ public class VSignInController {
                         MainMenu.initStage(root);
                         break;
                     case EVENT_MANAGER:
-                        /*stage.close();
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                        Parent root = loader.load();
-                        Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
-                        VUserManagementController controller = ((VUserManagementController) loader.getController());
-                        controller.setStage(stage);
-                        controller.initStage(root);*/
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setHeaderText("The event manager window is under maintenance");
+                        alert.show();
                         break;
                     case ADMIN:
                         stage.close();
@@ -243,12 +237,11 @@ public class VSignInController {
     }
 
     /**
-     * Metodo tipo booleano que comprueba si los campos contienen mas de 255
-     * caracteres
+     * Metodo para limitar la entrada de 50 caracteres
      *
-     * @return Devuelve una variable booleana que dice hay algun campo que
-     * supera los 50 caracteres (si es false hay un campo que los supera, si es
-     * true ningun campo supera los 50 caracteres, por tanto, todo correcto)
+     * @param observable
+     * @param oldValue
+     * @param newValue
      */
     private void limitCharacters(ObservableValue<? extends String> observable, String oldValue,
             String newValue) {
@@ -290,17 +283,21 @@ public class VSignInController {
 
     }
 
+    /**
+     * Metodo que se va a ejecutar una vez pulsado el hyperlink de ForgotPassword el
+     * cual te va a llevar a la ventana ResetPassword
+     *
+     * @param event
+     */
     @FXML
     private void handleForgotPasswdAction(ActionEvent event) {
 
         try {
             //La ventana actual se cierra
             stage.close();
-            //Logger.getLogger(VSignInController.class.getName()).info("VENTANA RESET PASSWORD");
             //El usuario inicia sesion y va a la ventana LogOut
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VResetPassword.fxml"));
             Parent root = loader.load();
-            //Logger.getLogger(VSignInController.class.getName()).info("LOGOUT VENTANA");
             VResetPasswordController controller = ((VResetPasswordController) loader.getController());
             controller.setStage(stage);
             controller.initStage(root);
