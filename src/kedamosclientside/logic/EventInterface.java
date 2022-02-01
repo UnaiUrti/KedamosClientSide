@@ -5,9 +5,10 @@
  */
 package kedamosclientside.logic;
 
+import java.net.ConnectException;
 import java.util.Collection;
 import kedamosclientside.entities.Event;
-import kedamosclientside.exceptions.ClientLogicException;
+
 
 
 
@@ -17,14 +18,14 @@ import kedamosclientside.exceptions.ClientLogicException;
  */
 public interface EventInterface {
     
-    public void createEvent(Event event) throws ClientLogicException;
+    public void createEvent(Event event) throws ConnectException;
     
-    public void editEvent (Event event) throws ClientLogicException;
+    public void editEvent (Event event) throws ConnectException;
     
-    public void removeEvent (Event event) throws ClientLogicException;
+    public void removeEvent (Event event) throws ConnectException;
     
-    public void searchEvent (Event event) throws ClientLogicException;
+    public void searchEvent (Event event) throws ConnectException;
     
-    public Collection <Event> getEvents() throws ClientLogicException;
+    public Collection <Event> getEvents() throws ConnectException;
             
 }

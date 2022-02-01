@@ -35,7 +35,7 @@ public class Main extends Application {
         MyEventsViewController controller= ((MyEventsViewController)loader.getController());
         controller.setEventinterface(EventFactory.getEvent());
         controller.setStage(primaryStage);
-        controller.initStage(root);
+        controller.initStage(root, null);
         
     }
 
