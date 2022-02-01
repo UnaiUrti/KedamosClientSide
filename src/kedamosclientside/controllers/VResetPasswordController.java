@@ -2,6 +2,8 @@ package kedamosclientside.controllers;
 
 import java.io.IOException;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -19,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Client;
 import kedamosclientside.exceptions.EmailDoesNotExist;
+import kedamosclientside.exceptions.ServerDown;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
 
@@ -107,6 +110,8 @@ public class VResetPasswordController {
             txtEmail.setStyle("-fx-border-color: red;");
             lblEmail.setText(ex.getMessage());
             lblEmail.setVisible(true);
+        } catch (ServerDown ex) {
+            Logger.getLogger(VResetPasswordController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

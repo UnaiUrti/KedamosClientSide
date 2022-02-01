@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kedamosclientside.security;
 
 import java.io.File;
@@ -26,6 +21,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 /**
+ * Esta clase representa la parte de encriptacion de la contraseña del usuario.
  *
  * @author Steven Arce
  */
@@ -34,9 +30,10 @@ public class Crypt {
     private static ResourceBundle rbp = ResourceBundle.getBundle("kedamosclientside.security.Public");
 
     /**
+     * Este metodo encripta asimetricamente la contraseña.
      *
-     * @param passwd
-     * @return
+     * @param passwd Contraseña para encriptar.
+     * @return Devuelve la contraseña hexadecimalmente.
      */
     public static String encryptAsimetric(String passwd) {
 
@@ -59,23 +56,12 @@ public class Crypt {
 
     }
 
-    public static String hash(String passwd) {
-
-        byte[] hash = null;
-
-        try {
-
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            hash = md.digest(passwd.getBytes(StandardCharsets.UTF_8));
-
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(Crypt.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return byteArrayToHexString(hash);
-
-    }
-
+    /**
+     * Este metodo convierte un array de bytes a un string de hexadecimal.
+     *
+     * @param bytes Array de bytes para parsear a hexadecimal.
+     * @return Devuelve el array de bytes en forma de string.
+     */
     public static String byteArrayToHexString(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
@@ -84,6 +70,12 @@ public class Crypt {
         return sb.toString();
     }
 
+    /**
+     * Este metodo convierte un string en hexadecimal a un array de bytes.
+     *
+     * @param s String que se pasa para convertirlo a bytes.
+     * @return Devuelve el string en forma de array de bytes
+     */
     public static byte[] hexStringToByteArray(String s) {
         int len = s.length();
         byte[] data = new byte[len / 2];
@@ -94,6 +86,11 @@ public class Crypt {
         return data;
     }
 
+    /**
+     * Este metodo genera una nueva contraseña para el cliente.
+     *
+     * @return Devuelve un string que sera la contraseña generada.
+     */
     public static String generatePassword() {
 
         int length = 16;
@@ -116,6 +113,11 @@ public class Crypt {
 
     }
 
+    /**
+     * Este metodo lee la llave publica para la encriptacion asimetrica.
+     *
+     * @return Devuelve la llave publica.
+     */
     public static PublicKey readPublicKey() {
         PublicKey pubKey = null;
         try {
@@ -129,17 +131,6 @@ public class Crypt {
             Logger.getLogger(Crypt.class.getName()).log(Level.SEVERE, null, ex);
         }
         return pubKey;
-    }
-
-    public static byte[] fileReader(String path) {
-        byte ret[] = null;
-        File file = new File(path);
-        try {
-            ret = Files.readAllBytes(file.toPath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return ret;
     }
 
 }

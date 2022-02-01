@@ -86,13 +86,38 @@ public class VUserManagementControllerIT extends ApplicationTest {
     }
 
     @Test
-    public void testC_AdminLogin() {
-        clickOn("#txtUsername");
-        write("admin");
-        clickOn("#txtPassword");
-        write("admin");
-        clickOn("#btnSignIn");
-        verifyThat("#UserManagementPane", isVisible());
+    public void testC_createEmpty() {
+        clickOn("#btnCreate");
+        verifyThat("#lblUsername", isVisible());
+        verifyThat("#lblFullName", isVisible());
+        verifyThat("#lblEmail", isVisible());
+        verifyThat("#lblPassword", isVisible());
+        verifyThat("#lblStatus", isVisible());
+        verifyThat("#lblManagerCategory", isVisible());
+    }
+    
+    @Test
+    public void testD_createWithEmailWrongPattern() {
+        clickOn("#btnCreate");
+        
+    }
+    
+    @Test
+    public void testE_createWithExistingUsername() {
+        clickOn("#btnCreate");
+        
+    }
+    
+    @Test
+    public void testF_createWithExistingEmail() {
+        clickOn("#btnCreate");
+        
+    }
+    
+    @Test
+    public void testG_createEventManager() {
+        clickOn("#btnCreate");
+        
     }
 
 }

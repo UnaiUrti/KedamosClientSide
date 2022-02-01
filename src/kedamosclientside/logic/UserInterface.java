@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kedamosclientside.logic;
 
 import java.util.Collection;
@@ -12,44 +7,62 @@ import kedamosclientside.exceptions.ServerDown;
 import kedamosclientside.exceptions.UsernameDoesNotExist;
 
 /**
+ * Interfaz de logica que encapsula los metodos para la gestion de usuarios.
  *
  * @author Steven Arce
  */
 public interface UserInterface {
+
     /**
-     * 
-     * @param user 
+     * Este metodo crea un nuevo usuario.
+     *
+     * @param user El objeto User que se agregara.
+     * @throws ServerDown Si el servidor esta apagado.
      */
-    public void createUser(User user);
+    public void createUser(User user) throws ServerDown;
+
     /**
-     * 
-     * @param user 
+     * Este metodo modificara los datos de un usuario existente.
+     *
+     * @param user El objeto User que se editara.
+     * @throws ServerDown Si el servidor esta apagado.
      */
-    public void editUser(User user);
+    public void editUser(User user) throws ServerDown;
+
     /**
-     * 
-     * @param user 
+     * Este metodo eliminara un usuario existente.
+     *
+     * @param user El objeto User que se eliminara.
+     * @throws ServerDown Si el servidor esta apagado.
      */
-    public void removeUser(User user);
+    public void removeUser(User user) throws ServerDown;
+
     /**
-     * 
-     * @param user
-     * @return 
+     * Este metodo busca un usuaio existente.
+     *
+     * @param user El objeto User que buscara el servidor.
+     * @return Devuelve el usuario encontrado.
+     * @throws ServerDown Si el servidor esta apagado.
      */
-    public User findUser(User user);
+    public User findUser(User user) throws ServerDown;
+
     /**
-     * 
-     * @return 
+     * Este metodo retorna una coleccion de usuarios con todos sus datos.
+     *
+     * @return Coleccion con todos los datos de los usuarios.
+     * @throws ServerDown Si el servidor esta apagado.
      */
-    public Collection<User> findAllUser();
-    
+    public Collection<User> findAllUser() throws ServerDown;
+
     /**
-     * 
-     * @param user
-     * @return 
-     * @throws kedamosclientside.exceptions.UsernameDoesNotExist 
-     * @throws kedamosclientside.exceptions.PasswordIncorrect 
-     * @throws kedamosclientside.exceptions.ServerDown 
+     * Este metodo valida el usuario y la contraseña que se introduce en el
+     * login.
+     *
+     * @param user El objeto User que buscara el servidor.
+     * @return Coleccion con los datos del usuario del login.
+     * @throws UsernameDoesNotExist Si el username no existe.
+     * @throws PasswordIncorrect Si la contraseña del usuario es incorrecto.
+     * @throws ServerDown Si el servidor esta apagado.
      */
     public Collection<User> LoginValidation(User user) throws UsernameDoesNotExist,
             PasswordIncorrect, ServerDown;

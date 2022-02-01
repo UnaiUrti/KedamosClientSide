@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -23,6 +24,7 @@ import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Client;
 import kedamosclientside.entities.User;
 import kedamosclientside.entities.UserStatus;
+import kedamosclientside.exceptions.ServerDown;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
 import kedamosclientside.logic.UserFactory;
@@ -137,25 +139,29 @@ public class VSignUpController {
         if (informedFields()) {
             if (emailPattern() & confirmPassword()) {
                 if (isEmailUsernameExists()) {
-                    Client client = new Client();
+                    try {
+                        Client client = new Client();
 
-                    client.setUsername(txtUsername.getText());
-                    client.setEmail(txtEmail.getText());
-                    client.setFullName(txtFullName.getText());
-                    client.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
-                    client.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-                    client.setStatus(UserStatus.ENABLED);
-                    client.setAccountNumber(0L);
-                    client.setIsPremium(false);
+                        client.setUsername(txtUsername.getText());
+                        client.setEmail(txtEmail.getText());
+                        client.setFullName(txtFullName.getText());
+                        client.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
+                        client.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+                        client.setStatus(UserStatus.ENABLED);
+                        client.setAccountNumber(0L);
+                        client.setIsPremium(false);
 
-                    ci.createClient(client);
-                    
-                    //Limpiamos todos los campos despues de crear al cliente
-                    clearFields();
-                    // Alerta para mostrar que ha ido bien
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setHeaderText("The account has been created successfully");
-                    alert.show();
+                        ci.createClient(client);
+
+                        //Limpiamos todos los campos despues de crear al cliente
+                        clearFields();
+                        // Alerta para mostrar que ha ido bien
+                        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                        alert.setHeaderText("The account has been created successfully");
+                        alert.show();
+                    } catch (ServerDown ex) {
+                        Logger.getLogger(VSignUpController.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
@@ -298,21 +304,24 @@ public class VSignUpController {
     }
 
     private boolean isEmailUsernameExists() {
-
         boolean find = true;
-        Collection<User> users = ui.findAllUser();
+        try {
+            Collection<User> users = ui.findAllUser();
 
-        if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText())).count() != 0) {
-            txtUsername.setStyle("-fx-border-color: red;");
-            lblUsername.setText("Username is already in use");
-            lblUsername.setVisible(true);
-            find = false;
-        }
-        if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText())).count() != 0) {
-            txtEmail.setStyle("-fx-border-color: red;");
-            lblEmail.setText("Email is already in use");
-            lblEmail.setVisible(true);
-            find = false;
+            if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText())).count() != 0) {
+                txtUsername.setStyle("-fx-border-color: red;");
+                lblUsername.setText("Username is already in use");
+                lblUsername.setVisible(true);
+                find = false;
+            }
+            if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText())).count() != 0) {
+                txtEmail.setStyle("-fx-border-color: red;");
+                lblEmail.setText("Email is already in use");
+                lblEmail.setVisible(true);
+                find = false;
+            }
+        } catch (ServerDown ex) {
+            Logger.getLogger(VSignUpController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return find;
     }

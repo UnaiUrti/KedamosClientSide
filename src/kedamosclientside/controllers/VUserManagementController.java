@@ -37,6 +37,7 @@ import kedamosclientside.entities.EventManager;
 import kedamosclientside.entities.User;
 import kedamosclientside.entities.UserPrivilege;
 import kedamosclientside.entities.UserStatus;
+import kedamosclientside.exceptions.ServerDown;
 import kedamosclientside.logic.EventManagerFactory;
 import kedamosclientside.logic.EventManagerInterface;
 import kedamosclientside.logic.UserFactory;
@@ -51,14 +52,13 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
- *
+ * Esta clase represemta el controlador de la ventana VUserManagement
  *
  * @author Steven Arce
  */
 public class VUserManagementController {
 
-    //private Tooltip tooltip;
-    //private final static Logger logger = Logger.getLogger("kedamosclientside.controllers.VResetPasswordController");
+    private final static Logger logger = Logger.getLogger("kedamosclientside.controllers.VUserManagementController");
     private Stage stage;
     @FXML
     private TableView<EventManager> tlView;
@@ -134,7 +134,7 @@ public class VUserManagementController {
      */
     public void initStage(Parent root) {
 
-        //logger.info("Iniciado el initStage de la ventana ResetPassword");
+        logger.info("Iniciado el initStage de la ventana VUserManagement");
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
@@ -195,7 +195,7 @@ public class VUserManagementController {
         txtEmail.textProperty().addListener(this::limitCharacters);
         txtFullName.textProperty().addListener(this::limitCharacters);
         txtPassword.textProperty().addListener(this::limitCharacters);
-        
+
         // Focus en el Username field
         txtUsername.requestFocus();
 
@@ -203,6 +203,15 @@ public class VUserManagementController {
 
     }
 
+    /**
+     * Este metodo pretende que cuando se seleccione una fila de la tabla, los
+     * datos de los campos se cargaran con los datos de la fila seleccionada. Y
+     * al deseleccionar la fila los campos se vaciaran.
+     *
+     * @param observable Observa el contenido
+     * @param oldValue Valor antiguo del campo
+     * @param newValue Nuevo valor del campo
+     */
     private void handleTableSelectionChanged(ObservableValue observable,
             Object oldValue,
             Object newValue) {
@@ -234,98 +243,137 @@ public class VUserManagementController {
         txtUsername.requestFocus();
     }
 
+    /**
+     * Este metodo pretende crear un manejador de evento.
+     *
+     * @param event Representa la accion del evento handleCreateEventManager.
+     */
     @FXML
     private void handleCreateEventManager(ActionEvent event) {
+        logger.info("Iniciado el evento para crear el manejador de evento");
         clearAllLabels();
         if (informedCreateFields() & emailPattern() & validateCreateUsernameEmail()) {
+            try {
+                // Creamos el event manager con todos sus datos
+                EventManager eventManager = new EventManager();
+                eventManager.setUsername(txtUsername.getText().trim());
+                eventManager.setFullName(txtFullName.getText().trim());
+                eventManager.setEmail(txtEmail.getText().trim());
+                eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+                eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
 
-            // Creamos el event manager con todos sus datos
-            EventManager eventManager = new EventManager();
-            eventManager.setUsername(txtUsername.getText().trim());
-            eventManager.setFullName(txtFullName.getText().trim());
-            eventManager.setEmail(txtEmail.getText().trim());
-            eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-            eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
+                if (dpLastPasswordChange.getValue() != null) {
+                    eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                } else {
+                    eventManager.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
+                }
 
-            if (dpLastPasswordChange.getValue() != null) {
-                eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            } else {
-                eventManager.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
+                eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+                eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+
+                // Enviamos la peticion al servidor para crear el event manager
+                emi.createEventManager(eventManager);
+
+                // Cargamos otra vez la tabla con todos los datos
+                loadTableWithData();
+                // Limpiamos los labels y los bordes de los fields
+                clearAllLabels();
+                // Alerta para indicar que se ha creado con exito el event manager
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("The account has been created successfully");
+                alert.show();
+            } catch (ServerDown ex) {
+                logger.severe("Error el servidor esta caido o apagado");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(ex.getMessage());
+                alert.show();
             }
-
-            eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
-            eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
-
-            // Enviamos la peticion al servidor para crear el event manager
-            emi.createEventManager(eventManager);
-
-            // Cargamos otra vez la tabla con todos los datos
-            loadTableWithData();
-            // Limpiamos los labels y los bordes de los fields
-            clearAllLabels();
-            // Alerta para indicar que se ha creado con exito el event manager
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("The account has been created successfully");
-            alert.show();
         }
 
     }
 
+    /**
+     * Este metodo prentende modificar el manejador de evento seleccionada.
+     *
+     * @param event Representa la accion del evento handleEditEventManger.
+     */
     @FXML
     private void handleEditEventManger(ActionEvent event) {
+        logger.info("Iniciado el evento para editar el manejador de evento");
         clearAllLabels();
         EventManager em = tlView.getSelectionModel().getSelectedItem();
         if (informedEditFields() & emailPattern() & validateEditUsernameEmail(em)) {
+            try {
+                // Creamos el event manager con todos sus datos
+                EventManager eventManager = new EventManager();
+                eventManager.setUser_id(em.getUser_id());
+                eventManager.setUsername(txtUsername.getText().trim());
+                eventManager.setFullName(txtFullName.getText().trim());
+                eventManager.setEmail(txtEmail.getText().trim());
+                if (!txtPassword.getText().trim().isEmpty()) {
+                    eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
+                    eventManager.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
+                } else {
+                    eventManager.setPassword(em.getPassword());
+                    eventManager.setLastPasswordChange(em.getLastPasswordChange());
+                }
+                if (dpLastPasswordChange.getValue().equals(em.getLastPasswordChange().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
+                    eventManager.setLastPasswordChange(em.getLastPasswordChange());
+                } else {
+                    eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+                }
+                eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
+                eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
+                eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
 
-            // Creamos el event manager con todos sus datos
-            EventManager eventManager = new EventManager();
-            eventManager.setUser_id(em.getUser_id());
-            eventManager.setUsername(txtUsername.getText().trim());
-            eventManager.setFullName(txtFullName.getText().trim());
-            eventManager.setEmail(txtEmail.getText().trim());
-            if (!txtPassword.getText().trim().isEmpty()) {
-                eventManager.setPassword(Crypt.encryptAsimetric(txtPassword.getText()));
-                eventManager.setLastPasswordChange(new Timestamp(System.currentTimeMillis()));
-            } else {
-                eventManager.setPassword(em.getPassword());
-                eventManager.setLastPasswordChange(em.getLastPasswordChange());
+                // Enviamos la peticion al servidor para crear el event manager
+                emi.editEventManager(eventManager);
+
+                // Cargamos otra vez la tabla con todos los datos
+                loadTableWithData();
+                // Limpiamos los labels y los bordes de los fields
+                clearAllLabels();
+                // Alerta para indicar que se ha creado con exito el event manager
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("The account has been modified successfully");
+                alert.show();
+            } catch (ServerDown ex) {
+                logger.severe("Error el servidor esta caido o apagado");
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setHeaderText(ex.getMessage());
+                alert.show();
             }
-            if (dpLastPasswordChange.getValue().equals(em.getLastPasswordChange().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())) {
-                eventManager.setLastPasswordChange(em.getLastPasswordChange());
-            } else {
-                eventManager.setLastPasswordChange(Date.from(dpLastPasswordChange.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-            }
-            eventManager.setPrivilege(UserPrivilege.EVENT_MANAGER);
-            eventManager.setStatus((UserStatus) cbStatus.getSelectionModel().getSelectedItem());
-            eventManager.setManagerCategory((Category) cbManagerCategory.getSelectionModel().getSelectedItem());
+        }
 
-            // Enviamos la peticion al servidor para crear el event manager
-            emi.editEventManager(eventManager);
+    }
 
-            // Cargamos otra vez la tabla con todos los datos
-            loadTableWithData();
-            // Limpiamos los labels y los bordes de los fields
-            clearAllLabels();
-            // Alerta para indicar que se ha creado con exito el event manager
+    /**
+     * Este metodo pretende borrar el manejador de evento seleccionado.
+     *
+     * @param event Representa la accion del evento handleRemoveEventManger.
+     */
+    @FXML
+    private void handleRemoveEventManger(ActionEvent event) {
+        logger.info("Iniciado el evento para eliminar un manejador de evento");
+        try {
+            emi.removeEventManager(tlView.getSelectionModel()
+                    .getSelectedItem());
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("The account has been modified successfully");
+            alert.setHeaderText("The account has been deleted successfully");
+            alert.show();
+            loadTableWithData();
+        } catch (ServerDown ex) {
+            logger.severe("Error el servidor esta caido o apagado");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(ex.getMessage());
             alert.show();
         }
 
     }
 
-    @FXML
-    private void handleRemoveEventManger(ActionEvent event) {
-
-        emi.removeEventManager(tlView.getSelectionModel()
-                .getSelectedItem());
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText("The account has been deleted successfully");
-        alert.show();
-        loadTableWithData();
-
-    }
-
+    /**
+     * Este metodo limpia todos los campos de la ventana.
+     */
     private void clearAllFields() {
 
         txtUsername.clear();
@@ -336,11 +384,14 @@ public class VUserManagementController {
         cbManagerCategory.getSelectionModel().clearSelection();
         dpLastPasswordChange.setValue(null);
         dpLastPasswordChange.getEditor().clear();
-
+        logger.info("Se ha limpiado todos los campos");
     }
 
+    /**
+     * Este metodo hace invisible todos los labels y los bordes de los campos
+     * vuelve al color original.
+     */
     private void clearAllLabels() {
-
         txtEmail.setStyle(null);
         txtFullName.setStyle(null);
         txtPassword.setStyle(null);
@@ -354,54 +405,88 @@ public class VUserManagementController {
         lblStatus.setVisible(false);
         lblManagerCategory.setVisible(false);
         lblLastPasswordChange.setVisible(false);
+        logger.info("Se ha limpiado todos los labels");
 
     }
 
+    /**
+     * Este metodo valida que al crear un manejador de evento el usuario y el
+     * email no exista en la base de datos.
+     *
+     * @return Retorna true si no existe el usuario y el email.
+     */
     private boolean validateCreateUsernameEmail() {
-
+        logger.info("Iniciado el evento para validar el email o username");
         boolean find = true;
-        Collection<User> users = ui.findAllUser();
+        try {
+            Collection<User> users = ui.findAllUser();
 
-        if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText().trim())).count() != 0) {
-            txtUsername.setStyle("-fx-border-color: red;");
-            lblUsername.setText("Username is already in use");
-            lblUsername.setVisible(true);
-            find = false;
-        }
-        if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText().trim())).count() != 0) {
-            txtEmail.setStyle("-fx-border-color: red;");
-            lblEmail.setText("Email is already in use");
-            lblEmail.setVisible(true);
-            find = false;
+            if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText().trim())).count() != 0) {
+                txtUsername.setStyle("-fx-border-color: red;");
+                lblUsername.setText("Username is already in use");
+                lblUsername.setVisible(true);
+                find = false;
+            }
+            if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText().trim())).count() != 0) {
+                txtEmail.setStyle("-fx-border-color: red;");
+                lblEmail.setText("Email is already in use");
+                lblEmail.setVisible(true);
+                find = false;
+            }
+        } catch (ServerDown ex) {
+            logger.severe("Error el servidor esta caido o apagado");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(ex.getMessage());
+            alert.show();
         }
         return find;
     }
 
+    /**
+     * Este metodo valida que al editar un manejador de evento el usuario y el
+     * email no exista en la base de datos.
+     *
+     * @param em Objeto EventManager para validar el usuario y el email.
+     * @return Retorna true si no existe el usuario y el email.
+     */
     private boolean validateEditUsernameEmail(EventManager em) {
-
+        logger.info("Iniciado el evento para validar el email o username");
         boolean find = true;
-        Collection<User> users = ui.findAllUser();
+        try {
+            Collection<User> users = ui.findAllUser();
 
-        if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText().trim())).count() != 0 & !em.getUsername().
-                equalsIgnoreCase(txtUsername.getText().trim())) {
-            txtUsername.setStyle("-fx-border-color: red;");
-            lblUsername.setText("Username is already in use");
-            lblUsername.setVisible(true);
-            find = false;
-        }
-        if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText().trim())).count() != 0
-                & !em.getEmail().equalsIgnoreCase(txtEmail.getText().trim())) {
-            txtEmail.setStyle("-fx-border-color: red;");
-            lblEmail.setText("Email is already in use");
-            lblEmail.setVisible(true);
-            find = false;
+            if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText().trim())).count() != 0 & !em.getUsername().
+                    equalsIgnoreCase(txtUsername.getText().trim())) {
+                txtUsername.setStyle("-fx-border-color: red;");
+                lblUsername.setText("Username is already in use");
+                lblUsername.setVisible(true);
+                find = false;
+            }
+            if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText().trim())).count() != 0
+                    & !em.getEmail().equalsIgnoreCase(txtEmail.getText().trim())) {
+                txtEmail.setStyle("-fx-border-color: red;");
+                lblEmail.setText("Email is already in use");
+                lblEmail.setVisible(true);
+                find = false;
+            }
+        } catch (ServerDown ex) {
+            logger.severe("Error el servidor esta caido o apagado");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(ex.getMessage());
+            alert.show();
         }
         return find;
 
     }
 
+    /**
+     * Este metodo comprueba que los campos no esten vacios al crear un
+     * manejador de evento.
+     *
+     * @return Retorna true si los campos estan informados.
+     */
     private boolean informedCreateFields() {
-        //logger.info("Iniciado el evento para controlar si el campo esta vacio");
+        logger.info("Iniciado el evento para controlar si los campos estan informados");
 
         boolean informed = true;
 
@@ -444,8 +529,14 @@ public class VUserManagementController {
         return informed;
     }
 
+    /**
+     * Este metodo comprueba que los campos no esten vacios al editar un
+     * manejador de evento.
+     *
+     * @return Retorna true si los campos estan informados.
+     */
     private boolean informedEditFields() {
-        //logger.info("Iniciado el evento para controlar si el campo esta vacio");
+        logger.info("Iniciado el evento para controlar si los campos estan informados");
 
         boolean informed = true;
 
@@ -482,10 +573,17 @@ public class VUserManagementController {
         return informed;
     }
 
+    /**
+     * Este metodo limita que no se pueda introducir mas de 50 caracteres en
+     * todos los campos.
+     *
+     * @param observable Observa el contenido
+     * @param oldValue Valor antiguo del campo
+     * @param newValue Nuevo valor del campo
+     */
     private void limitCharacters(ObservableValue observable, String oldValue,
             String newValue) {
         //logger.info("Inicio del metodo para limitar la entrada de un maximo de caracteres");
-
         if (txtUsername.getText().length() > 50) {
             txtUsername.setText(oldValue);
         }
@@ -498,11 +596,15 @@ public class VUserManagementController {
         if (txtPassword.getText().length() > 50) {
             txtPassword.setText(oldValue);
         }
-
     }
 
+    /**
+     * Este metodo comprueba que el campo email siga un patron en concreto.
+     *
+     * @return Retorna true si el email sigue el patron.
+     */
     private boolean emailPattern() {
-        //logger.info("Iniciado el evento para controlar si el campo email es valido");
+        logger.info("Iniciado el evento para controlar si el campo email es valido");
         boolean pattern = true;
 
         if (!txtEmail.getText().matches("[\\w.]+@[\\w]+\\.[a-zA-Z]{2,4}")) {
@@ -517,6 +619,12 @@ public class VUserManagementController {
         return pattern;
     }
 
+    /**
+     * Este metodo pretende controlar la salida de la ventana cuando se pulse la
+     * X de la barra de titulo.
+     *
+     * @param event Representa la accion del evento handleCloseRequest
+     */
     private void handleCloseRequest(WindowEvent event) {
 
         //Se envia un mensaje al usuario confirmando si de verdad quiere salir
@@ -527,24 +635,40 @@ public class VUserManagementController {
 
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
-            //logger.info("Se ha pulsado OK y el programa va a finalizar");
+            logger.info("Se ha pulsado OK y el programa va a finalizar");
             //El programa finalizara
             stage.close();
         } else {
-            //logger.info("Se ha pulsado CANCELAR y el evento va a ser cancelado");
+            logger.info("Se ha pulsado CANCELAR y el evento va a ser cancelado");
             //El aviso se cierra y el usuario continua en la ventana
             event.consume();
         }
 
     }
 
+    /**
+     * Este metodo carga la tabla con los datos de todos los manejadores de
+     * eventos.
+     */
     private void loadTableWithData() {
-        // Obtenemos todos los event managers 
-        usersData = FXCollections.observableArrayList(emi.findAll());
-        // Hacemos un set de la lista en la tabla
-        tlView.setItems(usersData);
+        try {
+            // Obtenemos todos los event managers
+            usersData = FXCollections.observableArrayList(emi.findAll());
+            // Hacemos un set de la lista en la tabla
+            tlView.setItems(usersData);
+        } catch (ServerDown ex) {
+            logger.severe("Error el servidor esta caido o apagado");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setHeaderText(ex.getMessage());
+            alert.show();
+        }
     }
 
+    /**
+     * Este metodo crea un reporte con los datos de la tabla.
+     *
+     * @param event Representa la accion del evento handleEventManagerReport.
+     */
     @FXML
     private void handleEventManagerReport(ActionEvent event) {
         try {
@@ -555,15 +679,21 @@ public class VUserManagementController {
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
-            Logger.getLogger(VUserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.severe("Se ha producido un error al cargar el informe");
         }
     }
 
+    /**
+     * Este metodo pretende cerrar sesion del administrador y volver al inicio
+     * de sesion.
+     *
+     * @param event Representa la accion del evento handleLogOut.
+     */
     @FXML
     private void handleLogOut(ActionEvent event) {
 
-        //logger.info("Se ha pulsado el boton back");
-        //logger.info("se volvera a la ventana de VSignIn");
+        logger.info("Se ha pulsado el boton log out");
+        logger.info("se volvera a la ventana de VSignIn");
         stage.close();
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VSignIn.fxml"));
@@ -572,13 +702,11 @@ public class VUserManagementController {
         try {
             root = (Parent) loader.load();
         } catch (IOException ex) {
-            //logger.severe("Se ha producido un error al cargarel fxml de la ventana singIn");
+            logger.severe("Se ha producido un error al cargar el fxml de la ventana singIn");
         }
-
         VSignInController controller = (VSignInController) loader.getController();
         controller.setStage(stage);
         controller.initStage(root);
-
     }
 
 }

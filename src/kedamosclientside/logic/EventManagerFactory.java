@@ -1,17 +1,17 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kedamosclientside.logic;
 
 /**
+ * Esta clase es una factoria para la interfaz {@link EventManagerInterface}.
  *
- * @author 2dam
+ * @author Steven Arce
  */
-
 public class EventManagerFactory {
 
+    /**
+     * Este metodo devuelve un objeto que implementa la interfaz.
+     * 
+     * @return Un objeto que implementa la interfaz.
+     */
     public static EventManagerInterface getEventManagerImplementation() {
 
         EventManagerInterface emi = new EventManagerImplementation();
