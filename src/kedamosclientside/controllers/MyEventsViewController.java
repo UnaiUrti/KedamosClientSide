@@ -219,7 +219,6 @@ public class MyEventsViewController {
             tvTable.setItems(eventsForTable);
         } catch (ConnectException ex) {
             Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
-            ex.printStackTrace();
         }
 
         //Se enfoca en el campo Title
@@ -644,15 +643,13 @@ public class MyEventsViewController {
             jasperViewer.setVisible(true);
 
         } catch (JRException ex) {
-            //hacer el catch 
-            ex.printStackTrace();
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle("No se ha imprimido informacion");
+        alert.setHeaderText("Error Report");
+        alert.setContentText("Ha habido un error al imprimir los datos");
+        alert.showAndWait();
         }
-        //Information alert when you dismiss the confirmation alert
-        Alert alert3 = new Alert(AlertType.INFORMATION);
-        alert3.setTitle("Non printed information");
-        alert3.setHeaderText(null);
-        alert3.setContentText(null);
-        alert3.showAndWait();
+
     }
 
     /**
