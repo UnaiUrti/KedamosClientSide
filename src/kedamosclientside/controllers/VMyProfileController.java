@@ -6,6 +6,7 @@
 package kedamosclientside.controllers;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
@@ -23,6 +24,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import kedamosclientside.entities.Client;
 import kedamosclientside.entities.ClientHolder;
+import kedamosclientside.entities.User;
 import kedamosclientside.exceptions.PasswordIncorrect;
 import kedamosclientside.logic.ClientFactory;
 import kedamosclientside.logic.ClientInterface;
@@ -47,7 +49,7 @@ public class VMyProfileController {
     @FXML
     private TextField txtAccountNumber;
     @FXML
-    private Button bntSave;
+    private Button btnSave;
     @FXML
     private ComboBox cbPremium;
     @FXML
@@ -76,9 +78,12 @@ public class VMyProfileController {
     private Label lblConfirmNewPassword;
     @FXML
     private Button bntDeleteAccount;
+    @FXML
+    private Button btnEdit;
+    @FXML
+    private Button btnCancel;
 
     private Stage stage;
-
     private UserInterface ui = UserFactory.getUserImplementation();
     private ClientInterface ci = ClientFactory.getClientImplementation();
     private Client holder = ClientHolder.getInstance().getClient();
@@ -104,6 +109,16 @@ public class VMyProfileController {
 
         cbPremium.getItems().addAll("Yes", "No");
 
+        // Desabilitar el boton save
+        btnSave.setDisable(true);
+        // No dejar editar los datos hasta darle al boton edit
+        txtEmail.setEditable(false);
+        txtFullName.setEditable(false);
+        txtUsername.setEditable(false);
+        txtAccountNumber.setEditable(false);
+        cbPremium.setDisable(true);
+
+        // Insertar la informacion del cliente en los fields
         setClientData();
 
         stage.show();
@@ -129,6 +144,11 @@ public class VMyProfileController {
     }
 
     private void clearLabelsChangePassword() {
+
+        txtCurrentPassword.setStyle(null);
+        txtNewPassword.setStyle(null);
+        txtConfirmNewPassword.setStyle(null);
+
         lblCurrentPassword.setVisible(false);
         lblNewPassword.setVisible(false);
         lblConfirmNewPassword.setVisible(false);
@@ -174,7 +194,7 @@ public class VMyProfileController {
         try {
             Client c = new Client();
             c.setUsername(holder.getUsername());
-            c.setPassword(Crypt.encryptAsimetric(txtNewPassword.getText()));
+            c.setPassword(Crypt.encryptAsimetric(txtCurrentPassword.getText()));
             ci.validatePassword(c);
             return true;
         } catch (PasswordIncorrect ex) {
@@ -183,14 +203,137 @@ public class VMyProfileController {
             txtCurrentPassword.setStyle("-fx-border-color: red;");
             return false;
         }
+    }
+
+    @FXML
+    private void handleEditUserInformation(ActionEvent event) {
+
+        btnSave.setDisable(false);
+        btnCancel.setDisable(false);
+        btnEdit.setDisable(true);
+
+        txtEmail.setEditable(true);
+        txtFullName.setEditable(true);
+        txtUsername.setEditable(true);
+        txtAccountNumber.setEditable(true);
+        cbPremium.setDisable(false);
+    }
+
+    @FXML
+    private void handleCancelUserInformation(ActionEvent event) {
+
+        btnSave.setDisable(true);
+        btnCancel.setDisable(true);
+        btnEdit.setDisable(false);
+
+        txtEmail.setEditable(false);
+        txtFullName.setEditable(false);
+        txtUsername.setEditable(false);
+        txtAccountNumber.setEditable(false);
+        cbPremium.setDisable(true);
+
+        setClientData();
 
     }
 
     @FXML
     private void handleSaveUserInformation(ActionEvent event) {
-        
-        
-        
+        clearLabelsSaveUserInformation();
+        if (informedSaveUserInformation()) {
+            if (isEmailUsernameExists()) {
+                holder.setEmail(txtEmail.getText());
+                holder.setFullName(txtFullName.getText());
+                holder.setUsername(txtUsername.getText());
+                holder.setAccountNumber(Long.parseLong(txtAccountNumber.getText()));
+                if (cbPremium.getValue().equals("Yes")) {
+                    holder.setIsPremium(true);
+                } else {
+                    holder.setIsPremium(false);
+                }
+                ci.editClient(holder);
+                btnSave.setDisable(true);
+                btnCancel.setDisable(true);
+                btnEdit.setDisable(false);
+
+                txtEmail.setEditable(false);
+                txtFullName.setEditable(false);
+                txtUsername.setEditable(false);
+                txtAccountNumber.setEditable(false);
+                cbPremium.setDisable(true);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setHeaderText("Your data has been changed successfully");
+                alert.show();
+            }
+        }
+
+    }
+
+    private void clearLabelsSaveUserInformation() {
+
+        lblEmail.setVisible(false);
+        lblAccountNumber.setVisible(false);
+        lblFullName.setVisible(false);
+        lblPremium.setVisible(false);
+        lblUsername.setVisible(false);
+
+    }
+
+    private boolean informedSaveUserInformation() {
+
+        boolean informed = true;
+        if (txtEmail.getText().isEmpty()) {
+            lblEmail.setVisible(true);
+            lblEmail.setText("Email cannot be empty");
+            txtEmail.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (txtFullName.getText().isEmpty()) {
+            lblFullName.setVisible(true);
+            lblFullName.setText("Full name cannot be empty");
+            txtFullName.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (txtUsername.getText().isEmpty()) {
+            lblUsername.setVisible(true);
+            lblUsername.setText("Username cannot be empty");
+            txtUsername.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (txtAccountNumber.getText().isEmpty()) {
+            lblAccountNumber.setVisible(true);
+            lblAccountNumber.setText("Account number cannot be empty");
+            txtAccountNumber.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        if (cbPremium.getSelectionModel().getSelectedIndex() == -1) {
+            lblPremium.setVisible(true);
+            lblPremium.setText("Premium cannot be empty");
+            cbPremium.setStyle("-fx-border-color: red;");
+            informed = false;
+        }
+        return informed;
+    }
+
+    private boolean isEmailUsernameExists() {
+
+        boolean find = true;
+        Collection<User> users = ui.findAllUser();
+
+        if (users.stream().filter(u -> u.getUsername().equals(txtUsername.getText())).
+                count() != 0 & !holder.getUsername().equalsIgnoreCase(txtUsername.getText().trim())) {
+            txtUsername.setStyle("-fx-border-color: red;");
+            lblUsername.setText("Username is already in use");
+            lblUsername.setVisible(true);
+            find = false;
+        }
+        if (users.stream().filter(u -> u.getEmail().equals(txtEmail.getText()))
+                .count() != 0 & !holder.getEmail().equalsIgnoreCase(txtEmail.getText().trim())) {
+            txtEmail.setStyle("-fx-border-color: red;");
+            lblEmail.setText("Email is already in use");
+            lblEmail.setVisible(true);
+            find = false;
+        }
+        return find;
     }
 
     @FXML
@@ -201,6 +344,11 @@ public class VMyProfileController {
                 if (validatePassword()) {
                     holder.setPassword(Crypt.encryptAsimetric(txtNewPassword.getText()));
                     ci.changePassword(holder);
+                    clearLabelsChangePassword();
+                    clealAllChangePasswordFields();
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setHeaderText("The password has been changed successfully");
+                    alert.show();
                 }
             }
         }
@@ -228,6 +376,12 @@ public class VMyProfileController {
             Logger.getLogger(VMyProfileController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    private void clealAllChangePasswordFields() {
+        txtCurrentPassword.clear();
+        txtNewPassword.clear();
+        txtConfirmNewPassword.clear();
     }
 
 }

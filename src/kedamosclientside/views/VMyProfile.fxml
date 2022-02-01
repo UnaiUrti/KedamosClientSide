@@ -50,13 +50,15 @@
             </TextField>
             <Label layoutX="348.0" layoutY="30.0" text="Account Number" />
             <Label layoutX="348.0" layoutY="103.0" text="Premium" />
-            <Button fx:id="bntSave" layoutX="496.0" layoutY="260.0" mnemonicParsing="false" onAction="#handleSaveUserInformation" prefHeight="39.0" prefWidth="74.0" text="Save" />
+            <Button fx:id="btnSave" layoutX="496.0" layoutY="260.0" mnemonicParsing="false" onAction="#handleSaveUserInformation" prefHeight="39.0" prefWidth="74.0" text="Save" />
             <ComboBox fx:id="cbPremium" layoutX="348.0" layoutY="120.0" prefHeight="36.0" prefWidth="224.0" />
             <Label fx:id="lblEmail" layoutX="56.0" layoutY="86.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
             <Label fx:id="lblAccountNumber" layoutX="346.0" layoutY="86.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
             <Label fx:id="lblFullName" layoutX="56.0" layoutY="160.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
             <Label fx:id="lblPremium" layoutX="348.0" layoutY="160.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
             <Label fx:id="lblUsername" layoutX="56.0" layoutY="236.0" prefHeight="17.0" prefWidth="224.0" textFill="RED" />
+            <Button fx:id="btnEdit" layoutX="322.0" layoutY="260.0" mnemonicParsing="false" onAction="#handleEditUserInformation" prefHeight="39.0" prefWidth="74.0" text="Edit" />
+            <Button fx:id="btnCancel" layoutX="410.0" layoutY="260.0" mnemonicParsing="false" onAction="#handleCancelUserInformation" prefHeight="39.0" prefWidth="74.0" text="Cancel" />
          </children>
       </Pane>
       <Pane layoutX="845.0" layoutY="239.0" prefHeight="337.0" prefWidth="327.0" style="-fx-border-width: 2; -fx-border-color: black; -fx-border-radius: 10;">

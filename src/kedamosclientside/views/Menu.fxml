@@ -9,7 +9,7 @@
 
 <HBox fx:id="hbMenu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/9.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="kedamosclientside.controllers.MenuController">
    <children>
-      <MenuBar fx:id="menuBar" prefHeight="50.0" prefWidth="1300.0">
+      <MenuBar fx:id="menuBar" prefHeight="50.0" prefWidth="1280.0">
         <menus>
             <Menu mnemonicParsing="false" text="HOME">
               <items>
