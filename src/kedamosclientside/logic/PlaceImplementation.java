@@ -54,7 +54,7 @@ public class PlaceImplementation implements PlaceInterface {
         try {
             webPlace.edit(place, place.getId().toString());
         } catch (Exception e) {
-            throw new ConnectException("No se ha podido conectar con la base de datos");
+            throw new ConnectException("There was an error connecting with the server. Try again later.");
         }
     }
 
@@ -63,7 +63,7 @@ public class PlaceImplementation implements PlaceInterface {
         try {
             webPlace.deletePlaceByAddress(place.getAddress());
         } catch (Exception e) {
-            throw new ConnectException("No se ha podido conectar con la base de datos");
+            throw new ConnectException("There was an error connecting with the server. Try again later.");
         }
     }
 
@@ -72,7 +72,7 @@ public class PlaceImplementation implements PlaceInterface {
         try {
             webPlace.remove(place.getId().toString());
         } catch (Exception e) {
-            throw new ConnectException("No se ha podido conectar con la base de datos");
+            throw new ConnectException("There was an error connecting with the server. Try again later.");
         }
     }
 
@@ -83,7 +83,7 @@ public class PlaceImplementation implements PlaceInterface {
         try {
             tempPlace = webPlace.getPlaceByAddress(Place.class, place.getAddress());
         } catch (Exception e) {
-            throw new ConnectException("No se ha podido conectar con la base de datos");
+            throw new ConnectException("There was an error connecting with the server. Try again later.");
         }
         return tempPlace;
     }

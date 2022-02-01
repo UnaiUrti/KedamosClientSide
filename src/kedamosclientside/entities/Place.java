@@ -10,9 +10,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.beans.property.SimpleLongProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -27,7 +24,7 @@ public class Place implements Serializable {
         this.address = "";
         this.name = "";
         this.price = Float.valueOf(0);
-        this.dateRenewal = new Date();
+        this.dateRenewal = null;
         this.events = new HashSet<>();
     }
     

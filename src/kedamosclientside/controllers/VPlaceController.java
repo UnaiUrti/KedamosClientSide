@@ -11,7 +11,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -50,16 +49,16 @@ import kedamosclientside.logic.PlaceInterface;
  * @author UnaiUrtiaga
  */
 public class VPlaceController {
-
+    
+    private final static Logger LOGGER = Logger.getLogger("kedamosclientside.controllers.VPlaceController");
+    
     private Stage stage;
     private PlaceInterface placeInterface;
-    @FXML
-    private Label lblAddressExists;
-
+    
     public void setPlace(PlaceInterface placeInterface) {
         this.placeInterface = placeInterface;
     }
-
+    
     @FXML
     private TableView<Place> table;
     @FXML
@@ -97,18 +96,20 @@ public class VPlaceController {
     @FXML
     private Button btnPrint;
     @FXML
-    private Label lblAddressError;
-    @FXML
     private Label lblPriceError;
     @FXML
     private Label lblDateError;
     @FXML
     private Label lblNameError;
-
+    @FXML
+    private Label lblAddressExists;
+    @FXML
+    private Label lblAddressError;
+    
     public Stage getStage() {
         return stage;
     }
-
+    
     public void setStage(Stage stage) {
         this.stage = stage;
     }
@@ -120,7 +121,9 @@ public class VPlaceController {
      * @param event
      */
     public void initStage(Parent root, Event event) {
-
+        
+        LOGGER.info("Generando ventana...");
+        
         Scene scene = new Scene(root);
         stage = new Stage();
         //Set stage properties
@@ -145,6 +148,11 @@ public class VPlaceController {
         tfName.setDisable(false);
         tfPrice.setDisable(false);
         dpDateRenewal.setDisable(false);
+        
+        tfAddress.setText("");
+        tfName.setText("");
+        tfPrice.setText("");
+        dpDateRenewal.setValue(null);
 
         //Mensajes de error
         lblAddressError.setVisible(false);
@@ -187,7 +195,7 @@ public class VPlaceController {
                     if (!table.getSelectionModel().isEmpty()) {
                         btnModify.setDisable(false);
                     }
-
+                    
                 }
             }
         });
@@ -211,7 +219,6 @@ public class VPlaceController {
                     if (!table.getSelectionModel().isEmpty()) {
                         btnModify.setDisable(false);
                     }
-
                 }
             }
         });
@@ -221,7 +228,7 @@ public class VPlaceController {
                 lblPriceError.setVisible(false);
                 tfPrice.setStyle("-fx-border-color: none;");
             }
-
+            
         });
         dpDateRenewal.valueProperty().addListener((observable, oldValue, newValue) -> {
             lblDateError.setVisible(false);
@@ -230,20 +237,24 @@ public class VPlaceController {
 
         //Comprobar selección de la tabla
         table.getSelectionModel().selectedItemProperty().addListener(this::handleTableSelected);
-
+        
         stage.setOnCloseRequest(this::handleCloseRequest);
-
+        
         stage.show();
-
+        
+        LOGGER.info("Ventana generada correctamente");
+        
     }
-
+    
     @FXML
     private void handleCreatePlace(ActionEvent event) {
-
+        
         try {
+            LOGGER.info("Creando un Place...");
+            
             Place place = new Place();
             place.setAddress(tfAddress.getText());
-
+            
             validarCampos();
 
             //Comprobar que no exista ya un place con el Address introducido
@@ -273,45 +284,60 @@ public class VPlaceController {
 
             //Actualizar la tabla con nuevos datos
             updateTable();
-
+            
+            LOGGER.info("Place creado correctamente");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success!");
+            alert.setContentText("A place has been created successfully");
+            alert.showAndWait();
+            
         } catch (placePriceBadException ex) {
+            LOGGER.severe("El valor del campo precio no es numerico");
             lblPriceError.setVisible(true);
             tfPrice.setStyle("-fx-border-color: red;");
         } catch (placeNameBadException ex) {
+            LOGGER.severe("El valor del campo nombre no contiene solo letras");
             lblNameError.setVisible(true);
             tfName.setStyle("-fx-border-color: red;");
         } catch (placeDateBadException ex) {
+            LOGGER.severe("El valor del campo fecha es posterior a la fecha actual");
             lblDateError.setVisible(true);
             dpDateRenewal.setStyle("-fx-border-color: red;");
         } catch (placeAddressBadException ex) {
+            LOGGER.severe("El valor del campo address contiene caracteres no validos");
             lblAddressError.setVisible(true);
             tfAddress.setStyle("-fx-border-color: red;");
         } catch (placeAddressExistException ex) {
+            LOGGER.severe("Ya existe un address con el valor introducido");
             lblAddressExists.setVisible(true);
             tfAddress.setStyle("-fx-border-color: red;");
         } catch (ConnectException ex) {
+            LOGGER.severe("Ha habido un error a la hora de conectar con el servidor");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("CONNECTION ERROR");
-            alert.setContentText("There was an error connecting with the server. Try again later.");
+            alert.setContentText(ex.getMessage());
             alert.showAndWait();
         } catch (MaxCharacterException ex) {
+            LOGGER.severe("Alguno de los campos Name o Address contiene mas de 255 caracteres");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("TOO MUCH CHARACTERS");
-            alert.setContentText("The fields Name and Address cannot contain more than 255 characters");
+            alert.setContentText(ex.getMessage());
             alert.showAndWait();
         }
-
+        
     }
-
+    
     @FXML
     private void handleDeletePlace(ActionEvent event) {
-
+        
+        LOGGER.info("Eliminando un Place...");
+        
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete Place");
         alert.setContentText("Are you sure you want to delete this Place?");
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
-
+            
             try {
                 //Si le da a SI eliminar el Place
                 Place place = table.getSelectionModel().getSelectedItem();
@@ -325,25 +351,29 @@ public class VPlaceController {
 
                 //Deseleccionar la tabla y actualizarla con los nuevos datos
                 updateTable();
+                
+                LOGGER.info("Place eliminado correctamente");
             } catch (ConnectException ex) {
-                Alert alert2 = new Alert(Alert.AlertType.ERROR);
+                LOGGER.severe("Ha habido un error a la hora de conectar con el servidor");
+                Alert alert2 = new Alert(Alert.AlertType.WARNING);
                 alert2.setTitle("CONNECTION ERROR");
-                alert2.setContentText("There was an error connecting with the server. Try again later.");
+                alert2.setContentText(ex.getMessage());
                 alert2.showAndWait();
             }
-
+            
         }
-
+        
     }
-
+    
     @FXML
     private void handleModifyPlace(ActionEvent event) throws placePriceBadException {
-
+        
         try {
-
+            LOGGER.info("Modificando un Place...");
+            
             Place place = new Place();
             place.setAddress(tfAddress.getText());
-
+            
             validarCampos();
 
             //Comprobar que el campo Address sea el mismo que el seleccionado en la tabla
@@ -365,7 +395,7 @@ public class VPlaceController {
                 place.setDateRenewal(null);
             }
             place.setId(table.getSelectionModel().getSelectedItem().getId());
-
+            
             placeInterface.updatePlace(place);
 
             //Actualizar la tabla con los nuevos campos
@@ -376,60 +406,78 @@ public class VPlaceController {
             tfName.setText("");
             tfPrice.setText("");
             dpDateRenewal.setValue(null);
-
+            
+            LOGGER.info("Place modificado correctamente");
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Success!");
+            alert.setContentText("A place has been modified successfully");
+            alert.showAndWait();
+            
         } catch (placePriceBadException ex) {
+            LOGGER.severe("El valor del campo precio no es numerico");
             lblPriceError.setVisible(true);
             tfPrice.setStyle("-fx-border-color: red;");
         } catch (placeNameBadException ex) {
+            LOGGER.severe("El valor del campo nombre no contiene solo letras");
             lblNameError.setVisible(true);
             tfName.setStyle("-fx-border-color: red;");
         } catch (placeDateBadException ex) {
+            LOGGER.severe("El valor del campo fecha es posterior a la fecha actual");
             lblDateError.setVisible(true);
             dpDateRenewal.setStyle("-fx-border-color: red;");
         } catch (placeAddressBadException ex) {
+            LOGGER.severe("El valor del campo address contiene caracteres no validos");
             lblAddressError.setVisible(true);
             tfAddress.setStyle("-fx-border-color: red;");
         } catch (placeAddressExistException ex) {
+            LOGGER.severe("Ya existe un address con el valor introducido");
             lblAddressExists.setVisible(true);
             tfAddress.setStyle("-fx-border-color: red;");
         } catch (ConnectException ex) {
+            LOGGER.severe("Ha habido un error a la hora de conectar con el servidor");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("CONNECTION ERROR");
-            alert.setContentText("There was an error connecting with the server. Try again later.");
+            alert.setContentText(ex.getMessage());
             alert.showAndWait();
         } catch (MaxCharacterException ex) {
+            LOGGER.severe("Alguno de los campos Name o Address contiene mas de 255 caracteres");
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("TOO MUCH CHARACTERS");
-            alert.setContentText("The fields Name and Address cannot contain more than 255 characters");
+            alert.setContentText(ex.getMessage());
             alert.showAndWait();
         }
-
+        
     }
-
+    
     @FXML
     private void handleBack(ActionEvent event) {
     }
-
+    
     @FXML
     private void handlePrintPlace(ActionEvent event) {
     }
-
+    
     private void handleTableSelected(ObservableValue observable, Object oldValue, Object newValue) {
-
+        LOGGER.info("Una fila de la tabla ha sido seleccionada o deseleccionada");
         //Si se ha seleccionado una fila informar todos los campos con los datos del Place seleccionado
         if (newValue != null) {
+            LOGGER.info("Colocando la informacion de la fila seleccionada en los campos");
             Place place = (Place) newValue;
             tfAddress.setText(place.getAddress());
             tfName.setText(place.getName());
             tfPrice.setText(place.getPrice().toString());
-            dpDateRenewal.setValue(place.getDateRenewal().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
-
+            if (place.getDateRenewal() == null) {
+                dpDateRenewal.setValue(null);
+            } else {
+                dpDateRenewal.setValue(place.getDateRenewal().toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+            }
             //Habilitar los botones Modify y Delete y deshabilitar el botón Create
             btnModify.setDisable(false);
             btnDelete.setDisable(false);
             btnCreate.setDisable(true);
-
+            
         } else {
+            LOGGER.info("Eliminando la información de la fila deseleccionada de los campos");
             //Si se ha deseleccionado una fila desinformar todos los campos
             tfAddress.setText("");
             tfName.setText("");
@@ -441,66 +489,70 @@ public class VPlaceController {
             btnModify.setDisable(true);
             btnDelete.setDisable(true);
         }
-
+        
     }
-
+    
     private void updateTable() {
-
+        
         try {
+            LOGGER.info("Actualizando los valores de la tabla");
             table.getItems().clear();
             Collection<Place> places = placeInterface.getAllPlaces();
-
+            
             ObservableList<Place> placesForTable
                     = FXCollections.observableArrayList(places);
-
+            
             table.setItems(placesForTable);
         } catch (Exception e) {
-
+            
         }
     }
-
+    
     private void handleCloseRequest(WindowEvent event) {
-
+        LOGGER.info("Se ha enviado una petición para finalizar el programa");
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setHeaderText(null);
         alert.setTitle("EXIT");
-
+        
         alert.setContentText("Sure you want to go out?");
-
+        
         Optional<ButtonType> answer = alert.showAndWait();
         if (answer.get() == ButtonType.OK) {
+            LOGGER.info("El programa va a finalizar");
             stage.close();
         } else {
+            LOGGER.info("La petición ha sido cancelada");
             event.consume();
         }
-
+        
     }
-
+    
     private void validarCampos() throws placePriceBadException, placeNameBadException, placeDateBadException, placeAddressBadException, MaxCharacterException {
-
-        if(tfAddress.getText().getBytes().length>=255){
-            throw new MaxCharacterException("Los campos no pueden contener mas de 255 caracteres");
+        LOGGER.info("Comprobando la validez de los campos...");
+        if (tfAddress.getText().getBytes().length >= 255) {
+            throw new MaxCharacterException("Field Address cannot contain more than 255 characters");
         }
-        if(tfName.getText().getBytes().length>=255){
-            throw new MaxCharacterException("Los campos no pueden contener mas de 255 caracteres");
+        if (tfName.getText().getBytes().length >= 255) {
+            throw new MaxCharacterException("Field Name cannot contain more than 255 characters");
         }
         
-        if (!tfAddress.getText().trim().toLowerCase().matches("[0-9]*[a-záéíóú]*[.]*[,]*")) {
+        if (!tfAddress.getText().trim().toLowerCase().matches("[a-záéíóú]*[0-9]*[.]*[,]*")) {
             throw new placeAddressBadException("El campo Address solo puede contener numeros, letras, puntos y comas");
         }
-
+        
         if (!tfPrice.getText().matches("[0-9]{1,5}[.][0-9]{1,2}") && !tfPrice.getText().matches("[0-9]{1,5}") && !tfPrice.getText().matches("")) {
             throw new placePriceBadException("El campo Price solo puede contener numeros");
         }
-
+        
         if (!tfName.getText().trim().toLowerCase().matches("[a-zA-ZáéíóúÁÉÍÓÚ]{2,}[\\\\s[a-zA-ZáéíóúÁÉÍÓÚ]{2,}]*")) {
             throw new placeNameBadException("El campo Name solo puede contener letras");
         }
-
+        
         if (dpDateRenewal.getValue() != null) {
             if (Date.from(dpDateRenewal.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant()).after(Calendar.getInstance().getTime())) {
                 throw new placeDateBadException("La fecha introducida no puede ser posterior a la fecha actual");
             }
         }
+        LOGGER.info("Validez exitosa");
     }
 }
