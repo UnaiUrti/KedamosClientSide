@@ -5,6 +5,7 @@
  */
 package kedamosclientside.logic;
 
+import java.net.ConnectException;
 import java.util.Collection;
 
 
@@ -13,12 +14,12 @@ import kedamosclientside.entities.PersonalResource;
 
 
 /**
- *
+ *Esta es la interfaz de los personal resources
  * @author Irkus de la Fuente
  */
 public interface PersonalResourceInterface {
-    public Collection<PersonalResource> getPersonalByEvent(String event_id);
-    public void createPersonal (PersonalResource per);
-    public void updatePersonal(PersonalResource per,Long id);
-    public void deletePersonal(Long id);
+    public Collection<PersonalResource> getPersonalByEvent(Long event_id)throws ConnectException;
+    public void createPersonal (PersonalResource per) throws ConnectException;
+    public void updatePersonal(PersonalResource per,Long id)throws ConnectException;
+    public void deletePersonal(Long id)throws ConnectException;
 }

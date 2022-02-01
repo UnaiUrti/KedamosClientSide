@@ -6,5 +6,69 @@ package kedamosclientside.entities;
  * @author Irkus de la Fuente
  */
 public enum Type {
-    CAMARERO,SEGURIDAD,DJ,PAYASO,MAGO,HUMOSRISTA,COCINERO,GUIA,ARBITRO,COCTELERO,CANTANTE,MUSICO,ACTOR
+
+    /**
+     *
+     */
+    CAMARERO,
+
+    /**
+     *
+     */
+    SEGURIDAD,
+
+    /**
+     *
+     */
+    DJ,
+
+    /**
+     *
+     */
+    PAYASO,
+
+    /**
+     *
+     */
+    MAGO,
+
+    /**
+     *
+     */
+    HUMOSRISTA,
+
+    /**
+     *
+     */
+    COCINERO,
+
+    /**
+     *
+     */
+    GUIA,
+
+    /**
+     *
+     */
+    ARBITRO,
+
+    /**
+     *
+     */
+    COCTELERO,
+
+    /**
+     *
+     */
+    CANTANTE,
+
+    /**
+     *
+     */
+    MUSICO,
+
+    /**
+     *
+     */
+    ACTOR
 }

@@ -6,7 +6,7 @@
 package kedamosclientside.logic;
 
 /**
- *
+ *Esta clase es la factoria de los personal resources
  * @author Irkus de la Fuente
  */
 public class PersonalResourceManager {
