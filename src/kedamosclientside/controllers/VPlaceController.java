@@ -5,6 +5,7 @@
  */
 package kedamosclientside.controllers;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.time.ZoneId;
 import java.util.Calendar;
@@ -20,6 +21,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -36,6 +38,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import kedamosclientside.entities.Event;
+import kedamosclientside.entities.EventManager;
 import kedamosclientside.entities.Place;
 import kedamosclientside.exceptions.MaxCharacterException;
 import kedamosclientside.exceptions.placeAddressBadException;
@@ -43,6 +46,7 @@ import kedamosclientside.exceptions.placeAddressExistException;
 import kedamosclientside.exceptions.placeDateBadException;
 import kedamosclientside.exceptions.placeNameBadException;
 import kedamosclientside.exceptions.placePriceBadException;
+import kedamosclientside.logic.PlaceFactory;
 import kedamosclientside.logic.PlaceInterface;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -63,7 +67,7 @@ public class VPlaceController {
     private final static Logger LOGGER = Logger.getLogger("kedamosclientside.controllers.VPlaceController");
     
     private Stage stage;
-    private PlaceInterface placeInterface;
+    private PlaceInterface placeInterface=PlaceFactory.getPlace();
     
     public void setPlace(PlaceInterface placeInterface) {
         this.placeInterface = placeInterface;
@@ -461,19 +465,37 @@ public class VPlaceController {
     
     @FXML
     private void handleBack(ActionEvent event) {
+        try {
+                    LOGGER.info("metodo boton back volver a event");
+                    
+                    //Abrir la ventana de eventos
+                    stage.close();
+                    FXMLLoader loader;
+                    loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/MyEventsView.fxml"));
+                    
+                    
+                    Parent roota = (Parent) loader.load();
+                    
+                    MyEventsViewController controller = ((MyEventsViewController) loader.getController());
+                    // controller.setEventinterface(EventFactory.getEvent());
+                    controller.setStage(new Stage());
+                    controller.initStage(roota);
+                } catch (IOException ex) {
+                  Alert alert=new Alert(Alert.AlertType.ERROR);
+                  alert.setContentText("Error al volver a la ventana de eventos");
+                  alert.showAndWait();
+                }
     }
     
     @FXML
     private void handlePrintPlace(ActionEvent event) {
         LOGGER.info("Generando el report...");
         try {
-            System.out.println(System.getProperty("user.dir"));
-         
-            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/PlaceReport.jrxml"));
+            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/report/PlaceReport.jrxml");
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Place>) this.table.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
             System.out.println(ex.getMessage());

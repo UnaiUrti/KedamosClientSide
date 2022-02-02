@@ -1,5 +1,6 @@
 package kedamosclientside.controllers;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -79,7 +82,7 @@ public class VPersonalResourceController {
     private PersonalResource p;
     private Event ev;
     private ObservableList<PersonalResource> data;
-    private PersonalResourceInterface personalIface = new PersonalResourceImplementation();
+    private PersonalResourceInterface personalIface = PersonalResourceManager.getImplementation();
 
     /**
      *
@@ -164,16 +167,27 @@ public class VPersonalResourceController {
                     });
 
             backBtn.setOnAction(action -> {
-                logger.info("metodo boton back volver a event");
-                //Abrir la ventana de eventos
-                /*
-         FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VEvent.fxml"));
-                    Parent root = loader.load();                             
-                    VEventController controller = ((VEventController) loader.getController());
-          
-                    controller.setStage( (Stage)hbMenuAdm.getScene().getWindow(););
-                    controller.initStage(root);*/
-                logger.info("Button back pressed");
+                try {
+                    logger.info("metodo boton back volver a event");
+                    
+                    //Abrir la ventana de eventos
+                    stage.close();
+                    FXMLLoader loader;
+                    loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/MyEventsView.fxml"));
+                    
+                    
+                    Parent roota = (Parent) loader.load();
+                    
+                    MyEventsViewController controller = ((MyEventsViewController) loader.getController());
+                    // controller.setEventinterface(EventFactory.getEvent());
+                    controller.setStage(new Stage());
+                    controller.initStage(roota);
+                } catch (IOException ex) {
+                  Alert alert=new Alert(Alert.AlertType.ERROR);
+                  alert.setContentText("Error al volver a la ventana de eventos");
+                  alert.showAndWait();
+                }
+              
 
             });
             logger.info("Asignar acciones");
@@ -206,11 +220,11 @@ public class VPersonalResourceController {
     private void handlePrintRequest(ActionEvent action) {
         logger.info("Metodo report");
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/views/PersonalResourceReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/report/PersonalResourceReport.jrxml");
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<PersonalResource>) this.table.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
         } catch (JRException ex) {
             logger.severe("Error al abrir el report");

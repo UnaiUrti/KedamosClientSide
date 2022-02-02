@@ -672,7 +672,7 @@ public class VUserManagementController {
     @FXML
     private void handleEventManagerReport(ActionEvent event) {
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/views/EventManagerReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/report/EventManagerReport.jrxml");
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.tlView.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);

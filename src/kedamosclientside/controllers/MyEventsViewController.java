@@ -67,7 +67,7 @@ public class MyEventsViewController {
 
     private final static Logger LOGGER = Logger.getLogger("kedamosclientside.controllers.MyEventsViewController");
     private Stage stage;
-    private EventInterface eventinterface;
+    private EventInterface eventinterface = EventFactory.getEvent();
 
     /**
      * Set de la interfaz evento
@@ -131,6 +131,8 @@ public class MyEventsViewController {
     @FXML
     private Button btnPrint;
 
+    private Event e;
+
     /**
      * Return de la ventana
      *
@@ -153,15 +155,14 @@ public class MyEventsViewController {
      * Este metodo pretende inicializar la escena y el escenario.
      */
     //Acordarme q urti e irkus me devuelven el objeto event con place y/o personal
-    public void initStage(Parent root, Event event) {
+    public void initStage(Parent root) {
 
         Scene scene = new Scene(root);
-        stage = new Stage();
+
         //Set stage properties
-        stage.initModality(Modality.APPLICATION_MODAL);
+        //stage.initModality(Modality.APPLICATION_MODAL);
         stage.setScene(scene);
         stage.setTitle("Event");
-
         //No redimensionable
         stage.setResizable(false);
 
@@ -172,24 +173,23 @@ public class MyEventsViewController {
         tcCategory.setCellValueFactory(new PropertyValueFactory<>("Category"));
         tcDate.setCellValueFactory(new PropertyValueFactory<>("Date"));
         tcDate.setCellFactory(column -> {
-        TableCell<Event, Date> cell = new TableCell<Event, Date>() {
-            private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+            TableCell<Event, Date> cell = new TableCell<Event, Date>() {
+                private SimpleDateFormat format = new SimpleDateFormat("dd/MM/yyyy");
 
-            @Override
-            protected void updateItem(Date item, boolean empty) {
-                super.updateItem(item, empty);
-                if(empty) {
-                    setText(null);
+                @Override
+                protected void updateItem(Date item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty) {
+                        setText(null);
+                    } else {
+                        this.setText(format.format(item));
+
+                    }
                 }
-                else {
-                    this.setText(format.format(item));
+            };
 
-                }
-            }
-        };
-
-        return cell;
-    });
+            return cell;
+        });
         tcMinParticipants.setCellValueFactory(new PropertyValueFactory<>("MinParticipants"));
         tcMaxParticipants.setCellValueFactory(new PropertyValueFactory<>("MaxParticipants"));
         tcActualParticipants.setCellValueFactory(new PropertyValueFactory<>("ActualParticipants"));
@@ -225,8 +225,8 @@ public class MyEventsViewController {
         tfTitle.requestFocus();
         //Botones create, modify, delere, add place y add personal, deshabilitados
         btnCreate.setDisable(false);
-        btnAddPersonal.setDisable(false);
-        btnAddPlace.setDisable(false);
+        btnAddPersonal.setDisable(true);
+        btnAddPlace.setDisable(true);
         btnModify.setDisable(true);
         btnDelete.setDisable(true);
 
@@ -466,6 +466,7 @@ public class MyEventsViewController {
             btnAddPlace.setDisable(false);
             btnDelete.setDisable(false);
             btnCreate.setDisable(true);
+            this.e = event;
         } else {
             //CUANDO DES-SELECCIONA
             tfTitle.setText("");
@@ -478,8 +479,8 @@ public class MyEventsViewController {
 
             //Deshabilitar los botones 
             btnCreate.setDisable(false);
-            btnAddPersonal.setDisable(false);
-            btnAddPlace.setDisable(false);
+            btnAddPersonal.setDisable(true);
+            btnAddPlace.setDisable(true);
             btnModify.setDisable(true);
             btnDelete.setDisable(true);
         }
@@ -492,24 +493,18 @@ public class MyEventsViewController {
      */
     @FXML
     private void handleBack(ActionEvent event) throws IOException {
-        
-        
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setHeaderText(null);
-        alert.setTitle("BACK");
 
-        alert.setContentText("Quieres cerrar la ventana?");
+        stage.close();
+        FXMLLoader loader;
+        loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VMainMenu.fxml"));
 
-        Optional<ButtonType> resp = alert.showAndWait();
+        Parent roota = (Parent) loader.load();
 
-        if (resp.get() == ButtonType.OK) {
-            LOGGER.info("Se ha pulsado Confirm, el programa se va a cerrar");
-            this.stage.close();
-        } else {
-            LOGGER.info("Se ha cancelado la request, continua en la misma ventana");
-            event.consume();
-        }
-        
+        VMainMenuController controller = ((VMainMenuController) loader.getController());
+        // controller.setEventinterface(EventFactory.getEvent());
+        controller.setStage(new Stage());
+        controller.initStage(roota);
+
     }
 
     /**
@@ -591,16 +586,16 @@ public class MyEventsViewController {
      */
     @FXML
     private void handleAddPlace(ActionEvent event) throws IOException {
-
+        stage.close();
         FXMLLoader loader;
         loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VPlace.fxml"));
 
         Parent root = (Parent) loader.load();
 
-        MyEventsViewController controller = ((MyEventsViewController) loader.getController());
-        controller.setEventinterface(EventFactory.getEvent());
+        VPlaceController controller = ((VPlaceController) loader.getController());
+        // controller.setEventinterface(EventFactory.getEvent());
         controller.setStage(new Stage());
-        controller.initStage(root, null);
+        controller.initStage(root, e);
 
     }
 
@@ -612,16 +607,18 @@ public class MyEventsViewController {
     @FXML
     private void handleAddPersonal(ActionEvent event) throws IOException {
 
+        stage.close();
         FXMLLoader loader;
         loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VPersonalResource.fxml"));
 
         Parent root = (Parent) loader.load();
 
-        MyEventsViewController controller = ((MyEventsViewController) loader.getController());
-        controller.setEventinterface(EventFactory.getEvent());
+        VPersonalResourceController controller = ((VPersonalResourceController) loader.getController());
+        //controller.setEventinterface(EventFactory.getEvent());
         controller.setStage(new Stage());
         //controller.setEvent
-        controller.initStage(root, null);
+        controller.initStage(root, e);
+
     }
 
     /**
@@ -643,11 +640,11 @@ public class MyEventsViewController {
             jasperViewer.setVisible(true);
 
         } catch (JRException ex) {
-        Alert alert = new Alert(AlertType.INFORMATION);
-        alert.setTitle("No se ha imprimido informacion");
-        alert.setHeaderText("Error Report");
-        alert.setContentText("Ha habido un error al imprimir los datos");
-        alert.showAndWait();
+            Alert alert = new Alert(AlertType.INFORMATION);
+            alert.setTitle("No se ha imprimido informacion");
+            alert.setHeaderText("Error Report");
+            alert.setContentText("Ha habido un error al imprimir los datos");
+            alert.showAndWait();
         }
 
     }

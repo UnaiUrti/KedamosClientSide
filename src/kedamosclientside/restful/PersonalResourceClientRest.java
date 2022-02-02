@@ -5,6 +5,7 @@
  */
 package kedamosclientside.restful;
 
+import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
@@ -13,14 +14,15 @@ import javax.ws.rs.core.GenericType;
 /**
  * Restful de personal resources
  *
- * @author 2dam
+ * @author Irkus
  */
 public class PersonalResourceClientRest {
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = "http://localhost:15593/KedamosServerSide/webresources";
+        private static final ResourceBundle RB = ResourceBundle.getBundle("kedamosclientside.config.RESTParameters");
 
+  private static final String BASE_URI = RB.getString("ClientURI");
     public PersonalResourceClientRest() {
         client = javax.ws.rs.client.ClientBuilder.newClient();
         webTarget = client.target(BASE_URI).path("kedamosserverside.entities.personalresource");

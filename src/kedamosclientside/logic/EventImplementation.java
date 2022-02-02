@@ -56,10 +56,9 @@ public class EventImplementation implements EventInterface {
     @Override
     public Collection<Event> getEvents() throws ConnectException {
 
-        Collection<Event> events = null;
+        Collection<Event> events;
         try {
             events =eventREST.findAll(new GenericType<Collection<Event>>() {
-
             });
         } catch (ClientErrorException e) {
                 throw new ConnectException(e.getMessage());
