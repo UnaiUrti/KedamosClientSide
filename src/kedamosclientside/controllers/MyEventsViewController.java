@@ -213,14 +213,8 @@ public class MyEventsViewController {
         );
         cmbCategory.setItems(comboItems);
         cmbCategory.getSelectionModel().selectFirst();
-        try {
-            Collection<Event> events = eventinterface.getEvents();
-            ObservableList<Event> eventsForTable = FXCollections.observableArrayList(events);
-            tvTable.setItems(eventsForTable);
-        } catch (ConnectException ex) {
-            Logger.getLogger(MyEventsViewController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
+        
+        tableLoad();
         //Se enfoca en el campo Title
         tfTitle.requestFocus();
         //Botones create, modify, delere, add place y add personal, deshabilitados
@@ -699,6 +693,19 @@ public class MyEventsViewController {
      * participants
      * @throws EventPriceException excepcion para problemas con el precio
      */
+    private void tableLoad() {
+        try {
+            Collection<Event> events = eventinterface.getEvents();
+            ObservableList<Event> eventsForTable = FXCollections.observableArrayList(events);
+            tvTable.setItems(eventsForTable);
+        } catch (ConnectException ex) {
+            LOGGER.severe("Error de conexion con el servidor");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Server error wait a few minutes");
+            alert.showAndWait();
+        }
+    }
+
     private void fieldsValidations() throws EventDateBadException, EventParticipantsException, EventPriceException {
 
         if (dpDate.getValue() != null) {

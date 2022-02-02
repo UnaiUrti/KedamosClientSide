@@ -14,8 +14,7 @@ import kedamosclientside.restful.EventClientREST;
 
 /**
  *
- * @author Adrian Franco
- * Implementacion de la interfaz
+ * @author Adrian Franco Implementacion de la interfaz
  */
 public class EventImplementation implements EventInterface {
 
@@ -31,21 +30,29 @@ public class EventImplementation implements EventInterface {
      */
     @Override
     public void createEvent(Event event) throws ConnectException {
-       eventREST.create(event);
+        try {
+            eventREST.create(event);
+        } catch (Exception e) {
+            throw new ConnectException("Server down");
+        }
     }
 
     @Override
     public void editEvent(Event event) throws ConnectException {
-        try{
-            eventREST.edit(event,String.valueOf(event.getEvent_id()));
-        }catch(ClientErrorException e){
+        try {
+            eventREST.edit(event, String.valueOf(event.getEvent_id()));
+        } catch (Exception e) {
             throw new ConnectException(e.getMessage());
         }
     }
 
     @Override
     public void removeEvent(Event event) throws ConnectException {
-       eventREST.remove(event.getEvent_id().toString());
+        try{
+        eventREST.remove(event.getEvent_id().toString());
+        }catch (Exception e){
+            throw new ConnectException("Server down");
+        }
     }
 
     @Override
@@ -58,10 +65,10 @@ public class EventImplementation implements EventInterface {
 
         Collection<Event> events;
         try {
-            events =eventREST.findAll(new GenericType<Collection<Event>>() {
+            events = eventREST.findAll(new GenericType<Collection<Event>>() {
             });
-        } catch (ClientErrorException e) {
-                throw new ConnectException(e.getMessage());
+        } catch (Exception e) {
+            throw new ConnectException("Server down");
         }
         return events;
     }

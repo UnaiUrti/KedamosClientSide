@@ -355,20 +355,26 @@ public class VUserManagementController {
     @FXML
     private void handleRemoveEventManger(ActionEvent event) {
         logger.info("Iniciado el evento para eliminar un manejador de evento");
-        try {
-            emi.removeEventManager(tlView.getSelectionModel()
-                    .getSelectedItem());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("The account has been deleted successfully");
-            alert.show();
-            loadTableWithData();
-        } catch (ServerDown ex) {
-            logger.severe("Error el servidor esta caido o apagado");
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText(ex.getMessage());
-            alert.show();
-        }
 
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Event");
+        alert.setContentText("Seguro que quieres eliminar el Evento?");
+        Optional<ButtonType> resp = alert.showAndWait();
+        if (resp.get() == ButtonType.OK) {
+            try {
+                emi.removeEventManager(tlView.getSelectionModel()
+                        .getSelectedItem());
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
+                alert2.setHeaderText("The account has been deleted successfully");
+                alert2.show();
+                loadTableWithData();
+            } catch (ServerDown ex) {
+                logger.severe("Error el servidor esta caido o apagado");
+                Alert alert2 = new Alert(Alert.AlertType.ERROR);
+                alert2.setHeaderText(ex.getMessage());
+                alert2.show();
+            }
+        }
     }
 
     /**
