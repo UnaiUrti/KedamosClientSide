@@ -18,7 +18,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import org.junit.Test;
 import javax.jnlp.UnavailableServiceException;
-import kedamosclientside.Client;
+import kedamosclientside.KedamosApp;
+import kedamosclientside.entities.Client;
 import kedamosclientside.entities.PersonalResource;
 import kedamosclientside.entities.Type;
 import org.junit.Assert;
@@ -62,7 +63,7 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      */
     public VPersonalResourceControllerTest() throws TimeoutException, UnavailableServiceException {
         FxToolkit.registerPrimaryStage();
-        FxToolkit.setupApplication(Client.class);
+        FxToolkit.setupApplication(KedamosApp.class);
 
         typeCombo = lookup("#typeCombo").queryComboBox();
         dateHired = lookup("#hiredDate").query();

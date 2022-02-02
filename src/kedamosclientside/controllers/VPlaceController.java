@@ -491,12 +491,13 @@ public class VPlaceController {
     private void handlePrintPlace(ActionEvent event) {
         LOGGER.info("Generando el report...");
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/report/PlaceReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/PlaceReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Place>) this.table.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
+            
         } catch (JRException ex) {
             System.out.println(ex.getMessage());
             LOGGER.severe("Ha habido un error al abrir el report");

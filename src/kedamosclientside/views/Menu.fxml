@@ -16,7 +16,7 @@
                 <MenuItem fx:id="miHome" mnemonicParsing="false" onAction="#handleHome" text="Main Menu" />
               </items>
             </Menu>
-          <Menu mnemonicParsing="false" text="Events">
+          <Menu fx:id="menuEvents" mnemonicParsing="false" text="Events">
             <items>
               <MenuItem fx:id="miViewEvents" mnemonicParsing="false" onAction="#handleViewEvents" text="View Events" />
             </items>

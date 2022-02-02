@@ -213,12 +213,13 @@ public class VPersonalResourceController {
     private void handlePrintRequest(ActionEvent action) {
         logger.info("Metodo report");
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/report/PersonalResourceReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/PersonalResourceReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<PersonalResource>) this.table.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
+            
         } catch (JRException ex) {
             logger.severe("Error al abrir el report");
             Alert alert = new Alert(Alert.AlertType.ERROR);

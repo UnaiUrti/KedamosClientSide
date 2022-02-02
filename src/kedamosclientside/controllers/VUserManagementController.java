@@ -402,6 +402,8 @@ public class VUserManagementController {
         txtFullName.setStyle(null);
         txtPassword.setStyle(null);
         txtUsername.setStyle(null);
+        cbManagerCategory.setStyle(null);
+        cbStatus.setStyle(null);
         dpLastPasswordChange.setStyle(null);
 
         lblUsername.setVisible(false);
@@ -678,12 +680,13 @@ public class VUserManagementController {
     @FXML
     private void handleEventManagerReport(ActionEvent event) {
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/report/EventManagerReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/EventManagerReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.tlView.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
+            
         } catch (JRException ex) {
             logger.severe("Se ha producido un error al cargar el informe");
         }

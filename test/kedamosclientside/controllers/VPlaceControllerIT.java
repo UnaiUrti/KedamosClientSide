@@ -18,8 +18,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import kedamosclientside.Proba;
+import kedamosclientside.KedamosApp;
+//import kedamosclientside.Proba;
 import kedamosclientside.entities.Place;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -51,9 +53,11 @@ public class VPlaceControllerIT extends ApplicationTest {
     private TextField tfPrice;
     private DatePicker dpDateRenewal;
     private TableView table;
+    private TableView eventTable;
     private Button btnCreate;
     private Button btnModify;
     private Button btnDelete;
+    private Pane placePane;
 
     public VPlaceControllerIT() {
         tfAddress = lookup("#tfAddress").query();
@@ -64,6 +68,8 @@ public class VPlaceControllerIT extends ApplicationTest {
         btnModify = lookup("#btnModify").query();
         btnDelete = lookup("#btnDelete").query();
         table = lookup("#table").queryTableView();
+        eventTable = lookup("#tvTable").queryTableView();
+        placePane = lookup("#placePane").query();
     }
 
     /*
@@ -83,25 +89,56 @@ public class VPlaceControllerIT extends ApplicationTest {
     @BeforeClass
     public static void setUpClass() throws TimeoutException {
         FxToolkit.registerPrimaryStage();
-        FxToolkit.setupApplication(Proba.class);
-
+        FxToolkit.setupApplication(KedamosApp.class);
     }
 
     @Test
-    public void testA_initialStage() {
+    public void testA_enterWindow() {
+        
+        clickOn("#txtUsername");
+        write("alex");
+        clickOn("#txtPassword");
+        write("abcd*1234");
+        clickOn("#btnSignIn");
+        
+        sleep(5000);
+        
+        clickOn("Events");
+        sleep(500);
+        clickOn("#miViewEvents");
+        
+        sleep(5000);
+        
+        assertNotEquals("FAIL - Table has no data to click on",
+                lookup("#tvTable").queryTableView().getItems().size(), 0);
+        Node row = lookup(".table-row-cell").nth(0).query();
+        assertNotNull("FAIL - Table has not that row. ", row);
+        clickOn(row);
+        
+        clickOn("#btnAddPlace");
+        
+        sleep(5000);
+        
+        verifyThat("#placePane", isVisible());
+        
+    }
 
-        verifyThat(tfAddress, hasText(""));
+    //@Ignore
+    @Test
+    public void testB_initialStage() {
+
+        verifyThat("#tfAddress", hasText(""));
         verifyThat("#lblAddressError", isInvisible());
         verifyThat("#lblAddressExists", isInvisible());
-        verifyThat(tfName, hasText(""));
+        verifyThat("#tfName", hasText(""));
         verifyThat("#lblNameError", isInvisible());
-        verifyThat(tfPrice, hasText(""));
+        verifyThat("#tfPrice", hasText(""));
         verifyThat("#lblPriceError", isInvisible());
-        verifyThat(dpDateRenewal, (DatePicker dp) -> dp.getValue() == null);
+        verifyThat("#dpDateRenewal", (DatePicker dp) -> dp.getValue() == null);
         verifyThat("#lblDateError", isInvisible());
-        verifyThat(btnCreate, isDisabled());
-        verifyThat(btnModify, isDisabled());
-        verifyThat(btnDelete, isDisabled());
+        verifyThat("#btnCreate", isDisabled());
+        verifyThat("#btnModify", isDisabled());
+        verifyThat("#btnDelete", isDisabled());
         verifyThat("#btnPrint", isEnabled());
         verifyThat("#btnBack", isEnabled());
 
@@ -109,7 +146,7 @@ public class VPlaceControllerIT extends ApplicationTest {
 
     //@Ignore
     @Test
-    public void testB_CRUDButtonsActivation() {
+    public void testC_CRUDButtonsActivation() {
 
         verifyThat("#btnCreate", isDisabled());
         verifyThat("#btnModify", isDisabled());
@@ -128,10 +165,9 @@ public class VPlaceControllerIT extends ApplicationTest {
         sleep(500);
 
         //Verificar que no se activan si sólo está el campo Name informado
-        /*clickOn("#tfAddress");
+        clickOn("#tfAddress");
         push(KeyCode.CONTROL, KeyCode.A);
-        eraseText(1);*/
-        tfAddress.clear();
+        eraseText(1);
 
         clickOn("#tfName");
         write("Wachin");
@@ -164,7 +200,7 @@ public class VPlaceControllerIT extends ApplicationTest {
         * es seleccionada
          */
         assertNotEquals("FAIL - Table has no data",
-                table.getItems().size(), 0);
+                lookup("#table").queryTableView().getItems().size(), 0);
         Node row = lookup(".table-row-cell").nth(0).query();
         assertNotNull("FAIL - Table has not that row. ", row);
         clickOn(row);
@@ -176,9 +212,16 @@ public class VPlaceControllerIT extends ApplicationTest {
         verifyThat("#btnCreate", isDisabled());
 
         //Borrar todos los campos antes de ir a la segunda prueba
-        tfAddress.clear();
-        tfName.clear();
-        tfPrice.clear();
+        clickOn("#tfAddress");
+        push(KeyCode.CONTROL, KeyCode.A);
+        eraseText(1);
+        clickOn("#tfName");
+        push(KeyCode.CONTROL, KeyCode.A);
+        eraseText(1);
+        clickOn("#tfPrice");
+        push(KeyCode.CONTROL, KeyCode.A);
+        eraseText(1);
+        dpDateRenewal = lookup("#dpDateRenewal").query();
         dpDateRenewal.setValue(null);
 
         sleep(1000);
@@ -187,29 +230,29 @@ public class VPlaceControllerIT extends ApplicationTest {
 
     @Ignore
     @Test
-    public void testC_FieldsValidation() {
-        
-        clickOn(tfAddress);
+    public void testD_FieldsValidation() {
+
+        clickOn("#tfAddress");
         write("abcd*1234");
-        
-        clickOn(tfName);
+
+        clickOn("#tfName");
         write("abcd*1234");
-        
-        clickOn(tfPrice);
+
+        clickOn("<3tfPrice");
         write("abcd*1234");
-        
+
         assertNotEquals("FAIL - Button is not enabled",
-                btnCreate.isDisabled());
-        
-        clickOn(btnCreate);
-        
-        
+                lookup("#btnCreate").query().isDisabled());
+
+        clickOn("#btnCreate");
+
     }
 
+    //@Ignore
     @Test
-    public void testD_Create() {
+    public void testE_Create() {
 
-        int rowCount = table.getItems().size();
+        int rowCount = lookup("#table").queryTableView().getItems().size();
 
         String address = "Address" + (rowCount + 1);
 
@@ -222,7 +265,7 @@ public class VPlaceControllerIT extends ApplicationTest {
         sleep(500);
 
         assertNotEquals("FAIL - Button is not enabled",
-                btnCreate.isDisabled());
+                lookup("#btnCreate").query().isDisabled());
 
         sleep(500);
 
@@ -233,20 +276,23 @@ public class VPlaceControllerIT extends ApplicationTest {
         clickOn("Aceptar");
 
         assertEquals("FAIL - A row has not been added", rowCount + 1,
-                table.getItems().size());
-
+                lookup("#table").queryTableView().getItems().size());
+        
+        table = lookup("#table").queryTableView();
+        
         List<Place> places = table.getItems();
         assertEquals("FAIL - The place has not been added",
                 places.stream().filter(u -> u.getAddress().equals(address)).count(), 1);
 
     }
 
+    //@Ignore
     @Test
-    public void testE_CreateExists() {
+    public void testF_CreateExists() {
 
-        int rowCount = table.getItems().size();
+        int rowCount = lookup("#table").queryTableView().getItems().size();
 
-        String existingAddress = ((Place) table.getItems().get(0)).getAddress();
+        String existingAddress = ((Place) lookup("#table").queryTableView().getItems().get(0)).getAddress();
 
         clickOn(tfAddress);
         write(existingAddress);
@@ -262,7 +308,7 @@ public class VPlaceControllerIT extends ApplicationTest {
         verifyThat("#lblAddressExists", isVisible());
 
         assertEquals("FAIL - A row has been added", rowCount,
-                table.getItems().size());
+                lookup("#table").queryTableView().getItems().size());
 
     }
 
