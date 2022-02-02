@@ -207,7 +207,7 @@ public class VPersonalResourceController {
         logger.info("Metodo report");
         try {
             JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/views/PersonalResourceReport.jrxml");
-            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.table.getItems());
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<PersonalResource>) this.table.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint);
