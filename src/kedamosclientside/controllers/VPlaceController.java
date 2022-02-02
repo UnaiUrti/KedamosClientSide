@@ -10,6 +10,8 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
@@ -42,6 +44,14 @@ import kedamosclientside.exceptions.placeDateBadException;
 import kedamosclientside.exceptions.placeNameBadException;
 import kedamosclientside.exceptions.placePriceBadException;
 import kedamosclientside.logic.PlaceInterface;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import net.sf.jasperreports.view.JasperViewer;
+import static org.hsqldb.Library.user;
 
 /**
  * FXML Controller class
@@ -455,6 +465,24 @@ public class VPlaceController {
     
     @FXML
     private void handlePrintPlace(ActionEvent event) {
+        LOGGER.info("Generando el report...");
+        try {
+            System.out.println(System.getProperty("user.dir"));
+         
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/PlaceReport.jrxml"));
+            JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<Place>) this.table.getItems());
+            Map<String, Object> parameters = new HashMap<>();
+            JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            jasperViewer.setVisible(true);
+        } catch (JRException ex) {
+            System.out.println(ex.getMessage());
+            LOGGER.severe("Ha habido un error al abrir el report");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Error during loading the report");
+            alert.showAndWait();
+        }
+        
     }
     
     private void handleTableSelected(ObservableValue observable, Object oldValue, Object newValue) {
