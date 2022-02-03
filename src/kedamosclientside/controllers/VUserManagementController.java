@@ -358,7 +358,7 @@ public class VUserManagementController {
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Delete Event");
-        alert.setContentText("Seguro que quieres eliminar el Evento?");
+        alert.setContentText("Are you sure do you want to delete actual event manager?");
         Optional<ButtonType> resp = alert.showAndWait();
         if (resp.get() == ButtonType.OK) {
             try {

@@ -213,7 +213,7 @@ public class MyEventsViewController {
         );
         cmbCategory.setItems(comboItems);
         cmbCategory.getSelectionModel().selectFirst();
-        
+
         tableLoad();
         //Se enfoca en el campo Title
         tfTitle.requestFocus();
@@ -416,7 +416,21 @@ public class MyEventsViewController {
                 tfTitle.setText("");
                 taDescription.setText("");
                 dpDate.setValue(null);
-                cmbCategory.setValue(null);
+                cmbCategory.getItems().clear();
+                ObservableList<Category> comboItems;
+                comboItems = FXCollections.observableArrayList(
+                        Category.CULTURA,
+                        Category.DEPORTES,
+                        Category.EXCURSIONES,
+                        Category.FIESTA,
+                        Category.JUEGOS_DE_MESA,
+                        Category.MUSICA,
+                        Category.OCIO,
+                        Category.VIDEOJUEGOS,
+                        Category.OTROS
+                );
+                cmbCategory.setItems(comboItems);
+                cmbCategory.getSelectionModel().selectFirst();
                 tfPrice.setText("");
                 tfMinParticipants.setText("");
                 tfMaxParticipants.setText("");
