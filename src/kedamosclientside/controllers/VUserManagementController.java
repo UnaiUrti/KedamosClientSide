@@ -215,7 +215,7 @@ public class VUserManagementController {
     private void handleTableSelectionChanged(ObservableValue observable,
             Object oldValue,
             Object newValue) {
-
+        clearAllLabels();
         if (newValue != null) {
             txtPassword.clear();
             EventManager eventManager = (EventManager) newValue;

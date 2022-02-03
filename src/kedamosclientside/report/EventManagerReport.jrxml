@@ -17,7 +17,7 @@
 			<staticText>
 				<reportElement x="100" y="13" width="372" height="51" uuid="3bbfbfda-a1bd-469e-8418-aa8148cac8f3"/>
 				<textElement textAlignment="Center">
-					<font size="36"/>
+					<font fontName="DejaVu Serif" size="36" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Event Manager Report]]></text>
 			</staticText>
@@ -36,42 +36,42 @@
 			<staticText>
 				<reportElement x="0" y="21" width="100" height="20" uuid="e2cd087b-32e0-4889-97bd-7fb1882dc891"/>
 				<textElement textAlignment="Center">
-					<font size="12" isUnderline="true"/>
+					<font size="12" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Username]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="100" y="21" width="100" height="20" uuid="497bb267-cdc9-4d83-9ab5-192458c8aec8"/>
 				<textElement textAlignment="Center">
-					<font size="12" isUnderline="true"/>
+					<font size="12" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Full Name]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="200" y="21" width="95" height="20" uuid="37315400-90f0-4753-bdbf-c8eac35e3b4f"/>
 				<textElement textAlignment="Center">
-					<font size="12" isUnderline="true"/>
+					<font size="12" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Email]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="300" y="21" width="83" height="40" uuid="42482190-cec3-4cb7-9914-2686eefdf978"/>
 				<textElement textAlignment="Center">
-					<font size="12" isUnderline="true"/>
+					<font size="12" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[LastPasswordChange]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="395" y="21" width="70" height="40" uuid="ed710413-6f4f-4a0b-b47a-14da02eb39be"/>
 				<textElement textAlignment="Center">
-					<font size="12" isUnderline="true"/>
+					<font size="12" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Status]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="465" y="21" width="90" height="40" uuid="fdcc0bfa-cc2a-4988-a407-878d52865a7a"/>
 				<textElement textAlignment="Center">
-					<font size="12" isUnderline="true"/>
+					<font size="12" isBold="true" isUnderline="true"/>
 				</textElement>
 				<text><![CDATA[Manager Category]]></text>
 			</staticText>
@@ -129,8 +129,13 @@
 	<pageFooter>
 		<band height="54" splitType="Stretch">
 			<textField>
-				<reportElement x="529" y="34" width="26" height="20" uuid="c7df1b6b-ed37-41b9-8cc9-4bed59054e0b"/>
-				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+				<reportElement x="435" y="34" width="80" height="20" uuid="22314267-9b60-424d-989c-5f654d12fddb"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="515" y="34" width="40" height="20" uuid="74bcb32d-bc80-4cc7-82ca-4b7509d50642"/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
