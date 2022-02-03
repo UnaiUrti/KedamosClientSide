@@ -150,30 +150,6 @@ public class VSignInController {
 
         if (informedFields()) {
             try {
-                // Puerta trasera del login para ir a la ventana principal del cliente
-                if (txtUsername.getText().equals("backdoor") & txtPassword.getText().equals("abcd*1234")) {
-                    FXMLLoader loader;
-                    Parent root;
-                    stage.close();
-                    loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VMainMenu.fxml"));
-                    root = loader.load();
-                    Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del cliente");
-                    VMainMenuController MainMenu = ((VMainMenuController) loader.getController());
-                    MainMenu.setStage(stage);
-                    MainMenu.initStage(root);
-                }
-                // Puerta trasera del login para ir a la ventana admin
-                if (txtUsername.getText().equals("backdoor") & txtPassword.getText().equals("admin")) {
-                    FXMLLoader loader;
-                    Parent root;
-                    stage.close();
-                    loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VUserManagement.fxml"));
-                    root = loader.load();
-                    Logger.getLogger(VSignInController.class.getName()).info("Ventana Principal del administrador");
-                    VUserManagementController UserManagement = ((VUserManagementController) loader.getController());
-                    UserManagement.setStage(stage);
-                    UserManagement.initStage(root);
-                }
                 FXMLLoader loader;
                 Parent root;
                 // Vamos a comprobar que tipo de usuario se va a logear
