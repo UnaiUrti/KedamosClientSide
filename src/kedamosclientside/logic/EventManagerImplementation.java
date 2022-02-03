@@ -1,7 +1,9 @@
 package kedamosclientside.logic;
 
+import java.net.ConnectException;
 import java.util.Collection;
 import java.util.Set;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.core.GenericType;
 import kedamosclientside.entities.EventManager;
 import kedamosclientside.exceptions.ServerDown;
@@ -33,7 +35,11 @@ public class EventManagerImplementation implements EventManagerInterface {
      */
     @Override
     public void createEventManager(EventManager eventManager) throws ServerDown {
-        webClient.create(eventManager);
+        try {
+            webClient.create(eventManager);
+        } catch (Exception e) {
+            throw new ServerDown("Server down");
+        }
     }
 
     /**
@@ -44,7 +50,11 @@ public class EventManagerImplementation implements EventManagerInterface {
      */
     @Override
     public void editEventManager(EventManager eventManager) throws ServerDown {
-        webClient.edit(eventManager, eventManager.getUser_id());
+        try {
+            webClient.edit(eventManager, eventManager.getUser_id());
+        } catch (Exception e) {
+            throw new ServerDown("Server down");
+        }
     }
 
     /**
@@ -55,7 +65,11 @@ public class EventManagerImplementation implements EventManagerInterface {
      */
     @Override
     public void removeEventManager(EventManager eventManager) throws ServerDown {
-        webClient.remove(eventManager.getUser_id());
+        try {
+            webClient.remove(eventManager.getUser_id());
+        } catch (Exception e) {
+            throw new ServerDown("Server down");
+        }
     }
 
     /**
@@ -68,9 +82,14 @@ public class EventManagerImplementation implements EventManagerInterface {
     @Override
     public EventManager findEventManager(EventManager eventManager) throws ServerDown {
         EventManager eventManagerBean;
-        eventManagerBean = webClient.find(new GenericType<EventManager>() {
-        }, eventManager.getUser_id());
+        try {
+            eventManagerBean = webClient.find(new GenericType<EventManager>() {
+            }, eventManager.getUser_id());
+        } catch (Exception e) {
+            throw new ServerDown("Server down");
+        }
         return eventManagerBean;
+
     }
 
     /**
@@ -82,8 +101,12 @@ public class EventManagerImplementation implements EventManagerInterface {
     @Override
     public Collection<EventManager> findAll() throws ServerDown {
         Set<EventManager> eventManagers;
-        eventManagers = webClient.findAll(new GenericType<Set<EventManager>>() {
-        });
+        try {
+            eventManagers = webClient.findAll(new GenericType<Set<EventManager>>() {
+            });
+        } catch (Exception e) {
+            throw new ServerDown("Server down");
+        }
         return eventManagers;
     }
 
@@ -98,9 +121,15 @@ public class EventManagerImplementation implements EventManagerInterface {
     @Override
     public EventManager getEventManagerByUsername(EventManager eventManager) throws UsernameDoesNotExist, ServerDown {
         EventManager eventManagerBean;
-        eventManagerBean = webClient.getEventManagerByUsername(new GenericType<EventManager>() {
-        }, eventManager.getUsername());
+        try {
+            eventManagerBean = webClient.getEventManagerByUsername(new GenericType<EventManager>() {
+            }, eventManager.getUsername());
+
+        } catch (NotFoundException e) {
+            throw new UsernameDoesNotExist("User not Exist");
+        } catch (Exception e) {
+            throw new ServerDown("Server down");
+        }
         return eventManagerBean;
     }
-
 }

@@ -1,5 +1,6 @@
 package kedamosclientside.controllers;
 
+import java.io.IOException;
 import java.net.ConnectException;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -15,6 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -79,7 +82,7 @@ public class VPersonalResourceController {
     private PersonalResource p;
     private Event ev;
     private ObservableList<PersonalResource> data;
-    private PersonalResourceInterface personalIface = new PersonalResourceImplementation();
+    private PersonalResourceInterface personalIface = PersonalResourceManager.getImplementation();
 
     /**
      *
@@ -104,97 +107,101 @@ public class VPersonalResourceController {
      * @param id
      */
     public void initStage(Parent root, Event id) {
-        try {
-            logger.info("Iniciado initStage de la ventana PersonalResource");
-            Scene scene = new Scene(root);
-            this.ev = id;
-            stage.setTitle("PersonalResource");
-            logger.info("Caracteristicas del init resizeable false botones deshabilitados etc");
-            stage.setResizable(false);
-            modifyBtn.setDisable(true);
-            deleteBtn.setDisable(true);
-            createbtn.setDisable(true);
-            logger.info("Asignar tipos a las columnas de las tablas");
-            typecolum.setCellValueFactory(
-                    new PropertyValueFactory<>("type"));
-            quantitycolum.setCellValueFactory(
-                    new PropertyValueFactory<>("quantity"));
-            pricecolum.setCellValueFactory(
-                    new PropertyValueFactory<>("price"));
-            expiredcolum.setCellValueFactory(
-                    new PropertyValueFactory<>("dateExpired"));
-            hiredcolum.setCellValueFactory(
-                    new PropertyValueFactory<>("dateHired"));
-            logger.info("Llamada al metodo de cargar la tabla");
-            tableLoad(id.getEvent_id());
 
-            logger.info("Alineamos campos numericos a la derecha");
-            quantitycolum.setStyle("-fx-alignment: CENTER-RIGHT;");
-            pricecolum.setStyle("-fx-alignment: CENTER-RIGHT;");
-            logger.info("Asignamos valores a la combo");
-            typeCombo.getItems().addAll(Type.values());
-            //Metodo de selecion de la fila
-            table.getSelectionModel().selectedItemProperty()
-                    .addListener((observable, oldValue, newValue) -> {
-                        logger.info("metodo de seleccion de fila");
-                        if (newValue != null) {
-                            //Si seleciona ponemos los valores de la fila arriba y habilitamos botones
-                            PersonalResource per = (PersonalResource) newValue;
-                            this.p = per;
-                            this.pid = per.getPersonalresource_id();
-                            LocalDate datehired = per.getDateHired().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-                            LocalDate dateexpired = per.getDateExpired().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        logger.info("Iniciado initStage de la ventana PersonalResource");
+        Scene scene = new Scene(root);
+        this.ev = id;
+        stage.setTitle("PersonalResource");
+        logger.info("Caracteristicas del init resizeable false botones deshabilitados etc");
+        stage.setResizable(false);
+        modifyBtn.setDisable(true);
+        deleteBtn.setDisable(true);
+        createbtn.setDisable(true);
+        logger.info("Asignar tipos a las columnas de las tablas");
+        typecolum.setCellValueFactory(
+                new PropertyValueFactory<>("type"));
+        quantitycolum.setCellValueFactory(
+                new PropertyValueFactory<>("quantity"));
+        pricecolum.setCellValueFactory(
+                new PropertyValueFactory<>("price"));
+        expiredcolum.setCellValueFactory(
+                new PropertyValueFactory<>("dateExpired"));
+        hiredcolum.setCellValueFactory(
+                new PropertyValueFactory<>("dateHired"));
+        logger.info("Llamada al metodo de cargar la tabla");
+        tableLoad(id.getEvent_id());
 
-                            hiredDate.setValue(datehired);
+        logger.info("Alineamos campos numericos a la derecha");
+        quantitycolum.setStyle("-fx-alignment: CENTER-RIGHT;");
+        pricecolum.setStyle("-fx-alignment: CENTER-RIGHT;");
+        logger.info("Asignamos valores a la combo");
+        typeCombo.getItems().addAll(Type.values());
+        //Metodo de selecion de la fila
+        table.getSelectionModel().selectedItemProperty()
+                .addListener((observable, oldValue, newValue) -> {
+                    logger.info("metodo de seleccion de fila");
+                    if (newValue != null) {
+                        //Si seleciona ponemos los valores de la fila arriba y habilitamos botones
+                        PersonalResource per = (PersonalResource) newValue;
+                        this.p = per;
+                        this.pid = per.getPersonalresource_id();
+                        LocalDate datehired = per.getDateHired().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                        LocalDate dateexpired = per.getDateExpired().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-                            expiredDate.setValue(dateexpired);
+                        hiredDate.setValue(datehired);
 
-                            priceText.setText(per.getPrice().toString());
-                            quantityText.setText(per.getQuantity().toString());
-                            typeCombo.getSelectionModel().select(per.getType());
-                            deleteBtn.setDisable(false);
-                            modifyBtn.setDisable(false);
+                        expiredDate.setValue(dateexpired);
 
-                        } else {
-                            //Si deselecciona desabilitamos botones y limpiamos campos
-                            clearFields();
-                            deleteBtn.setDisable(true);
-                            modifyBtn.setDisable(true);
-                        }
-                    });
+                        priceText.setText(per.getPrice().toString());
+                        quantityText.setText(per.getQuantity().toString());
+                        typeCombo.getSelectionModel().select(per.getType());
+                        deleteBtn.setDisable(false);
+                        modifyBtn.setDisable(false);
 
-            backBtn.setOnAction(action -> {
+                    } else {
+                        //Si deselecciona desabilitamos botones y limpiamos campos
+                        clearFields();
+                        deleteBtn.setDisable(true);
+                        modifyBtn.setDisable(true);
+                    }
+                });
+
+        backBtn.setOnAction(action -> {
+            try {
                 logger.info("metodo boton back volver a event");
+
                 //Abrir la ventana de eventos
-                /*
-         FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/VEvent.fxml"));
-                    Parent root = loader.load();                             
-                    VEventController controller = ((VEventController) loader.getController());
-          
-                    controller.setStage( (Stage)hbMenuAdm.getScene().getWindow(););
-                    controller.initStage(root);*/
-                logger.info("Button back pressed");
+                stage.close();
+                FXMLLoader loader;
+                loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/MyEventsView.fxml"));
 
-            });
-            logger.info("Asignar acciones");
-            stage.setOnCloseRequest(this::handleCloseRequest);
-            deleteBtn.setOnAction(this::handleDeleteRequest);
-            quantityText.textProperty().addListener(this::handleNumericType);
-            priceText.textProperty().addListener(this::handleDecimalType);
-            modifyBtn.setOnAction(this::handleModifyRequest);
-            createbtn.setOnAction(this::handleCreateRequest);
-            printBtn.setOnAction(this::handlePrintRequest);
-            //Comprobacion de que los campos esten rellenos para habilitar botones
-            informedFields();
+                Parent roota = (Parent) loader.load();
 
-            stage.setScene(scene);
-            logger.info("Mostramos la ventana");
-            stage.show();
-        } catch (ConnectException ex) {
-            logger.severe("Error al cargar la tabla");
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setContentText("The window cant be open please check the server");
-        }
+                MyEventsViewController controller = ((MyEventsViewController) loader.getController());
+                // controller.setEventinterface(EventFactory.getEvent());
+                controller.setStage(new Stage());
+                controller.initStage(roota);
+            } catch (IOException ex) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setContentText("Error al volver a la ventana de eventos");
+                alert.showAndWait();
+            }
+
+        });
+        logger.info("Asignar acciones");
+        stage.setOnCloseRequest(this::handleCloseRequest);
+        deleteBtn.setOnAction(this::handleDeleteRequest);
+        quantityText.textProperty().addListener(this::handleNumericType);
+        priceText.textProperty().addListener(this::handleDecimalType);
+        modifyBtn.setOnAction(this::handleModifyRequest);
+        createbtn.setOnAction(this::handleCreateRequest);
+        printBtn.setOnAction(this::handlePrintRequest);
+        //Comprobacion de que los campos esten rellenos para habilitar botones
+        informedFields();
+
+        stage.setScene(scene);
+        logger.info("Mostramos la ventana");
+        stage.show();
     }
 
     /**
@@ -206,12 +213,13 @@ public class VPersonalResourceController {
     private void handlePrintRequest(ActionEvent action) {
         logger.info("Metodo report");
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/views/PersonalResourceReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/PersonalResourceReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<PersonalResource>) this.table.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
-            JasperViewer jasperViewer = new JasperViewer(jasperPrint);
+            JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
+            
         } catch (JRException ex) {
             logger.severe("Error al abrir el report");
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -253,12 +261,19 @@ public class VPersonalResourceController {
      * @param id
      * @throws ConnectException
      */
-    public void tableLoad(Long id) throws ConnectException {
+    public void tableLoad(Long id) {
 
-        logger.info("Iniciado metodo cargar tabla");
-        data = FXCollections.observableArrayList(personalIface.getPersonalByEvent(id));
+        try {
+            logger.info("Iniciado metodo cargar tabla");
+            data = FXCollections.observableArrayList(personalIface.getPersonalByEvent(id));
 
-        table.setItems(data);
+            table.setItems(data);
+        } catch (ConnectException ex) {
+            logger.severe("Error de conexion con el servidor");
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setContentText("Server error wait a few minutes");
+            alert.showAndWait();
+        }
 
     }
 

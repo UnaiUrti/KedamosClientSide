@@ -6,6 +6,7 @@
 package kedamosclientside.controllers;
 
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,6 +41,8 @@ public class MenuController {
     private MenuItem miHome;
 
     private Stage stage;
+    @FXML
+    private MenuItem miViewEvents;
 
     public Stage getStage() {
         return stage;
@@ -48,6 +51,7 @@ public class MenuController {
     public void setStage(Stage stage) {
         this.stage = stage;
     }
+
     /*
     public void initStage(Parent root) {
 
@@ -62,8 +66,8 @@ public class MenuController {
         stage.show();
 
     }
-    */
-    
+     */
+
     @FXML
     private void handleMyProfile(ActionEvent event) {
 
@@ -105,6 +109,22 @@ public class MenuController {
             controller.initStage(root);
         } catch (IOException ex) {
             //logger.severe("Se ha producido un error al cargarel fxml de la ventana singIn");
+        }
+
+    }
+
+    @FXML
+    private void handleViewEvents(ActionEvent event) {
+
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/kedamosclientside/views/MyEventsView.fxml"));
+            Parent root = loader.load();
+            Logger.getLogger(VSignInController.class.getName()).info("");
+            MyEventsViewController controller = ((MyEventsViewController) loader.getController());
+            controller.setStage((Stage) hbMenu.getScene().getWindow());
+            controller.initStage(root);
+        } catch (IOException ex) {
+            Logger.getLogger(MenuController.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }

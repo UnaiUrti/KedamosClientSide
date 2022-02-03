@@ -10,8 +10,8 @@ package kedamosclientside.logic;
  * @author Irkus de la Fuente
  */
 public class PersonalResourceManager {
-    public PersonalResourceInterface getImplementation(){
-       PersonalResourceInterface per= new PersonalResourceImplementation();
+    public static PersonalResourceInterface getImplementation(){
+        PersonalResourceInterface per= new PersonalResourceImplementation();
         return per;
     }
 }

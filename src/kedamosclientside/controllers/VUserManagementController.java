@@ -355,20 +355,26 @@ public class VUserManagementController {
     @FXML
     private void handleRemoveEventManger(ActionEvent event) {
         logger.info("Iniciado el evento para eliminar un manejador de evento");
-        try {
-            emi.removeEventManager(tlView.getSelectionModel()
-                    .getSelectedItem());
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setHeaderText("The account has been deleted successfully");
-            alert.show();
-            loadTableWithData();
-        } catch (ServerDown ex) {
-            logger.severe("Error el servidor esta caido o apagado");
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setHeaderText(ex.getMessage());
-            alert.show();
-        }
 
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Event");
+        alert.setContentText("Seguro que quieres eliminar el Evento?");
+        Optional<ButtonType> resp = alert.showAndWait();
+        if (resp.get() == ButtonType.OK) {
+            try {
+                emi.removeEventManager(tlView.getSelectionModel()
+                        .getSelectedItem());
+                Alert alert2 = new Alert(Alert.AlertType.INFORMATION);
+                alert2.setHeaderText("The account has been deleted successfully");
+                alert2.show();
+                loadTableWithData();
+            } catch (ServerDown ex) {
+                logger.severe("Error el servidor esta caido o apagado");
+                Alert alert2 = new Alert(Alert.AlertType.ERROR);
+                alert2.setHeaderText(ex.getMessage());
+                alert2.show();
+            }
+        }
     }
 
     /**
@@ -396,6 +402,8 @@ public class VUserManagementController {
         txtFullName.setStyle(null);
         txtPassword.setStyle(null);
         txtUsername.setStyle(null);
+        cbManagerCategory.setStyle(null);
+        cbStatus.setStyle(null);
         dpLastPasswordChange.setStyle(null);
 
         lblUsername.setVisible(false);
@@ -672,12 +680,13 @@ public class VUserManagementController {
     @FXML
     private void handleEventManagerReport(ActionEvent event) {
         try {
-            JasperReport report = JasperCompileManager.compileReport("src/kedamosclientside/views/EventManagerReport.jrxml");
+            JasperReport report = JasperCompileManager.compileReport(getClass().getResourceAsStream("/kedamosclientside/report/EventManagerReport.jrxml"));
             JRBeanCollectionDataSource dataItems = new JRBeanCollectionDataSource((Collection<EventManager>) this.tlView.getItems());
             Map<String, Object> parameters = new HashMap<>();
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, parameters, dataItems);
             JasperViewer jasperViewer = new JasperViewer(jasperPrint, false);
             jasperViewer.setVisible(true);
+            
         } catch (JRException ex) {
             logger.severe("Se ha producido un error al cargar el informe");
         }
