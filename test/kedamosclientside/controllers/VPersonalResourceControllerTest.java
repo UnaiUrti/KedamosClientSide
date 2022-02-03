@@ -26,7 +26,9 @@ import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.runners.MethodSorters;
 import static org.testfx.api.FxAssert.verifyThat;
 import org.testfx.api.FxToolkit;
@@ -61,22 +63,49 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * @throws TimeoutException
      * @throws UnavailableServiceException
      */
-    public VPersonalResourceControllerTest() throws TimeoutException, UnavailableServiceException {
+    @BeforeClass
+    public static void setUpClass() throws TimeoutException {
         FxToolkit.registerPrimaryStage();
         FxToolkit.setupApplication(KedamosApp.class);
 
-        typeCombo = lookup("#typeCombo").queryComboBox();
-        dateHired = lookup("#hiredDate").query();
-        dateExpired = lookup("#expiredDate").query();
-        table = lookup("#table").query();
+    }
 
+    @Test
+    public void testA_navigattion() {
+        clickOn("#txtUsername");
+        write("alex");
+        clickOn("#txtPassword");
+        write("abcd*1234");
+        clickOn("#btnSignIn");
+
+        sleep(1000);
+
+        clickOn("Events");
+        sleep(500);
+        clickOn("#miViewEvents");
+
+        sleep(1000);
+
+        assertNotEquals("FAIL - Table has no data to click on",
+                lookup("#tvTable").queryTableView().getItems().size(), 0);
+        Node row = lookup(".table-row-cell").nth(0).query();
+        assertNotNull("FAIL - Table has not that row. ", row);
+        clickOn(row);
+
+        clickOn("#btnAddPersonal");
+
+        sleep(1000);
     }
 
     /**
      * Comprobamos el estado incial de la ventana
      */
     @Test
-    public void testA_initialStatus() {
+    public void testB_initialStatus() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
 
         verifyThat("#createbtn", isDisabled());
         verifyThat("#modifyBtn", isDisabled());
@@ -93,7 +122,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos que los campos esten vacios y vaciamos la tabla si hay filas
      */
     @Test
-    public void testB_informedFields() {
+    public void testC_informedFields() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         int rowCount = table.getItems().size();
         for (int i = 0; i < rowCount; i++) {
             Node row = lookup(".table-row-cell").nth(0).query();
@@ -143,7 +176,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos error de price y quantity incorrectos en el create
      */
     @Test
-    public void testC_IncorrectFormatCreate() {
+    public void testD_IncorrectFormatCreate() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         //formato de price incorrecto
         int rowCount = table.getItems().size();
         clickOn("#quantityText");
@@ -181,7 +218,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos error dateHired>dateExpired en el create
      */
     @Test
-    public void testD_dateHiredMayorCreate() {
+    public void testE_dateHiredMayorCreate() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         int rowCount = table.getItems().size();
         clearFields();
         clickOn("#quantityText");
@@ -210,9 +251,14 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos que crea correctamente
      */
     @Test
-    public void testE_createCorrect() {
+    public void testF_createCorrect() {
 
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         clearFields();
+
         int rowCount = table.getItems().size();
         clickOn("#quantityText");
         write("1");
@@ -236,7 +282,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comrpbamos error tipo duplicado en el create
      */
     @Test
-    public void testF_createduplicate() {
+    public void testG_createduplicate() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         clearFields();
         int rowCount = table.getItems().size();
         clickOn("#quantityText");
@@ -244,6 +294,9 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
         clickOn("#priceText");
         write("13.2");
         clickOn("#typeCombo");
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
         press(KeyCode.DOWN).release(KeyCode.DOWN);
         press(KeyCode.ENTER).release(KeyCode.ENTER);
         String type = typeCombo.getValue().toString();
@@ -262,7 +315,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos que no borra cuando cancelas el delete
      */
     @Test
-    public void testG_deleteCancel() {
+    public void testH_deleteCancel() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         int rowCount = table.getItems().size();
         assertNotEquals("Table has no data: Cannot test.",
                 rowCount, 0);
@@ -282,7 +339,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos que borra cuando aceptas el delete
      */
     @Test
-    public void testH_deleteCorrect() {
+    public void testI_deleteCorrect() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         int rowCount = table.getItems().size();
         assertNotEquals("Table has no data: Cannot test.",
                 rowCount, 0);
@@ -304,7 +365,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos el error de tipo duplicado en el modificar
      */
     @Test
-    public void testI_modifyduplicated() {
+    public void testJ_modifyduplicated() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         clickOn("#quantityText");
         write("1");
         clickOn("#priceText");
@@ -353,7 +418,11 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos error quantity y price en el modificar
      */
     @Test
-    public void testJ_IncorrectFormatModify() {
+    public void testK_IncorrectFormatModify() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         int rowCount = table.getItems().size();
         PersonalResource selectedPersonal;
         Node row;
@@ -393,16 +462,24 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      * Comprobamos error dateHired>dateExpired en el modifcar
      */
     @Test
-    public void testK_modifyDateIncorrect() {
+    public void testL_modifyDateIncorrect() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
         int rowCount = table.getItems().size();
         PersonalResource selectedPersonal;
         Node row;
         assertNotEquals("Table has no data: Cannot test.",
                 rowCount, 0);
+
         //clickamos la primera fila si la hay
         row = lookup(".table-row-cell").nth(0).query();
         assertNotNull("Row is null: table has not that row. ", row);
         clickOn(row);
+        clickOn("#quantityText");
+        push(KeyCode.CONTROL, KeyCode.A);
+        write("5");
         selectedPersonal = (PersonalResource) table.getSelectionModel()
                 .getSelectedItem();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -422,6 +499,94 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
      */
     @Test
     public void testM_modifyCorrect() {
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
+        table = lookup("#table").query();
+        int rowCount = table.getItems().size();
+        PersonalResource selectedPersonal;
+        Node row;
+        assertNotEquals("Table has no data: Cannot test.",
+                rowCount, 0);
+        //clickar la primera fila si la hay
+        row = lookup(".table-row-cell").nth(0).query();
+        assertNotNull("Row is null: table has not that row. ", row);
+        clickOn(row);
+        selectedPersonal = (PersonalResource) table.getSelectionModel()
+                .getSelectedItem();
+        clickOn("#priceText");
+        push(KeyCode.CONTROL, KeyCode.A);
+        write("1.2");
+        clickOn("#quantityText");
+        push(KeyCode.CONTROL, KeyCode.A);
+        write("5");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        dateExpired.setValue(LocalDate.parse("2001-01-01", formatter));
+        dateHired.setValue(LocalDate.parse("2000-01-01", formatter));
+        clickOn("#typeCombo");
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        clickOn("#modifyBtn");
+
+        assertNotEquals("The user has not been modified!!!",
+                selectedPersonal, (PersonalResource) table.getSelectionModel().getSelectedItem());
+        clickOn(row);
+        clickOn("#deleteBtn");
+        clickOn(isDefaultButton());
+        clickOn(row);
+        clickOn("#deleteBtn");
+        clickOn(isDefaultButton());
+    }
+
+    /**
+     * Este metodo comprueba el delete sin el servidor solo funciona si el
+     * servidor no esta iniciado y con un main que cargue directamente esta
+     * ventana debido a la navegacion por ello esta ignorado
+     */
+    @Ignore
+    @Test
+    public void testN_createConect() {
+        clearFields();
+        int rowCount = table.getItems().size();
+        clickOn("#quantityText");
+        write("1");
+        clickOn("#priceText");
+        write("13.2");
+        clickOn("#typeCombo");
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        press(KeyCode.ENTER).release(KeyCode.ENTER);
+        String type = typeCombo.getValue().toString();
+        clickOn("#hiderDate");
+        press(KeyCode.F4).release(KeyCode.F4);
+        press(KeyCode.UP).release(KeyCode.UP);
+
+        clickOn("#expiredDate");
+        press(KeyCode.F4).release(KeyCode.F4);
+        press(KeyCode.DOWN).release(KeyCode.DOWN);
+        clickOn("#createbtn");
+        verifyThat("Server error wait a few minutes", isVisible());
+        clickOn("Aceptar");
+
+        List<PersonalResource> users = table.getItems();
+        assertEquals("The user has  been added!!!",
+                users.stream().filter(u -> u.getType().toString().equals(type)).count(), 0);
+    }
+
+    /**
+     * Este metodo comprueba el delete sin el servidor solo funciona si el
+     * servidor no esta iniciado y con un main que cargue directamente esta
+     * ventana debido a la navegacion por ello esta ignorado
+     */
+    @Ignore
+    @Test
+    public void testO_modifyConnect() {
         int rowCount = table.getItems().size();
         PersonalResource selectedPersonal;
         Node row;
@@ -440,8 +605,9 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
         push(KeyCode.CONTROL, KeyCode.A);
         write("5");
         clickOn("#modifyBtn");
-
-        assertNotEquals("The user has been modified!!!",
+        verifyThat("Server error wait a few minutes", isVisible());
+        clickOn("Aceptar");
+        assertEquals("The user has not been modified!!!",
                 selectedPersonal, (PersonalResource) table.getSelectionModel().getSelectedItem());
         clickOn(row);
         clickOn("#deleteBtn");
@@ -449,16 +615,47 @@ public class VPersonalResourceControllerTest extends ApplicationTest {
         clickOn(row);
         clickOn("#deleteBtn");
         clickOn(isDefaultButton());
+
+    }
+
+    /**
+     * Este metodo comprueba el delete sin el servidor solo funciona si el
+     * servidor no esta iniciado y con un main que cargue directamente esta
+     * ventana debido a la navegacion por ello esta ignorado
+     */
+    @Ignore
+    @Test
+    public void testP_deleteConnect() {
+        int rowCount = table.getItems().size();
+        assertNotEquals("Table has no data: Cannot test.",
+                rowCount, 0);
+        //Clickamos la primera fila si la hay
+        Node row = lookup(".table-row-cell").nth(0).query();
+        assertNotNull("Row is null: table has not that row. ", row);
+        clickOn(row);
+        verifyThat("#deleteBtn", isEnabled());
+        clickOn("#deleteBtn");
+        verifyThat("Do you really want to delete this personal?",
+                isVisible());
+        clickOn(isDefaultButton());
+        verifyThat("Server error wait a few minutes", isVisible());
+        clickOn("Aceptar");
+        assertEquals("The row has  been deleted!!!",
+                rowCount, table.getItems().size());
+
     }
 
     private void clearFields() {
-
+        typeCombo = lookup("#typeCombo").queryComboBox();
+        dateHired = lookup("#hiredDate").query();
+        dateExpired = lookup("#expiredDate").query();
         clickOn("#quantityText");
         push(KeyCode.CONTROL, KeyCode.A);
         eraseText(1);
         clickOn("#priceText");
         push(KeyCode.CONTROL, KeyCode.A);
         eraseText(1);
+
         dateHired.setValue(null);
         dateExpired.setValue(null);
 
